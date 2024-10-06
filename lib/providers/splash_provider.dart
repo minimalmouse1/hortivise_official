@@ -1,0 +1,3 @@
+// class SplashProvider extends ChangeNotifier{
+
+// }

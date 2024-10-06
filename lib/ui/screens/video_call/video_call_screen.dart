@@ -1,0 +1,417 @@
+import 'dart:async';
+import 'dart:math';
+
+import 'package:flutter/material.dart';
+import 'package:horti_vige/core/utils/helpers/preference_manager.dart';
+import 'package:horti_vige/data/models/consultation/consultation_model.dart';
+import 'package:horti_vige/data/models/user/user_model.dart';
+import 'package:horti_vige/data/services/video_service.dart';
+import 'package:horti_vige/ui/utils/extensions/extensions.dart';
+import 'package:stream_video_flutter/stream_video_flutter.dart';
+
+import 'package:horti_vige/data/services/token_service.dart';
+
+class VideoCallScreen extends StatefulWidget {
+  const VideoCallScreen({
+    super.key,
+    required this.consultationModel,
+  });
+  static String routeName = 'Landing';
+  final ConsultationModel consultationModel;
+
+  @override
+  State<VideoCallScreen> createState() => _VideoCallScreenState();
+}
+
+class _VideoCallScreenState extends State<VideoCallScreen> {
+  bool isMute = false;
+  bool isVideoOn = true;
+  late Call call;
+  bool isLoading = true;
+  late UserModel currentUser;
+  late UserModel otherUser;
+  int second = 0, minut = 0;
+  late Timer ticker;
+  @override
+  void initState() {
+    setState(() {
+      isLoading = true;
+    });
+    super.initState();
+    final currentUserId =
+        PreferenceManager.getInstance().getCurrentUser()?.id ?? '';
+    if (currentUserId == widget.consultationModel.customer.id) {
+      currentUser = widget.consultationModel.customer;
+      otherUser = widget.consultationModel.specialist;
+    } else {
+      otherUser = widget.consultationModel.customer;
+      currentUser = widget.consultationModel.specialist;
+    }
+    Future.delayed(Duration.zero, () async {
+      await VideoService.instance
+          .init(currentUser, widget.consultationModel.id);
+      await setTimer(widget.consultationModel);
+      setState(() {
+        isLoading = false;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        body: SizedBox(
+          width: context.width,
+          height: context.safeHeight,
+          // child: Stack(
+          //   children: [
+          //     receivingStreamWidget(),
+          //     sendingStreamWidget(),
+          //     streamingMenuWidget(),
+          //     timerWidget(),
+          //   ],
+          // ),
+          child: isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : StreamCallContainer(
+                  callContentBuilder: (context, call, callState) {
+                    return StreamCallContent(
+                      callAppBarBuilder: (context, call, callState) {
+                        return const PreferredSize(
+                          preferredSize:
+                              Size.fromHeight(0), // here the desired height
+                          child: SizedBox(),
+                        );
+                      },
+                      call: call,
+                      callState: callState,
+                      callControlsBuilder: (context, call, callState) {
+                        return const SizedBox();
+                        // return StreamCallControls(
+                        //   borderRadius: BorderRadius.zero,
+                        //   backgroundColor: Colors.transparent,
+                        //   options: [
+                        //     // Custom call option toggles the chat while on a call.
+                        //     CallControlOption(
+                        //         icon: const Icon(Icons.chat_outlined),
+                        //         onPressed: () {}),
+                        //     ToggleMicrophoneOption(
+                        //       call: call,
+                        //       localParticipant: localParticipant,
+                        //     ),
+                        //     ToggleCameraOption(
+                        //       call: call,
+                        //       localParticipant: localParticipant,
+                        //     ),
+                        //     LeaveCallOption(
+                        //       call: call,
+                        //       onLeaveCallTap: () => call.leave(),
+                        //     ),
+                        //   ],
+                        // );
+                      },
+                      callParticipantsBuilder: (context, call, callState) {
+                        return Stack(
+                          children: [
+                            receivingStreamWidget(
+                              call,
+                              callState.otherParticipants.isNotEmpty
+                                  ? callState.otherParticipants.last
+                                  : callState.localParticipant!,
+                            ),
+                            if (callState.callParticipants.length != 1)
+                              sendingStreamWidget(
+                                context,
+                                call,
+                                callState.localParticipant!,
+                              ),
+                            streamingMenuWidget(
+                              context,
+                              call,
+                              callState.localParticipant!,
+                            ),
+                            streamTimerWidget(
+                              context,
+                              call,
+                              callState.localParticipant!,
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                    // return SizedBox(
+                    //   width: context.width,
+                    //   height: context.safeHeight,
+                    //   child: Stack(
+                    //     children: [
+                    //       receivingStreamWidget(),
+                    //       sendingStreamWidget(
+                    //         context,
+                    //         call,
+                    //         callState.localParticipant!,
+                    //       ),
+                    //       streamingMenuWidget(
+                    //         context,
+                    //         call,
+                    //         callState.localParticipant!,
+                    //       ),
+                    //       //   timerWidget(),
+                    //     ],
+                    //   ),
+                    // );
+                  },
+                  call: VideoService.instance.call,
+                ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> setTimer(ConsultationModel consultationModel) async {
+    // minut = 3;
+    minut = consultationModel.endTime.difference(DateTime.now()).inMinutes;
+    ticker = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      if (second == 0) {
+        setState(() {
+          minut--;
+          second = 60;
+        });
+      } else {
+        setState(() {
+          second--;
+        });
+      }
+      if (minut == 0 && second == 0) {
+        ticker.cancel();
+        await endCall();
+      }
+    });
+  }
+
+  Widget receivingStreamWidget(
+    Call call,
+    CallParticipantState localParticipantAction,
+  ) {
+    return Container(
+      child: StreamVideoRenderer(
+        placeholderBuilder: (context) {
+          final nameList = localParticipantAction.name.split(' ');
+          var txt = '';
+          for (final val in nameList) {
+            txt += val.characters.first;
+          }
+          return Center(
+            child: Container(
+              width: context.width * 0.2,
+              height: context.width * 0.2,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.green,
+                  width: 3,
+                ),
+                borderRadius: BorderRadius.circular(100),
+              ),
+              child: Center(
+                child: Text(
+                  txt,
+                  style: const TextStyle(
+                    color: Colors.green,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+        call: call,
+        participant: localParticipantAction,
+        videoTrackType: SfuTrackType.video,
+      ),
+    );
+  }
+
+  Widget streamTimerWidget(
+    BuildContext context,
+    Call call,
+    CallParticipantState localParticipantAction,
+  ) {
+    return Padding(
+      padding: EdgeInsets.only(
+        top: context.safeHeight * 0.07,
+      ),
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: Container(
+          width: context.width * 0.4,
+          height: context.width * 0.12,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(50),
+            color: Colors.white,
+          ),
+          child: Center(
+            child: Text(
+              '00:${minut > 10 ? minut : '0$minut'}:${second > 10 ? second : '0$second'}',
+              style: const TextStyle(
+                color: Color(0xff087750),
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget sendingStreamWidget(
+    BuildContext context,
+    Call call,
+    CallParticipantState localParticipantAction,
+  ) {
+    return Padding(
+      padding: EdgeInsets.only(
+        right: 20,
+        bottom: context.safeHeight * 0.15,
+      ),
+      child: Align(
+        alignment: Alignment.bottomRight,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(7),
+          child: Container(
+            width: context.width * 0.3,
+            height: context.width * 0.5,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(7),
+              color: const Color.fromARGB(255, 70, 69, 69),
+              // image: const DecorationImage(
+              //   image: AssetImage(
+              //     'assets/images/my.jpeg',
+              //   ),
+              //   fit: BoxFit.cover,
+              // ),
+            ),
+            child: StreamVideoRenderer(
+              placeholderBuilder: (context) {
+                final nameList = localParticipantAction.name.split(' ');
+                var txt = '';
+                for (final val in nameList) {
+                  txt += val.characters.first;
+                }
+                return Center(
+                  child: Container(
+                    width: context.width * 0.2,
+                    height: context.width * 0.2,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.green,
+                        width: 3,
+                      ),
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    child: Center(
+                      child: Text(
+                        txt,
+                        style: const TextStyle(
+                          color: Colors.green,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+              call: call,
+              participant: localParticipantAction,
+              videoTrackType: SfuTrackType.video,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget streamingMenuWidget(
+    BuildContext context,
+    Call call,
+    CallParticipantState localParticipantAction,
+  ) {
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: context.safeHeight * 0.05,
+      ),
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: SizedBox(
+          width: context.width * 0.7,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ToggleMicrophoneOption(
+                disabledMicrophoneIconColor: const Color(0xff087750),
+                enabledMicrophoneIconColor: const Color(0xff087750),
+                call: call,
+                localParticipant: localParticipantAction,
+              ),
+              ToggleCameraOption(
+                disabledCameraBackgroundColor: const Color(0xff087750),
+                enabledCameraBackgroundColor: const Color(0xff087750),
+                enabledCameraIconColor: Colors.white,
+                disabledCameraIconColor: Colors.white,
+                call: call,
+                localParticipant: localParticipantAction,
+              ),
+              CallControlOption(
+                disabledIconColor: const Color(0xff087750),
+                icon: const Icon(
+                  Icons.chat_outlined,
+                  color: Color(0xff087750),
+                ),
+                onPressed: () {},
+              ),
+              LeaveCallOption(
+                call: call,
+                onLeaveCallTap: () => call.leave(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> endCall() async {
+    await VideoService.instance.call.end();
+
+    Navigator.pop(context);
+  }
+
+  Future<void> initCall() async {
+    const apiKey = 's3qh79m4y2ct';
+    // const String _secrate =
+    //     'qkcj3ksd7tvwrr656hyqjtnfgnqpjvqg42w7bwtt6fafgjef8v4sp6v4rgvygzsj';
+    // const String _appId = '1307995';
+    final random = Random().nextInt(1000);
+    final userId = 'user_$random';
+    final userToken = await const TokenService().create(userId: userId);
+    final client = StreamVideo(
+      apiKey,
+      user: User.regular(userId: userId, name: 'Test User'),
+      userToken: userToken,
+      options: const StreamVideoOptions(
+        logPriority: Priority.info,
+      ),
+    );
+
+    call = client.makeCall(callType: StreamCallType(), id: '345');
+    await call.join();
+    // call.
+    setState(() {
+      isLoading = false;
+    });
+  }
+}

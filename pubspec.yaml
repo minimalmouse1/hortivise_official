@@ -1,0 +1,98 @@
+name: horti_vige
+description: HortiVige Flutter application.
+
+publish_to: 'none' 
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.6 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  cupertino_icons: ^1.0.2
+  flutter_staggered_grid_view: ^0.7.0
+  intl: ^0.19.0
+  super_tooltip: ^2.0.5
+  table_calendar: ^3.0.0
+  flutter_svg: ^2.0.10+1
+  firebase_core: ^2.15.1
+  firebase_auth: ^4.8.0
+  cloud_firestore: ^4.9.0
+  firebase_storage: ^11.2.6
+  provider: ^6.0.5
+  shared_preferences: ^2.2.0
+  image_picker: ^1.0.2
+  json_annotation: ^4.8.1
+  # For API Call
+  http: ^1.1.0
+
+  # Converting CSV data to List
+  csv: ^5.0.2
+  flutter_stripe: ^11.0.0
+  flutter_zoom_drawer: ^3.1.2
+  flutter_hidden_drawer: ^1.0.1
+  cached_network_image: ^3.3.1
+  timezone: ^0.9.2
+  flutter_timezone: ^1.0.8
+  equatable: ^2.0.5
+  fluttertoast: ^8.2.4
+  date_picker_timeline: ^1.2.5
+  collection: ^1.18.0
+  firebase_messaging: ^14.7.10
+  flutter_local_notifications: ^17.0.0
+  stream_video_flutter: ^0.3.4
+  stream_video_push_notification: ^0.3.4
+  stream_video: ^0.3.4
+  dart_jsonwebtoken: ^2.13.0
+  # agora_rtc_engine: ^6.3.0
+  permission_handler: ^11.3.1
+  cloud_functions: ^4.7.6
+  #firebase_app_check: ^0.2.2+7
+  url_launcher: ^6.3.0
+  app_links: ^6.1.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  
+  flutter_lints: ^3.0.1
+  build_runner: ^2.4.6
+  json_serializable: ^6.7.1
+  flutter_launcher_icons: ^0.13.1
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/Icon.png"
+
+flutter:
+  uses-material-design: true
+
+  fonts:
+    - family: AppIcons
+      fonts:
+        - asset: assets/fonts/AppIcons.ttf
+    - family: poppins_bold
+      fonts:
+        - asset: assets/fonts/poppins_bold.ttf
+    - family: poppins_medium
+      fonts:
+        - asset: assets/fonts/poppins_medium.ttf
+    - family: poppins_regular
+      fonts:
+        - asset: assets/fonts/poppins_regular.ttf
+  
+  assets:
+    - assets/images/
+    - assets/images/bottom_leafs.svg
+    - assets/images/ils_canceled.svg
+    - assets/images/ils_congrats.svg
+    - assets/images/ils_success.svg
+    - assets/images/ils_thankyou.svg
+    - assets/images/left_leafs.svg
+    - assets/images/right_leafs.svg
+    - assets/images/top_leafs.svg
+
