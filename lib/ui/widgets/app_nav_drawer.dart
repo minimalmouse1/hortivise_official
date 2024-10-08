@@ -55,7 +55,8 @@ class _ZoomDrawerScreenState extends State<ZoomDrawerScreen> {
     return ZoomDrawer(
       controller: ZoomDrawerController(),
       menuScreen: AppNavDrawer(
-        user: Provider.of<UserProvider>(context, listen: false).getCurrentUser(),
+        user:
+            Provider.of<UserProvider>(context, listen: false).getCurrentUser(),
         currentItem: currentItem,
         onSelectItem: (item) {
           setState(() {
@@ -84,7 +85,7 @@ class _ZoomDrawerScreenState extends State<ZoomDrawerScreen> {
 
   Widget _getScreen() {
     final currentUser = context.read<UserProvider>().getCurrentUser();
-    if (currentUser == null) return  LandingScreen();
+    if (currentUser == null) return LandingScreen();
 
     switch (currentItem) {
       case MenuItems.home:
@@ -143,11 +144,15 @@ class AppNavDrawer extends StatelessWidget {
       ),
       title: Text(
         user?.userName ?? 'N/A',
-        style: AppTextStyles.titleStyle.changeColor(AppColors.colorGreen).changeSize(18),
+        style: AppTextStyles.titleStyle
+            .changeColor(AppColors.colorGreen)
+            .changeSize(18),
       ),
       subtitle: Text(
         user?.email ?? 'example@gmail.com',
-        style: AppTextStyles.bodyStyle.changeColor(AppColors.colorGray).changeSize(11),
+        style: AppTextStyles.bodyStyle
+            .changeColor(AppColors.colorGray)
+            .changeSize(11),
       ),
       onTap: () => onSelectItem(MenuItems.profile),
     );
@@ -158,7 +163,7 @@ class AppNavDrawer extends StatelessWidget {
       padding: const EdgeInsets.only(left: 16),
       child: ListTile(
         selected: currentItem == item,
-        selectedTileColor: AppColors.appGreenMaterial,
+        selectedTileColor: AppColors.colorWhite,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         leading: Icon(item.icon),
         title: Text(item.title),
@@ -169,7 +174,8 @@ class AppNavDrawer extends StatelessWidget {
 
   Widget _buildChatTile(BuildContext context) {
     return ListTile(
-      onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => const Conversations())),
+      onTap: () => Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => const Conversations())),
       leading: const Icon(Icons.message),
       title: const Text('Chats', style: AppTextStyles.bodyStyleMedium),
     );

@@ -141,27 +141,34 @@ class _SelectDateTimePageState extends State<SelectDateTimePage> {
           Padding(
             padding: 12.horizontalPadding,
             child: Text(
-              'Select a Time',
+              availableTimes.isEmpty
+                  ? 'No slot available for this date'
+                  : 'Select a Time',
               style: AppTextStyles.titleStyle.changeSize(14),
             ),
           ),
           7.height,
-          AppHorizontalChoiceChips(
-            chips: availableTimes,
-            defaultSelection: const [],
-            onSelected: (index) {
-              final selectedTime = availableTimes[index];
-              final hour = int.parse(selectedTime.split(':')[0]);
-              final minutes = int.parse(selectedTime.split(':')[1]);
-              selectedHour = hour;
-              selectedMinute = minutes;
-            },
-            cornerRadius: 2,
-            selectedChipColor: AppColors.appGreenMaterial,
-            selectedLabelColor: AppColors.colorWhite,
-            unSelectedLabelColor: AppColors.colorGray,
-            horizontalPadding: 8,
-          ),
+          availableTimes.isEmpty
+              ? const SizedBox.shrink()
+              : AppHorizontalChoiceChips(
+                  chips: availableTimes,
+                  defaultSelection: const [],
+                  onSelected: (index) {
+                    final selectedTime = availableTimes[index];
+                    final hour = int.parse(selectedTime.split(':')[0]);
+                    final minutes = int.parse(selectedTime.split(':')[1]);
+                    selectedHour = hour;
+                    selectedMinute = minutes;
+                    debugPrint(
+                        'selected hour:$selectedHour and selectedMinute:$selectedMinute');
+                    debugPrint('availableTimes:$availableTimes');
+                  },
+                  cornerRadius: 2,
+                  selectedChipColor: AppColors.appGreenMaterial,
+                  selectedLabelColor: AppColors.colorWhite,
+                  unSelectedLabelColor: AppColors.colorGray,
+                  horizontalPadding: 8,
+                ),
           10.height,
           Padding(
             padding: 12.horizontalPadding,
@@ -232,22 +239,56 @@ class _SelectDateTimePageState extends State<SelectDateTimePage> {
     final fromHour = from.hour;
     final toHour = to.hour;
 
+    // Get the current date and time
+    final currentDateTime = DateTime.now();
+
+    // Check if the selected date is today
+    final isToday = selectedDay == currentDateTime.day &&
+        selectedMonth == currentDateTime.month;
+
     for (var i = fromHour; i <= toHour; i++) {
       final hour = i.toString().padLeft(2, '0');
 
       final fromMin = from.minute;
       final toMin = to.minute;
 
+      // Generate minutes for this hour
       final minutes = List.generate(
         toMin - fromMin + 1,
         (index) => '$hour:${(fromMin + index).toString().padLeft(2, '0')}',
       ).toList();
 
-      availableTimes.addAll(minutes);
+      // Add times to availableTimes if they are in the future
+      for (var time in minutes) {
+        final hour = int.parse(time.split(':')[0]);
+        final minute = int.parse(time.split(':')[1]);
+
+        final selectedDateTime = DateTime(
+          currentDateTime.year,
+          selectedMonth,
+          selectedDay,
+          hour,
+          minute,
+        );
+
+        // Add time if it is either not today, or it is today and in the future
+        if (!isToday || selectedDateTime.isAfter(currentDateTime)) {
+          availableTimes.add(time);
+        }
+      }
     }
 
-    selectedMinute = from.minute;
-    selectedHour = from.hour;
+    // Set default selected hour and minute to the first available time
+    if (availableTimes.isNotEmpty) {
+      final firstAvailableTime = availableTimes.first;
+      selectedHour = int.parse(firstAvailableTime.split(':')[0]);
+      selectedMinute = int.parse(firstAvailableTime.split(':')[1]);
+    } else {
+      selectedHour = from.hour;
+      selectedMinute = from.minute;
+    }
+
     setState(() {});
+    debugPrint('time:$availableTimes');
   }
 }

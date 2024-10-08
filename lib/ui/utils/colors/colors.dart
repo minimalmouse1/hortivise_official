@@ -17,6 +17,22 @@ class AppColors {
   static const Color colorRed = Color(0xFFF62D2D);
   static const inputBorderColor = Color(0xFFE1E1E1);
 
+  // changed color according to document
+  static MaterialColor appWhiteMaterial = MaterialColor(
+    0xFF087750,
+    <int, Color>{
+      50: colorGreen.withOpacity(0.050),
+      100: colorGreen.withOpacity(0.100),
+      200: colorGreen.withOpacity(.2),
+      300: colorGreen.withOpacity(.3),
+      400: colorGreen.withOpacity(.4),
+      500: colorGreen,
+      600: colorGreen.withOpacity(.6),
+      700: colorGreen.withOpacity(.7),
+      800: colorGreen.withOpacity(.8),
+      900: colorGreen.withOpacity(.9),
+    },
+  );
   static MaterialColor appGreenMaterial = MaterialColor(
     0xFF087750,
     <int, Color>{

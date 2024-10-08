@@ -72,9 +72,26 @@ class UserHomePage extends StatelessWidget {
             ],
           ),
           // TODO: Add actions
-          // actions: const [
-          //   HomeMenu(),
-          // ],
+          actions: [
+            IconButton(
+              onPressed: () {
+                // TODO: add navigation here
+              },
+              icon: const Icon(
+                Icons.calendar_month,
+                color: AppColors.colorGreen,
+              ),
+            ),
+            IconButton(
+              onPressed: () {
+                // todo: add navigation here
+              },
+              icon: const Icon(
+                Icons.search,
+                color: AppColors.colorGreen,
+              ),
+            )
+          ],
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(20),

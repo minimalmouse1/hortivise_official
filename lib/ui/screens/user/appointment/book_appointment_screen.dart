@@ -159,6 +159,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen>
                 print('tab 1 is selected');
                 _tabController.index = 1;
               });
+              debugPrint('_selectedDate$_selectedDate');
             },
           ),
           ConfirmBookingPage(
