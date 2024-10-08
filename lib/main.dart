@@ -17,7 +17,6 @@ import 'package:horti_vige/ui/screens/auth/become_consultant_screen.dart';
 import 'package:horti_vige/ui/screens/auth/change_password_screen.dart';
 import 'package:horti_vige/ui/screens/auth/login_screen.dart';
 import 'package:horti_vige/ui/screens/auth/signup_screen.dart';
-import 'package:horti_vige/ui/screens/auth/splash_screen.dart';
 import 'package:horti_vige/ui/screens/common/blog_detail_screen.dart';
 import 'package:horti_vige/ui/screens/common/conversation_screen.dart';
 import 'package:horti_vige/ui/screens/common/landing_screen.dart';

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:horti_vige/data/enums/user_type.dart';
+import 'package:horti_vige/ui/widgets/exit_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:horti_vige/data/models/user/user_model.dart';
@@ -115,21 +116,35 @@ class AppNavDrawer extends StatelessWidget {
   final Function(MenuItem) onSelectItem;
   final UserModel? user;
 
+ Future<bool> _onWillPop(BuildContext context) async {
+    // Show confirmation dialog when the user tries to exit
+    return (await showDialog(
+          context: context,
+          builder: (context) => const ExitBottomSheet()
+        
+        
+        )) ??
+        false; // Return false if dialog is dismissed
+  }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.colorBeige,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 60),
-          _buildUserInfo(),
-          const SizedBox(height: 20),
-          ...MenuItems.all.map((item) => _buildMenuItem(item)).toList(),
-          if (user?.specialist != null) _buildChatTile(context),
-          const Spacer(),
-          _buildFooter(context),
-        ],
+    return WillPopScope(
+      onWillPop: () => _onWillPop(context),
+      
+      child: Scaffold(
+        backgroundColor: AppColors.colorBeige,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 60),
+            _buildUserInfo(),
+            const SizedBox(height: 20),
+            ...MenuItems.all.map((item) => _buildMenuItem(item)).toList(),
+            if (user?.specialist != null) _buildChatTile(context),
+            const Spacer(),
+            _buildFooter(context),
+          ],
+        ),
       ),
     );
   }

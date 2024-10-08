@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:horti_vige/core/exceptions/app_exception.dart';
 import 'package:horti_vige/core/utils/app_consts.dart';
@@ -148,7 +147,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               floatHint: false,
               fieldHeight: 50,
               errorText: _passwordError,
-              isPassword: true,
+              isPasswordField: true,
               onUpdateInput: (value) {
                 _password = value;
                 setState(() {
@@ -162,7 +161,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               floatHint: false,
               fieldHeight: 50,
               errorText: _confirmPassError,
-              isPassword: true,
+              isPasswordField: true,
               onUpdateInput: (value) {
                 _confirmPassword = value;
                 setState(() {

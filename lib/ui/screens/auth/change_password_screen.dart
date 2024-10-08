@@ -82,7 +82,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             floatHint: false,
             fieldHeight: 50,
             errorText: _oldPasswordError,
-            isPassword: true,
+            isPasswordField: true,
             onUpdateInput: (value) {
               _oldPassword = value;
               setState(() {
@@ -97,7 +97,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             floatHint: false,
             fieldHeight: 50,
             errorText: _passwordError,
-            isPassword: true,
+            isPasswordField: true,
             onUpdateInput: (value) {
               _password = value;
               setState(() {
@@ -110,7 +110,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           AppTextInput(
             hint: 'Confirm Password ',
             floatHint: false,
-            isPassword: true,
+            isPasswordField: true,
             fieldHeight: 50,
             errorText: _confirmPasswordError,
             onUpdateInput: (value) {

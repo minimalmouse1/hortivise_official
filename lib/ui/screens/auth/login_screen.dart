@@ -10,203 +10,10 @@ import 'package:horti_vige/ui/utils/extensions/validation_helpers.dart';
 import 'package:horti_vige/ui/utils/styles/text_styles.dart';
 import 'package:horti_vige/ui/widgets/app_filled_button.dart';
 import 'package:horti_vige/ui/widgets/app_text_input.dart';
+import 'package:horti_vige/ui/widgets/exit_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 
-// class LoginScreen extends StatefulWidget {
-//   const LoginScreen({super.key});
-//   static String routeName = 'Login';
 
-//   @override
-//   State<LoginScreen> createState() => _LoginScreenState();
-// }
-
-// class _LoginScreenState extends State<LoginScreen> {
-//   var _email = '';
-//   var _password = '';
-//   String? _emailError;
-//   String? _passwordError;
-//   bool hidePass = false;
-//   late UserProvider _userProvider;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     _userProvider = Provider.of<UserProvider>(context, listen: false);
-
-//     return Scaffold(
-//       resizeToAvoidBottomInset: false,
-//       backgroundColor: AppColors.colorBeige,
-//       body: Stack(
-//         children: [
-//           Positioned(
-//             left: -220,
-//             top: -90,
-//             bottom: -50,
-//             child: SvgPicture.asset(
-//               Assets.assetsImagesLeftLeafs,
-//               fit: BoxFit.fill,
-//               color: AppColors.appGreenMaterial.withAlpha(150),
-//             ),
-//           ),
-//           Positioned(
-//             right: -220,
-//             top: -90,
-//             bottom: -50,
-//             child: SvgPicture.asset(
-//               Assets.assetsImagesRightLeafs,
-//               fit: BoxFit.fill,
-//               color: AppColors.appGreenMaterial.withAlpha(150),
-//             ),
-//           ),
-//           Positioned(
-//             left: 0,
-//             right: 0,
-//             top: 0,
-//             bottom: 0,
-//             child: SingleChildScrollView(
-//               child: Column(
-//                 children: [
-//                   150.height,
-//                   Padding(
-//                     padding: const EdgeInsets.all(12),
-//                     child: Align(
-//                       alignment: Alignment.centerLeft,
-//                       child: Text(
-//                         'Login',
-//                         style: AppTextStyles.titleStyle
-//                             .changeColor(AppColors.colorGreen)
-//                             .changeSize(28),
-//                       ),
-//                     ),
-//                   ),
-//                   20.height,
-//                   AppTextInput(
-//                     hint: 'Email',
-//                     floatHint: false,
-//                     fieldHeight: 50,
-//                     errorText: _emailError,
-//                     onUpdateInput: (value) {
-//                       _email = value;
-//                       setState(() {
-//                         _emailError = isEmailValid(_email);
-//                       });
-//                       debugPrint('Email -> $_email');
-//                     },
-//                   ),
-//                   20.height,
-//                   AppTextInput(
-//                     hint: 'Password',
-//                     floatHint: false,
-//                     fieldHeight: 50,
-//                     isPassword: hidePass,
-//                     errorText: _passwordError,
-//                     onUpdateInput: (value) {
-//                       _password = value;
-//                       setState(() {
-//                         _passwordError = isPasswordValid(_password);
-//                       });
-//                       debugPrint('Password -> $_password');
-//                     },
-//                     endIcon: Icon(
-//                         hidePass ? Icons.visibility : Icons.visibility_off),
-//                     onEndIconClick: () {
-//                       setState(() {
-//                         hidePass = !hidePass;
-//                       });
-//                     },
-//                   ),
-//                   5.height,
-//                   InkWell(
-//                     onTap: () {
-//                       print('forgot password');
-//                     },
-//                     child: Padding(
-//                       padding: const EdgeInsets.symmetric(
-//                         horizontal: 12,
-//                         vertical: 4,
-//                       ),
-//                       child: Align(
-//                         alignment: Alignment.centerRight,
-//                         child: Text(
-//                           'Forgot password?',
-//                           style: AppTextStyles.buttonStyle
-//                               .changeColor(AppColors.colorGreen),
-//                         ),
-//                       ),
-//                     ),
-//                   ),
-//                   80.height,
-//                   Consumer<UserProvider>(
-//                     builder: (context, value, child) => AppFilledButton(
-//                       onPress: () async {
-//                         FocusScope.of(context).unfocus();
-//                         await loginUser();
-//                       },
-//                       title: 'Login',
-//                       showLoading: value.isLoading,
-//                     ),
-//                   ),
-//                   20.height,
-//                   const Text(
-//                     'Not Registered?',
-//                     style: AppTextStyles.hintStyle,
-//                   ),
-//                   TextButton(
-//                     onPressed: () {
-//                       Navigator.pushNamed(context, SignUpScreen.routeName);
-//                     },
-//                     child: Text(
-//                       'Sign Up',
-//                       style: AppTextStyles.bodyStyle
-//                           .changeColor(AppColors.colorGreen),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   Future<void> loginUser() async {
-//     final exp = RegExp(
-//       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
-//     );
-
-//     if (_email.isEmpty) {
-//       setState(() {
-//         _emailError = 'Please enter your registered email';
-//       });
-//     } else if (!exp.hasMatch(_email)) {
-//       setState(() {
-//         _emailError = 'Email is not in proper format, please check it again';
-//       });
-//     } else if (_password.isEmpty || _password.length < 6) {
-//       setState(() {
-//         _emailError = null;
-//         _passwordError = 'Password must be at-least 6 characters';
-//       });
-//     } else {
-//       setState(() {
-//         _emailError = null;
-//         _passwordError = null;
-//       });
-
-//       debugPrint('Data is ready for login');
-
-//       try {
-//         await _userProvider.loginUser(email: _email, password: _password);
-//       } on AppException catch (e) {
-//         e.logError();
-//         if (!mounted) return;
-//         context.showSnack(message: e.message);
-//       } catch (e) {
-//         e.logError();
-//       }
-//     }
-//   }
-// }
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -233,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen>
   var _password = '';
   String? _emailError;
   String? _passwordError;
-  bool hidePass = false;
+
   late UserProvider _userProvider;
   @override
   void initState() {
@@ -265,162 +72,177 @@ class _LoginScreenState extends State<LoginScreen>
 
     super.initState();
   }
+  
+ Future<bool> _onWillPop() async {
+    // Show confirmation dialog when the user tries to exit
+    return (await showDialog(
+          context: context,
+          builder: (context) => const ExitBottomSheet()
+        
+        
+        )) ??
+        false; // Return false if dialog is dismissed
+  }
 
   @override
   Widget build(BuildContext context) {
     _userProvider = Provider.of<UserProvider>(context, listen: false);
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: AppColors.colorBeige,
-      body: GestureDetector(
-        onTap: () {
-          !animationPlayed ? startAnimation() : null;
-        },
-        child: Stack(
-          children: [
-            Center(
-              child: AnimatedBuilder(
-                animation: _textController,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: _scaleAnimation.value,
-                    child: Opacity(
-                      opacity: _opacityAnimation.value,
-                      child: const Text(
-                        "HortVise",
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: AppColors.colorBeige,
+        body: GestureDetector(
+          onTap: () {
+            !animationPlayed ? startAnimation() : null;
+          },
+          child: Stack(
+            children: [
+              Center(
+                child: AnimatedBuilder(
+                  animation: _textController,
+                  builder: (context, child) {
+                    return Transform.scale(
+                      scale: _scaleAnimation.value,
+                      child: Opacity(
+                        opacity: _opacityAnimation.value,
+                        child: const Text(
+                          "HortiVise",
+                          style: TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              !animationPlayed
+                  ? const Center(
+                      child: Text(
+                        "HortiVise",
                         style: TextStyle(
-                          fontSize: 40,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.green,
                         ),
                       ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            !animationPlayed
-                ? const Center(
-                    child: Text(
-                      "HortVise",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
+                    )
+                  : const SizedBox.shrink(),
+              AnimatedOpacity(
+                opacity: _imageOpacity, // Control opacity
+                duration: const Duration(seconds: 3), // Fade in/out duration
+                child: Stack(
+                  children: [
+                    // Left side image
+                    Positioned.fill(
+                      left: -530,
+                      top: -100,
+                      bottom: -50,
+                      child: Image.asset(
+                        'assets/Leaves/1x/Left_1.png',
+                        height: MediaQuery.of(context).size.height,
+                        fit: BoxFit.contain,
                       ),
                     ),
-                  )
-                : const SizedBox.shrink(),
-            AnimatedOpacity(
-              opacity: _imageOpacity, // Control opacity
-              duration: const Duration(seconds: 3), // Fade in/out duration
-              child: Stack(
-                children: [
-                  // Left side image
-                  Positioned.fill(
-                    left: -530,
-                    top: -100,
-                    bottom: -50,
-                    child: Image.asset(
-                      'assets/Leaves/1x/Left_1.png',
-                      height: MediaQuery.of(context).size.height,
-                      fit: BoxFit.contain,
+                    // Right side image
+                    Positioned.fill(
+                      right: -680,
+                      top: -50,
+                      bottom: -230,
+                      child: Image.asset(
+                        'assets/Leaves/1x/Right_2.png',
+                        height: MediaQuery.of(context).size.height,
+                        fit: BoxFit.contain,
+                      ),
                     ),
-                  ),
-                  // Right side image
-                  Positioned.fill(
-                    right: -680,
-                    top: -50,
-                    bottom: -230,
-                    child: Image.asset(
-                      'assets/Leaves/1x/Right_2.png',
-                      height: MediaQuery.of(context).size.height,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            AnimatedPositioned(
-              duration: const Duration(seconds: 2),
-              left: _startExpansion
-                  ? -80
-                  : _reverseExpansion
-                      ? -530
-                      : -530,
-              top: _startExpansion
-                  ? 0
-                  : _reverseExpansion
-                      ? -100
-                      : -100,
-              bottom: _startExpansion
-                  ? 0
-                  : _reverseExpansion
-                      ? -50
-                      : -50,
-              right: null,
-              child: AnimatedOpacity(
-                opacity: _startExpansion
-                    ? 1.0
-                    : _reverseExpansion
-                        ? 1.0
-                        : 0.0, // Control opacity during the phases
-                duration: const Duration(seconds: 2), // Fade duration
-                child: Image.asset(
-                  'assets/Leaves/1x/Left_1.png',
-                  height: MediaQuery.of(context).size.height,
-                  fit: BoxFit.contain,
+                  ],
                 ),
               ),
-            ),
-            AnimatedPositioned(
-              duration: const Duration(seconds: 2),
-              right: _startExpansion
-                  ? -80
-                  : _reverseExpansion
-                      ? -680
-                      : -680,
-              top: _startExpansion
-                  ? 0
-                  : _reverseExpansion
-                      ? -50
-                      : -50,
-              bottom: _startExpansion
-                  ? 0
-                  : _reverseExpansion
-                      ? -230
-                      : -230,
-              left: null,
-              child: AnimatedOpacity(
-                opacity: _startExpansion
-                    ? 1.0
-                    : _reverseExpansion
-                        ? 1.0
-                        : 0.0,
+              AnimatedPositioned(
                 duration: const Duration(seconds: 2),
-                child: Image.asset(
-                  'assets/Leaves/1x/Right_2.png',
-                  height: MediaQuery.of(context).size.height,
-                  fit: BoxFit.contain,
+                left: _startExpansion
+                    ? -80
+                    : _reverseExpansion
+                        ? -530
+                        : -530,
+                top: _startExpansion
+                    ? 0
+                    : _reverseExpansion
+                        ? -100
+                        : -100,
+                bottom: _startExpansion
+                    ? 0
+                    : _reverseExpansion
+                        ? -50
+                        : -50,
+                right: null,
+                child: AnimatedOpacity(
+                  opacity: _startExpansion
+                      ? 1.0
+                      : _reverseExpansion
+                          ? 1.0
+                          : 0.0, // Control opacity during the phases
+                  duration: const Duration(seconds: 2), // Fade duration
+                  child: Image.asset(
+                    'assets/Leaves/1x/Left_1.png',
+                    height: MediaQuery.of(context).size.height,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
-            ),
-            animationPlayed
-                ? Center(
-                    child: AnimatedBuilder(
-                      animation: _finalUiController,
-                      builder: (context, child) {
-                        return Transform.scale(
-                          scale: _finalUiScaleAnimation.value,
-                          child: Opacity(
-                              opacity: _finalUiOpacityAnimation.value,
-                              child: _loginUI()),
-                        );
-                      },
-                    ),
-                  )
-                : const SizedBox.shrink()
-          ],
+              AnimatedPositioned(
+                duration: const Duration(seconds: 2),
+                right: _startExpansion
+                    ? -80
+                    : _reverseExpansion
+                        ? -680
+                        : -680,
+                top: _startExpansion
+                    ? 0
+                    : _reverseExpansion
+                        ? -50
+                        : -50,
+                bottom: _startExpansion
+                    ? 0
+                    : _reverseExpansion
+                        ? -230
+                        : -230,
+                left: null,
+                child: AnimatedOpacity(
+                  opacity: _startExpansion
+                      ? 1.0
+                      : _reverseExpansion
+                          ? 1.0
+                          : 0.0,
+                  duration: const Duration(seconds: 2),
+                  child: Image.asset(
+                    'assets/Leaves/1x/Right_2.png',
+                    height: MediaQuery.of(context).size.height,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              animationPlayed
+                  ? Center(
+                      child: AnimatedBuilder(
+                        animation: _finalUiController,
+                        builder: (context, child) {
+                          return Transform.scale(
+                            scale: _finalUiScaleAnimation.value,
+                            child: Opacity(
+                                opacity: _finalUiOpacityAnimation.value,
+                                child: _loginUI()),
+                          );
+                        },
+                      ),
+                    )
+                  : const SizedBox.shrink()
+            ],
+          ),
         ),
       ),
     );
@@ -462,7 +284,7 @@ class _LoginScreenState extends State<LoginScreen>
             hint: 'Password',
             floatHint: false,
             fieldHeight: 50,
-            isPassword: hidePass,
+            isPasswordField: true,
             errorText: _passwordError,
             onUpdateInput: (value) {
               _password = value;
@@ -470,12 +292,6 @@ class _LoginScreenState extends State<LoginScreen>
                 _passwordError = isPasswordValid(_password);
               });
               debugPrint('Password -> $_password');
-            },
-            endIcon: Icon(hidePass ? Icons.visibility : Icons.visibility_off),
-            onEndIconClick: () {
-              setState(() {
-                hidePass = !hidePass;
-              });
             },
           ),
           5.height,

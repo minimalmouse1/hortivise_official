@@ -23,9 +23,15 @@ class AppTextInput extends StatefulWidget {
     this.textEditingController,
     this.errorText,
     this.suffixText,
-    this.isPassword = false,
+    this.isPasswordField = false,
     this.maxLength,
+    this.suffixIcon,
+    this.suffix,
+    this.onPressedSuffix,
   });
+  final IconData? suffix;
+  final dynamic suffixIcon;
+  final VoidCallback? onPressedSuffix;
   String hint;
   bool floatHint;
   Widget? icon;
@@ -40,7 +46,7 @@ class AppTextInput extends StatefulWidget {
   Function()? iconClick;
   Function()? onEndIconClick;
   Function(String value)? onUpdateInput;
-  final bool isPassword;
+  final bool isPasswordField;
   TextEditingController? textEditingController;
   String? suffixText;
 
@@ -62,6 +68,8 @@ class _AppTextInputState extends State<AppTextInput> {
   @override
   void initState() {
     super.initState();
+        _obscureText = widget.isPasswordField;
+
     _editingController =
         widget.textEditingController ?? TextEditingController();
     _focusNode.addListener(() {
@@ -77,6 +85,25 @@ class _AppTextInputState extends State<AppTextInput> {
     _editingController.dispose();
     _controller.dispose();
     super.dispose();
+  }
+  late bool _obscureText;
+    Widget? _buildSuffixIcon() {
+    if (widget.isPasswordField) {
+      return IconButton(
+        icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility),
+        onPressed: () {
+          setState(() {
+            _obscureText = !_obscureText;
+          });
+        },
+      );
+    } else if (widget.suffix != null && widget.onPressedSuffix != null) {
+      return IconButton(
+        icon: Icon(widget.suffix),
+        onPressed: widget.onPressedSuffix,
+      );
+    }
+    return null;
   }
 
   @override
@@ -102,7 +129,7 @@ class _AppTextInputState extends State<AppTextInput> {
             return null;
           },
           maxLength: widget.maxLength,
-          obscureText: widget.isPassword,
+          obscureText: _obscureText,
           keyboardType: widget.keyboardType,
           textAlignVertical: TextAlignVertical.center,
           focusNode: _focusNode,
@@ -122,14 +149,7 @@ class _AppTextInputState extends State<AppTextInput> {
                     onPressed: widget.iconClick,
                   )
                 : null,
-            suffixIcon: widget.errorText != null
-                ? errorToolTip()
-                : widget.endIcon != null
-                    ? IconButton(
-                        icon: widget.endIcon!,
-                        onPressed: widget.onEndIconClick,
-                      )
-                    : null,
+            suffixIcon: _buildSuffixIcon(),
             suffixText: widget.suffixText,
             labelText: widget.floatHint ? widget.hint : null,
             hintText: !widget.floatHint ? widget.hint : null,
