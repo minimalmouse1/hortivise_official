@@ -15,9 +15,7 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class UserHomePage extends StatefulWidget {
-  const UserHomePage({
-    super.key,
-  });
+  const UserHomePage({super.key});
 
   @override
   State<UserHomePage> createState() => _UserHomePageState();
@@ -28,6 +26,9 @@ class _UserHomePageState extends State<UserHomePage> {
   DateTime _focusedDay = DateTime.now();
   final currentUserId =
       PreferenceManager.getInstance().getCurrentUser()?.id ?? '';
+  TextEditingController searchController = TextEditingController();
+  bool isSearching = false;
+  String searchText = '';
 
   Future<void> _fetchConsultationDates() async {
     final snapshot = await FirebaseFirestore.instance
@@ -65,14 +66,20 @@ class _UserHomePageState extends State<UserHomePage> {
     _fetchConsultationDates();
   }
 
+  void _toggleSearch() {
+    setState(() {
+      isSearching = !isSearching;
+      if (!isSearching) {
+        searchController.clear();
+        searchText = '';
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     List<dynamic> _getEventsForDay(DateTime day) {
       DateTime normalizedDay = DateTime(day.year, day.month, day.day);
-
-      debugPrint(
-          '_consultationDates[normalizedDay]:${_consultationDates[normalizedDay]}');
-
       return _consultationDates[normalizedDay] ?? [];
     }
 
@@ -94,8 +101,7 @@ class _UserHomePageState extends State<UserHomePage> {
                   TableCalendar(
                     firstDay: DateTime.utc(2010, 10, 16),
                     lastDay: DateTime.utc(2030, 3, 14),
-                    focusedDay:
-                        _focusedDay, // Default focus is today's date, but events are still highlighted
+                    focusedDay: _focusedDay,
                     eventLoader: _getEventsForDay,
                     calendarStyle: const CalendarStyle(
                       todayDecoration: BoxDecoration(
@@ -150,31 +156,52 @@ class _UserHomePageState extends State<UserHomePage> {
               );
             },
           ),
-          title: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              8.height,
-              Text(
-                'Welcome',
-                style: AppTextStyles.bodyStyle
-                    .changeFontWeight(FontWeight.w500)
-                    .copyWith(
-                      height: 0.3,
+          title: isSearching
+              ? TextField(
+                  controller: searchController,
+                  onChanged: (value) {
+                    setState(() {
+                      searchText = value;
+                    });
+                  },
+                  style: AppTextStyles.bodyStyle.changeSize(16),
+                  decoration: const InputDecoration(
+                    hintText: 'Search consultant...',
+                    hintStyle: TextStyle(color: Colors.white60),
+                  ),
+                )
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    8.height,
+                    Text(
+                      'Welcome',
+                      style: AppTextStyles.bodyStyle
+                          .changeFontWeight(FontWeight.w500)
+                          .copyWith(
+                            height: 0.3,
+                          ),
                     ),
-              ),
-              Text(
-                userProvider.getCurrentUser()?.userName ?? '',
-                style: AppTextStyles.titleStyle
-                    .changeSize(16)
-                    .changeFontWeight(FontWeight.w800)
-                    .copyWith(
-                      color: AppColors.colorBlack,
+                    Text(
+                      userProvider.getCurrentUser()?.userName ?? '',
+                      style: AppTextStyles.titleStyle
+                          .changeSize(16)
+                          .changeFontWeight(FontWeight.w800)
+                          .copyWith(
+                            color: AppColors.colorBlack,
+                          ),
                     ),
-              ),
-            ],
-          ),
+                  ],
+                ),
           actions: [
+            IconButton(
+              onPressed: _toggleSearch,
+              icon: Icon(
+                isSearching ? Icons.cancel : Icons.search,
+                color: AppColors.colorGreen,
+              ),
+            ),
             IconButton(
               onPressed: () {
                 _showCalendar(context);
@@ -184,15 +211,6 @@ class _UserHomePageState extends State<UserHomePage> {
                 color: AppColors.colorGreen,
               ),
             ),
-            IconButton(
-              onPressed: () {
-                // Add search functionality here if needed
-              },
-              icon: const Icon(
-                Icons.search,
-                color: AppColors.colorGreen,
-              ),
-            )
           ],
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
@@ -204,7 +222,6 @@ class _UserHomePageState extends State<UserHomePage> {
       ),
       body: Column(
         children: [
-          // Add choice chips or other functionality if needed
           Expanded(
             child: Padding(
               padding: 12.allPadding,
@@ -229,26 +246,32 @@ class _UserHomePageState extends State<UserHomePage> {
                             ),
                           );
                         } else {
-                          final specialUsers = userProvider.getSpecialistsByCat(
+                          final allUsers = userProvider.getSpecialistsByCat(
                             catName: userProvider.getSelectedCat(),
                           );
+
+                          final filteredUsers = allUsers.where((user) {
+                            final userName =
+                                user.specialist?.professionalName.toLowerCase();
+                            return userName!.contains(searchText.toLowerCase());
+                          }).toList();
 
                           return MasonryGridView.count(
                             crossAxisCount: 2,
                             mainAxisSpacing: 8,
-                            itemCount: specialUsers.length,
+                            itemCount: filteredUsers.length,
                             crossAxisSpacing: 8,
                             padding: EdgeInsets.zero,
                             itemBuilder: (context, index) {
                               return ItemConsultantHome(
-                                user: specialUsers[index],
+                                user: filteredUsers[index],
                                 imageHeight: index % 2 != 0 ? 180 : 280,
                                 onConsultantClick: () {
                                   Navigator.pushNamed(
                                     context,
                                     ConsultantDetailsScreen.routeName,
                                     arguments: {
-                                      Constants.userModel: specialUsers[index],
+                                      Constants.userModel: filteredUsers[index],
                                     },
                                   );
                                 },
