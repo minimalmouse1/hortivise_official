@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
+import 'package:horti_vige/core/utils/helpers/preference_manager.dart';
 import 'package:horti_vige/data/enums/specialist_category.dart';
 import 'package:horti_vige/providers/user_provider.dart';
 import 'package:horti_vige/ui/items/item_consultant_home.dart';
@@ -8,18 +10,119 @@ import 'package:horti_vige/ui/screens/user/consultant_details_screen.dart';
 import 'package:horti_vige/ui/utils/colors/colors.dart';
 import 'package:horti_vige/ui/utils/extensions/extensions.dart';
 import 'package:horti_vige/ui/utils/styles/text_styles.dart';
-import 'package:horti_vige/ui/widgets/app_horizontal_choise_chips.dart';
 import 'package:horti_vige/core/utils/app_consts.dart';
 import 'package:provider/provider.dart';
+import 'package:table_calendar/table_calendar.dart';
 
-class UserHomePage extends StatelessWidget {
+class UserHomePage extends StatefulWidget {
   const UserHomePage({
     super.key,
   });
 
   @override
+  State<UserHomePage> createState() => _UserHomePageState();
+}
+
+class _UserHomePageState extends State<UserHomePage> {
+  Map<DateTime, List<dynamic>> _consultationDates = {};
+  DateTime _focusedDay = DateTime.now();
+  final currentUserId =
+      PreferenceManager.getInstance().getCurrentUser()?.id ?? '';
+
+  Future<void> _fetchConsultationDates() async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('Consultations')
+        .where('customer.id', isEqualTo: currentUserId)
+        .get();
+
+    final Map<DateTime, List<dynamic>> consultationMap = {};
+
+    for (final doc in snapshot.docs) {
+      final data = doc.data();
+
+      final DateTime consultationDate = DateTime.parse(data['startTime']);
+
+      final DateTime dateOnly = DateTime(
+          consultationDate.year, consultationDate.month, consultationDate.day);
+
+      // Add consultation date to the map
+      if (consultationMap.containsKey(dateOnly)) {
+        consultationMap[dateOnly]?.add(data);
+      } else {
+        consultationMap[dateOnly] = [data];
+      }
+    }
+
+    setState(() {
+      _consultationDates = consultationMap;
+    });
+    debugPrint('collection of dates:$_consultationDates');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchConsultationDates();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    List<dynamic> _getEventsForDay(DateTime day) {
+      DateTime normalizedDay = DateTime(day.year, day.month, day.day);
+
+      debugPrint(
+          '_consultationDates[normalizedDay]:${_consultationDates[normalizedDay]}');
+
+      return _consultationDates[normalizedDay] ?? [];
+    }
+
+    void _showCalendar(BuildContext context) {
+      showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return ColoredBox(
+            color: AppColors.colorBeige,
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Small dot indicates the appointment date',
+                    style: AppTextStyles.titleStyle.changeSize(16),
+                  ),
+                  TableCalendar(
+                    firstDay: DateTime.utc(2010, 10, 16),
+                    lastDay: DateTime.utc(2030, 3, 14),
+                    focusedDay:
+                        _focusedDay, // Default focus is today's date, but events are still highlighted
+                    eventLoader: _getEventsForDay,
+                    calendarStyle: const CalendarStyle(
+                      todayDecoration: BoxDecoration(
+                        color: AppColors.colorGreen,
+                        shape: BoxShape.circle,
+                      ),
+                      selectedDecoration: BoxDecoration(
+                        color: Colors.blue,
+                        shape: BoxShape.circle,
+                      ),
+                      markerDecoration: BoxDecoration(
+                        color: AppColors.colorGreen,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    onDaySelected: (selectedDay, focusedDay) {},
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
+
     final userProvider = Provider.of<UserProvider>(context, listen: false);
+
     return Scaffold(
       backgroundColor: AppColors.colorBeige,
       appBar: PreferredSize(
@@ -71,11 +174,10 @@ class UserHomePage extends StatelessWidget {
               ),
             ],
           ),
-          // TODO: Add actions
           actions: [
             IconButton(
               onPressed: () {
-                // TODO: add navigation here
+                _showCalendar(context);
               },
               icon: const Icon(
                 Icons.calendar_month,
@@ -84,7 +186,7 @@ class UserHomePage extends StatelessWidget {
             ),
             IconButton(
               onPressed: () {
-                // todo: add navigation here
+                // Add search functionality here if needed
               },
               icon: const Icon(
                 Icons.search,
@@ -102,20 +204,7 @@ class UserHomePage extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // Padding(
-          //   padding: 12.horizontalPadding,
-          //   child: AppHorizontalChoiceChips(
-          //     chips: SpecialistCategory.values.map((e) => e.name).toList(),
-          //     unSelectedLabelColor: const Color(0xff02010a).withOpacity(0.3),
-          //     labelSize: 16,
-          //     cornerRadius: 20,
-          //     onSelected: (index) {
-          //       userProvider.setCategory(
-          //         SpecialistCategory.values.map((e) => e.name).toList()[index],
-          //       );
-          //     },
-          //   ),
-          // ),
+          // Add choice chips or other functionality if needed
           Expanded(
             child: Padding(
               padding: 12.allPadding,
