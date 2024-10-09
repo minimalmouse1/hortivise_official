@@ -9,11 +9,16 @@ class ExitBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 15, bottom: 15),
+      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: MainAxisSize.min, // Ensures it takes only needed space
         children: [
-          const Text('Are you sure you want to exit?'),
+          const Text(
+            'Are you sure you want to exit?',
+            textAlign: TextAlign.center, // Ensures the text is centered
+            style:
+                TextStyle(color: Colors.black), // Make sure the color isn't red
+          ),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -33,16 +38,17 @@ class ExitBottomSheet extends StatelessWidget {
                 buttonColor: AppColors.colorGreen,
               ),
             ],
-          )
+          ),
         ],
       ),
     );
   }
 
-  Widget _button(
-      {required String label,
-      required Function() onTap,
-      required Color buttonColor}) {
+  Widget _button({
+    required String label,
+    required Function() onTap,
+    required Color buttonColor,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -53,11 +59,14 @@ class ExitBottomSheet extends StatelessWidget {
         ),
         width: 100,
         height: 40,
-        child: Text(label,
-            style: AppTextStyles.bodyStyle
-                .changeColor(AppColors.colorWhite)
-                .changeSize(15)
-                .changeFontWeight(FontWeight.w700)),
+        child: Text(
+          label,
+          textAlign: TextAlign.center, // Center text inside the button
+          style: AppTextStyles.bodyStyle
+              .changeColor(AppColors.colorWhite)
+              .changeSize(15)
+              .changeFontWeight(FontWeight.w700),
+        ),
       ),
     );
   }

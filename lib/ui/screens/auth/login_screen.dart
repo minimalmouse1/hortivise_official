@@ -13,8 +13,6 @@ import 'package:horti_vige/ui/widgets/app_text_input.dart';
 import 'package:horti_vige/ui/widgets/exit_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 
-
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
   static String routeName = 'Login';
@@ -72,24 +70,22 @@ class _LoginScreenState extends State<LoginScreen>
 
     super.initState();
   }
-  
- Future<bool> _onWillPop() async {
-    // Show confirmation dialog when the user tries to exit
-    return (await showDialog(
-          context: context,
-          builder: (context) => const ExitBottomSheet()
-        
-        
-        )) ??
-        false; // Return false if dialog is dismissed
-  }
 
   @override
   Widget build(BuildContext context) {
     _userProvider = Provider.of<UserProvider>(context, listen: false);
     return WillPopScope(
-      onWillPop: _onWillPop,
-      
+      onWillPop: () async {
+        showModalBottomSheet(
+          context: context,
+          backgroundColor: AppColors.colorBeige,
+          builder: (context) {
+            return const ExitBottomSheet();
+          },
+        );
+
+        return false;
+      },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: AppColors.colorBeige,

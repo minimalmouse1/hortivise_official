@@ -116,35 +116,21 @@ class AppNavDrawer extends StatelessWidget {
   final Function(MenuItem) onSelectItem;
   final UserModel? user;
 
- Future<bool> _onWillPop(BuildContext context) async {
-    // Show confirmation dialog when the user tries to exit
-    return (await showDialog(
-          context: context,
-          builder: (context) => const ExitBottomSheet()
-        
-        
-        )) ??
-        false; // Return false if dialog is dismissed
-  }
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () => _onWillPop(context),
-      
-      child: Scaffold(
-        backgroundColor: AppColors.colorBeige,
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 60),
-            _buildUserInfo(),
-            const SizedBox(height: 20),
-            ...MenuItems.all.map((item) => _buildMenuItem(item)).toList(),
-            if (user?.specialist != null) _buildChatTile(context),
-            const Spacer(),
-            _buildFooter(context),
-          ],
-        ),
+    return Scaffold(
+      backgroundColor: AppColors.colorBeige,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 60),
+          _buildUserInfo(),
+          const SizedBox(height: 20),
+          ...MenuItems.all.map((item) => _buildMenuItem(item)).toList(),
+          if (user?.specialist != null) _buildChatTile(context),
+          const Spacer(),
+          _buildFooter(context),
+        ],
       ),
     );
   }

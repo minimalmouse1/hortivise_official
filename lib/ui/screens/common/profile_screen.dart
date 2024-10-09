@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:horti_vige/data/enums/user_type.dart';
 import 'package:horti_vige/ui/screens/consultant/consultation_pricing/consultation_pricing_screen.dart';
+import 'package:horti_vige/ui/widgets/exit_bottom_sheet.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -75,250 +76,262 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final currentUser = getCurrentUser();
-    return Scaffold(
-      backgroundColor: AppColors.colorBeige,
-      extendBody: true,
-      extendBodyBehindAppBar: true,
-      body: Stack(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).padding.top + 20,
-                          left: 20,
-                          right: 20,
-                        ),
-                        decoration: const BoxDecoration(
-                          color: AppColors.colorWhite,
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(24),
-                            bottomRight: Radius.circular(24),
+    return WillPopScope(
+      onWillPop: () async {
+        showModalBottomSheet(
+            context: context,
+            backgroundColor: AppColors.colorBeige,
+            builder: (context) {
+              return const ExitBottomSheet();
+            });
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.colorBeige,
+        extendBody: true,
+        extendBodyBehindAppBar: true,
+        body: Stack(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(
+                            top: MediaQuery.of(context).padding.top + 20,
+                            left: 20,
+                            right: 20,
                           ),
-                        ),
-                        child: Column(
-                          children: [
-                            20.height,
-                            CircleAvatar(
-                              radius: 37,
-                              backgroundColor: AppColors.colorGreen,
-                              child: CircleAvatar(
-                                radius: 35,
-                                backgroundImage:
-                                    currentUser.profileUrl.startsWith('http')
-                                        ? NetworkImage(currentUser.profileUrl)
-                                        : null,
-                                child: Stack(
-                                  children: [
-                                    Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: CircleAvatar(
-                                        radius: 11,
-                                        backgroundColor: AppColors.colorGreen,
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            context.showBottomSheet(
-                                              bottomSheet: PickImageDialog(
-                                                onGalleryClick: () {
-                                                  _pickImageFromGallery();
-                                                },
-                                                onCameraClick: () {
-                                                  _pickImageFromCamera();
-                                                },
+                          decoration: const BoxDecoration(
+                            color: AppColors.colorWhite,
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(24),
+                              bottomRight: Radius.circular(24),
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              20.height,
+                              CircleAvatar(
+                                radius: 37,
+                                backgroundColor: AppColors.colorGreen,
+                                child: CircleAvatar(
+                                  radius: 35,
+                                  backgroundImage:
+                                      currentUser.profileUrl.startsWith('http')
+                                          ? NetworkImage(currentUser.profileUrl)
+                                          : null,
+                                  child: Stack(
+                                    children: [
+                                      Align(
+                                        alignment: Alignment.bottomRight,
+                                        child: CircleAvatar(
+                                          radius: 11,
+                                          backgroundColor: AppColors.colorGreen,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              context.showBottomSheet(
+                                                bottomSheet: PickImageDialog(
+                                                  onGalleryClick: () {
+                                                    _pickImageFromGallery();
+                                                  },
+                                                  onCameraClick: () {
+                                                    _pickImageFromCamera();
+                                                  },
+                                                ),
+                                                dismissible: true,
+                                              );
+                                            },
+                                            child: SvgPicture.asset(
+                                              Assets.pencilEditIcon,
+                                              colorFilter:
+                                                  const ColorFilter.mode(
+                                                Colors.white,
+                                                BlendMode.srcIn,
                                               ),
-                                              dismissible: true,
-                                            );
-                                          },
-                                          child: SvgPicture.asset(
-                                            Assets.pencilEditIcon,
-                                            colorFilter: const ColorFilter.mode(
-                                              Colors.white,
-                                              BlendMode.srcIn,
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                            4.height,
-                            Column(
-                              children: [
-                                Text(
-                                  currentUser.userName,
-                                  style: AppTextStyles.bodyStyle
-                                      .changeColor(AppColors.appGreenMaterial)
-                                      .changeSize(20)
-                                      .changeFontWeight(FontWeight.bold),
-                                ),
-                                Text(
-                                  'Hortivise ${currentUser.type.name.toLowerCase().capitalizeFirstLetter()}',
-                                  style: AppTextStyles.bodyStyle
-                                      .changeColor(AppColors.colorGray)
-                                      .changeSize(10),
-                                ),
-                              ],
-                            ),
-                            45.height,
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 6,
-                                ),
-                                child: TextFormField(
-                                  controller: _nameController,
-                                  style: const TextStyle(
-                                    color: AppColors.colorBlack,
+                              4.height,
+                              Column(
+                                children: [
+                                  Text(
+                                    currentUser.userName,
+                                    style: AppTextStyles.bodyStyle
+                                        .changeColor(AppColors.appGreenMaterial)
+                                        .changeSize(20)
+                                        .changeFontWeight(FontWeight.bold),
                                   ),
-                                  decoration: const InputDecoration(
-                                    hintText: 'Enter Name',
-                                    border: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: AppColors.inputBorderColor,
+                                  Text(
+                                    'Hortivise ${currentUser.type.name.toLowerCase().capitalizeFirstLetter()}',
+                                    style: AppTextStyles.bodyStyle
+                                        .changeColor(AppColors.colorGray)
+                                        .changeSize(10),
+                                  ),
+                                ],
+                              ),
+                              45.height,
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  child: TextFormField(
+                                    controller: _nameController,
+                                    style: const TextStyle(
+                                      color: AppColors.colorBlack,
+                                    ),
+                                    decoration: const InputDecoration(
+                                      hintText: 'Enter Name',
+                                      border: UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: AppColors.inputBorderColor,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                            25.height,
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 6,
-                                ),
-                                child: TextFormField(
-                                  controller: _emailController,
-                                  style: const TextStyle(
-                                    color: AppColors.colorBlack,
+                              25.height,
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
                                   ),
-                                  decoration: const InputDecoration(
-                                    hintText: 'Enter Name',
-                                    border: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: AppColors.inputBorderColor,
+                                  child: TextFormField(
+                                    controller: _emailController,
+                                    style: const TextStyle(
+                                      color: AppColors.colorBlack,
+                                    ),
+                                    decoration: const InputDecoration(
+                                      hintText: 'Enter Name',
+                                      border: UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: AppColors.inputBorderColor,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                            12.height,
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: TextButton(
-                                onPressed: () {
+                              12.height,
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: TextButton(
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      ChangePasswordScreen.routeName,
+                                    );
+                                  },
+                                  child: const Text(
+                                    'Change Password',
+                                    style: AppTextStyles.bodyStyleMedium,
+                                  ),
+                                ),
+                              ),
+                              16.height,
+                            ],
+                          ),
+                        ),
+                        20.height,
+                        // TODO: Notifications
+                        // ListTile(
+                        //   title: Text(
+                        //     'Notifications',
+                        //     style: AppTextStyles.titleStyle
+                        //         .changeSize(16)
+                        //         .changeFontWeight(FontWeight.bold),
+                        //   ),
+                        //   trailing: Switch(value: true, onChanged: (b) {}),
+                        // ),
+                        if (currentUser.type != UserType.CUSTOMER)
+                          Column(
+                            children: [
+                              // TODO: Vacation Mode
+                              // ListTile(
+                              //   title: Text(
+                              //     'Vacation Mode',
+                              //     style: AppTextStyles.titleStyle
+                              //         .changeSize(16)
+                              //         .changeFontWeight(FontWeight.bold),
+                              //   ),
+                              //   trailing: Switch(value: false, onChanged: (b) {}),
+                              // ),
+                              buildCustomButton(
+                                context,
+                                'Availability Settings',
+                                () {
                                   Navigator.pushNamed(
                                     context,
-                                    ChangePasswordScreen.routeName,
+                                    EditAvailabilityScreen.routeName,
                                   );
                                 },
-                                child: const Text(
-                                  'Change Password',
-                                  style: AppTextStyles.bodyStyleMedium,
-                                ),
                               ),
-                            ),
-                            16.height,
-                          ],
-                        ),
-                      ),
-                      20.height,
-                      // TODO: Notifications
-                      // ListTile(
-                      //   title: Text(
-                      //     'Notifications',
-                      //     style: AppTextStyles.titleStyle
-                      //         .changeSize(16)
-                      //         .changeFontWeight(FontWeight.bold),
-                      //   ),
-                      //   trailing: Switch(value: true, onChanged: (b) {}),
-                      // ),
-                      if (currentUser.type != UserType.CUSTOMER)
-                        Column(
-                          children: [
-                            // TODO: Vacation Mode
-                            // ListTile(
-                            //   title: Text(
-                            //     'Vacation Mode',
-                            //     style: AppTextStyles.titleStyle
-                            //         .changeSize(16)
-                            //         .changeFontWeight(FontWeight.bold),
-                            //   ),
-                            //   trailing: Switch(value: false, onChanged: (b) {}),
-                            // ),
-                            buildCustomButton(
-                              context,
-                              'Availability Settings',
-                              () {
-                                Navigator.pushNamed(
-                                  context,
-                                  EditAvailabilityScreen.routeName,
-                                );
-                              },
-                            ),
-                            16.height,
-                            buildCustomButton(
-                              context,
-                              'Consultation Pricing',
-                              () {
-                                Navigator.pushNamed(
-                                  context,
-                                  ConsultationPricingScreen.routeName,
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                    ],
+                              16.height,
+                              buildCustomButton(
+                                context,
+                                'Consultation Pricing',
+                                () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    ConsultationPricingScreen.routeName,
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              20.height,
-              AppFilledButton(
-                onPress: _updateProfile,
-                title: 'Save Changes',
-              ),
-              30.height,
-            ],
-          ),
-          Positioned(
-            left: 8,
-            top: 30,
-            child: RawMaterialButton(
-              onPressed: () {
-                Navigator.pushReplacementNamed(
-                  context,
-                  ZoomDrawerScreen.routeName,
-                );
-              },
-              elevation: 1,
-              constraints: const BoxConstraints(
-                minWidth: 26,
-                minHeight: 26,
-                maxWidth: 26,
-                maxHeight: 26,
-              ),
-              fillColor: Colors.white,
-              shape: const CircleBorder(),
-              child: const Icon(
-                Icons.arrow_back_ios_new,
-                size: 16,
+                20.height,
+                AppFilledButton(
+                  onPress: _updateProfile,
+                  title: 'Save Changes',
+                ),
+                30.height,
+              ],
+            ),
+            Positioned(
+              left: 8,
+              top: 30,
+              child: RawMaterialButton(
+                onPressed: () {
+                  Navigator.pushReplacementNamed(
+                    context,
+                    ZoomDrawerScreen.routeName,
+                  );
+                },
+                elevation: 1,
+                constraints: const BoxConstraints(
+                  minWidth: 26,
+                  minHeight: 26,
+                  maxWidth: 26,
+                  maxHeight: 26,
+                ),
+                fillColor: Colors.white,
+                shape: const CircleBorder(),
+                child: const Icon(
+                  Icons.arrow_back_ios_new,
+                  size: 16,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

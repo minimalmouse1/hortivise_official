@@ -86,15 +86,21 @@ class _UserMainScreenState extends State<UserMainScreen> {
         ),
       ),
       onWillPop: () async {
-        showModalBottomSheet(
-          context: context,
-
-          backgroundColor:
-              AppColors.colorBeige, // To set background transparent if needed
-          builder: (context) {
-            return const ExitBottomSheet();
-          },
-        );
+        debugPrint('index: $_index');
+        if (_index == 0) {
+          showModalBottomSheet(
+            context: context,
+            backgroundColor: AppColors.colorBeige,
+            builder: (context) {
+              return const ExitBottomSheet();
+            },
+          );
+        } else {
+          setState(() {
+            _index = 0;
+          });
+        }
+        debugPrint('index: $_index');
 
         return false;
       },

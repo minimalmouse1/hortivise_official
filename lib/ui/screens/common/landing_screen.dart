@@ -15,44 +15,28 @@ class LandingScreen extends StatefulWidget {
 }
 
 class _LandingScreenState extends State<LandingScreen> {
-
-
- Future<bool> _onWillPop() async {
-    // Show confirmation dialog when the user tries to exit
-    return (await showDialog(
-          context: context,
-          builder: (context) => const ExitBottomSheet()
-        
-        
-        )) ??
-        false; // Return false if dialog is dismissed
-  }
-
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) {
-          // Show splash message until Firebase completes checking auth state
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: SvgPicture.asset(
-                Assets.assetsImagesBottomLeafs,
-                color: const Color.fromARGB(255, 5, 110, 8),
-              ),
-            );
-          }
-      
-          // Once Firebase is done loading, navigate based on authentication state
-          if (snapshot.hasData) {
-            return const ZoomDrawerScreen(); // User is authenticated
-          } else {
-            return const LoginScreen(); // User is not authenticated
-          }
-        },
-      ),
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        // Show splash message until Firebase completes checking auth state
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: SvgPicture.asset(
+              Assets.assetsImagesBottomLeafs,
+              color: const Color.fromARGB(255, 5, 110, 8),
+            ),
+          );
+        }
+
+        // Once Firebase is done loading, navigate based on authentication state
+        if (snapshot.hasData) {
+          return const ZoomDrawerScreen(); // User is authenticated
+        } else {
+          return const LoginScreen(); // User is not authenticated
+        }
+      },
     );
   }
 }
