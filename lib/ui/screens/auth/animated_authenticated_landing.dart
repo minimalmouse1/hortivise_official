@@ -1,27 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_hidden_drawer/flutter_hidden_drawer.dart';
 import 'package:horti_vige/core/exceptions/app_exception.dart';
-import 'package:horti_vige/generated/assets.dart';
 import 'package:horti_vige/providers/user_provider.dart';
-import 'package:horti_vige/ui/screens/auth/forgot_password_screen.dart';
 import 'package:horti_vige/ui/screens/auth/signup_screen.dart';
 import 'package:horti_vige/ui/utils/colors/colors.dart';
 import 'package:horti_vige/ui/utils/extensions/extensions.dart';
 import 'package:horti_vige/ui/utils/extensions/validation_helpers.dart';
 import 'package:horti_vige/ui/utils/styles/text_styles.dart';
 import 'package:horti_vige/ui/widgets/app_filled_button.dart';
+import 'package:horti_vige/ui/widgets/app_nav_drawer.dart';
 import 'package:horti_vige/ui/widgets/app_text_input.dart';
 import 'package:horti_vige/ui/widgets/exit_bottom_sheet.dart';
-import 'package:provider/provider.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class AnimatedLandingScreen extends StatefulWidget {
+  const AnimatedLandingScreen({super.key});
   static String routeName = 'Login';
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<AnimatedLandingScreen> createState() => _AnimatedLandingScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
+class _AnimatedLandingScreenState extends State<AnimatedLandingScreen>
     with TickerProviderStateMixin {
   double _imageOpacity = 0.0; // Initial opacity (invisible)
   bool _startExpansion = false; // Controls whether the images expand
@@ -231,8 +229,9 @@ class _LoginScreenState extends State<LoginScreen>
                           return Transform.scale(
                             scale: _finalUiScaleAnimation.value,
                             child: Opacity(
-                                opacity: _finalUiOpacityAnimation.value,
-                                child: _loginUI()),
+                              opacity: _finalUiOpacityAnimation.value,
+                              child: Container(),
+                            ),
                           );
                         },
                       ),
@@ -243,142 +242,6 @@ class _LoginScreenState extends State<LoginScreen>
         ),
       ),
     );
-  }
-
-  Widget _loginUI() {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          150.height,
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Login',
-                style: AppTextStyles.titleStyle
-                    .changeColor(AppColors.colorGreen)
-                    .changeSize(28),
-              ),
-            ),
-          ),
-          20.height,
-          AppTextInput(
-            hint: 'Email',
-            floatHint: false,
-            fieldHeight: 50,
-            errorText: _emailError,
-            onUpdateInput: (value) {
-              _email = value;
-              setState(() {
-                _emailError = isEmailValid(_email);
-              });
-              debugPrint('Email -> $_email');
-            },
-          ),
-          20.height,
-          AppTextInput(
-            hint: 'Password',
-            floatHint: false,
-            fieldHeight: 50,
-            isPasswordField: true,
-            errorText: _passwordError,
-            onUpdateInput: (value) {
-              _password = value;
-              setState(() {
-                _passwordError = isPasswordValid(_password);
-              });
-              debugPrint('Password -> $_password');
-            },
-          ),
-          5.height,
-          InkWell(
-            onTap: () {
-              Navigator.pushNamed(context, ForgotPasswordScreen.routeName);
-              print('forgot password');
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 4,
-              ),
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  'Forgot password?',
-                  style: AppTextStyles.buttonStyle
-                      .changeColor(AppColors.colorGreen),
-                ),
-              ),
-            ),
-          ),
-          80.height,
-          Consumer<UserProvider>(
-            builder: (context, value, child) => AppFilledButton(
-              onPress: () async {
-                FocusScope.of(context).unfocus();
-                await loginUser();
-              },
-              title: 'Login',
-              showLoading: value.isLoading,
-            ),
-          ),
-          20.height,
-          const Text(
-            'Not Registered?',
-            style: AppTextStyles.hintStyle,
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pushNamed(context, SignUpScreen.routeName);
-            },
-            child: Text(
-              'Sign Up',
-              style: AppTextStyles.bodyStyle.changeColor(AppColors.colorGreen),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> loginUser() async {
-    final exp = RegExp(
-      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
-    );
-
-    if (_email.isEmpty) {
-      setState(() {
-        _emailError = 'Please enter your registered email';
-      });
-    } else if (!exp.hasMatch(_email)) {
-      setState(() {
-        _emailError = 'Email is not in proper format, please check it again';
-      });
-    } else if (_password.isEmpty || _password.length < 6) {
-      setState(() {
-        _emailError = null;
-        _passwordError = 'Password must be at-least 6 characters';
-      });
-    } else {
-      setState(() {
-        _emailError = null;
-        _passwordError = null;
-      });
-
-      debugPrint('Data is ready for login');
-
-      try {
-        await _userProvider.loginUser(
-            email: _email, password: _password, context: context);
-      } on AppException catch (e) {
-        e.logError();
-        if (!mounted) return;
-        context.showSnack(message: e.message);
-      } catch (e) {
-        e.logError();
-      }
-    }
   }
 
   void startAnimation() {
@@ -405,6 +268,7 @@ class _LoginScreenState extends State<LoginScreen>
 
         Future.delayed(const Duration(seconds: 2), () {
           _finalUiController.forward();
+          Navigator.pushNamed(context, ZoomDrawerScreen.routeName);
         });
       });
     });

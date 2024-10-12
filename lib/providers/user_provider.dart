@@ -16,6 +16,7 @@ import 'package:horti_vige/data/services/auth_service.dart';
 import 'package:horti_vige/data/services/stripe.dart';
 import 'package:horti_vige/ui/utils/extensions/extensions.dart';
 import 'package:horti_vige/core/utils/helpers/preference_manager.dart';
+import 'package:horti_vige/ui/widgets/app_nav_drawer.dart';
 
 class UserProvider extends ChangeNotifier {
   final _authService = AuthService();
@@ -108,10 +109,10 @@ class UserProvider extends ChangeNotifier {
     return UserRepository.getUserStream(_firebaseAuth.currentUser!.email!);
   }
 
-  Future<void> loginUser({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> loginUser(
+      {required String email,
+      required String password,
+      required BuildContext context}) async {
     try {
       _isLoading = true;
       notifyListeners();
@@ -128,6 +129,7 @@ class UserProvider extends ChangeNotifier {
           StripeController.instance.initStripe(appUser.specialist!.stripeId);
         }
         await _prefManager.saveUserModelInPref(appUser);
+        Navigator.pushNamed(context, ZoomDrawerScreen.routeName);
       }
     } on AppException {
       rethrow;

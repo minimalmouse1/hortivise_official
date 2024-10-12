@@ -15,6 +15,7 @@ import 'package:horti_vige/providers/user_provider.dart';
 import 'package:horti_vige/providers/wallet_provider.dart';
 import 'package:horti_vige/ui/screens/auth/become_consultant_screen.dart';
 import 'package:horti_vige/ui/screens/auth/change_password_screen.dart';
+import 'package:horti_vige/ui/screens/auth/forgot_password_screen.dart';
 import 'package:horti_vige/ui/screens/auth/login_screen.dart';
 import 'package:horti_vige/ui/screens/auth/signup_screen.dart';
 import 'package:horti_vige/ui/screens/common/blog_detail_screen.dart';
@@ -114,9 +115,8 @@ class MyApp extends StatelessWidget {
             fontFamily: 'Poppins',
           ),
           initialRoute: LandingScreen.routeName,
-
           routes: {
-            LandingScreen.routeName: (ctx) =>  const LandingScreen(),
+            LandingScreen.routeName: (ctx) => const LandingScreen(),
             LoginScreen.routeName: (ctx) => const LoginScreen(),
             SignUpScreen.routeName: (ctx) => const SignUpScreen(),
             ZoomDrawerScreen.routeName: (ctx) => const ZoomDrawerScreen(),
@@ -150,6 +150,8 @@ class MyApp extends StatelessWidget {
             ConsultationPricingScreen.routeName: (ctx) =>
                 const ConsultationPricingScreen(),
             AddPricingScreen.routeName: (ctx) => const AddPricingScreen(),
+            ForgotPasswordScreen.routeName: (ctx) =>
+                const ForgotPasswordScreen()
           },
         ),
       ),
