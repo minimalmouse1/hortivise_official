@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hidden_drawer/flutter_hidden_drawer.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:horti_vige/core/exceptions/app_exception.dart';
 import 'package:horti_vige/providers/user_provider.dart';
 import 'package:horti_vige/ui/screens/auth/signup_screen.dart';
@@ -102,13 +103,12 @@ class _AnimatedLandingScreenState extends State<AnimatedLandingScreen>
                       scale: _scaleAnimation.value,
                       child: Opacity(
                         opacity: _opacityAnimation.value,
-                        child: const Text(
-                          "HortiVise",
-                          style: TextStyle(
-                            fontSize: 40,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green,
-                          ),
+                        child: SvgPicture.asset(
+                          'assets/logo/Logo_1.svg',
+                          height: 40,
+                          width: 50,
+                          colorFilter: ColorFilter.mode(
+                              AppColors.colorGreen, BlendMode.srcIn),
                         ),
                       ),
                     );
@@ -116,14 +116,13 @@ class _AnimatedLandingScreenState extends State<AnimatedLandingScreen>
                 ),
               ),
               !animationPlayed
-                  ? const Center(
-                      child: Text(
-                        "HortiVise",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green,
-                        ),
+                  ? Center(
+                      child: SvgPicture.asset(
+                        'assets/logo/Logo_1.svg',
+                        height: 30,
+                        width: 40,
+                        colorFilter: ColorFilter.mode(
+                            AppColors.colorGreen, BlendMode.srcIn),
                       ),
                     )
                   : const SizedBox.shrink(),
@@ -146,7 +145,7 @@ class _AnimatedLandingScreenState extends State<AnimatedLandingScreen>
                     // Right side image
                     Positioned.fill(
                       right: -680,
-                      top: -50,
+                      top: -100,
                       bottom: -230,
                       child: Image.asset(
                         'assets/Leaves/1x/Right_2.png',
@@ -199,8 +198,8 @@ class _AnimatedLandingScreenState extends State<AnimatedLandingScreen>
                 top: _startExpansion
                     ? 0
                     : _reverseExpansion
-                        ? -50
-                        : -50,
+                        ? -100
+                        : -100,
                 bottom: _startExpansion
                     ? 0
                     : _reverseExpansion

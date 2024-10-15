@@ -40,7 +40,7 @@ class WaitingDialog extends StatelessWidget {
                   status,
                   textAlign: TextAlign.start,
                   style: AppTextStyles.bodyStyleMedium
-                      .changeSize(16)
+                      .changeSize(12)
                       .changeColor(AppColors.appGreenMaterial),
                 ),
                 const Padding(padding: EdgeInsets.symmetric(vertical: 2)),

@@ -83,6 +83,18 @@ class _UserHomePageState extends State<UserHomePage> {
       return _consultationDates[normalizedDay] ?? [];
     }
 
+    Widget _buildMarker(Object event) {
+      return Container(
+        width: 6.0,
+        height: 6.0,
+        margin: const EdgeInsets.symmetric(horizontal: 1.5),
+        decoration: BoxDecoration(
+          color: AppColors.colorGreen,
+          shape: BoxShape.circle,
+        ),
+      );
+    }
+
     void _showCalendar(BuildContext context) {
       showModalBottomSheet(
         context: context,
@@ -104,8 +116,9 @@ class _UserHomePageState extends State<UserHomePage> {
                     focusedDay: _focusedDay,
                     eventLoader: _getEventsForDay,
                     calendarStyle: const CalendarStyle(
+                      todayTextStyle: TextStyle(color: Colors.black),
                       todayDecoration: BoxDecoration(
-                        color: AppColors.colorGreen,
+                        color: Colors.transparent,
                         shape: BoxShape.circle,
                       ),
                       selectedDecoration: BoxDecoration(
@@ -118,6 +131,23 @@ class _UserHomePageState extends State<UserHomePage> {
                       ),
                     ),
                     onDaySelected: (selectedDay, focusedDay) {},
+                    calendarBuilders: CalendarBuilders(
+                      markerBuilder: (context, date, events) {
+                        if (events.isNotEmpty) {
+                          return Positioned(
+                            top:
+                                5, // Adjust this value to control the marker position
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: events
+                                  .map((event) => _buildMarker(event!))
+                                  .toList(),
+                            ),
+                          );
+                        }
+                        return null;
+                      },
+                    ),
                   ),
                 ],
               ),

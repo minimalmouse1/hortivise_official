@@ -104,13 +104,12 @@ class _LoginScreenState extends State<LoginScreen>
                       scale: _scaleAnimation.value,
                       child: Opacity(
                         opacity: _opacityAnimation.value,
-                        child: const Text(
-                          "HortiVise",
-                          style: TextStyle(
-                            fontSize: 40,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green,
-                          ),
+                        child: SvgPicture.asset(
+                          'assets/logo/Logo_1.svg',
+                          height: 40,
+                          width: 50,
+                          colorFilter: ColorFilter.mode(
+                              AppColors.colorGreen, BlendMode.srcIn),
                         ),
                       ),
                     );
@@ -118,14 +117,13 @@ class _LoginScreenState extends State<LoginScreen>
                 ),
               ),
               !animationPlayed
-                  ? const Center(
-                      child: Text(
-                        "HortiVise",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green,
-                        ),
+                  ? Center(
+                      child: SvgPicture.asset(
+                        'assets/logo/Logo_1.svg',
+                        height: 30,
+                        width: 40,
+                        colorFilter: ColorFilter.mode(
+                            AppColors.colorGreen, BlendMode.srcIn),
                       ),
                     )
                   : const SizedBox.shrink(),
@@ -148,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen>
                     // Right side image
                     Positioned.fill(
                       right: -680,
-                      top: -50,
+                      top: -100,
                       bottom: -230,
                       child: Image.asset(
                         'assets/Leaves/1x/Right_2.png',
@@ -201,8 +199,8 @@ class _LoginScreenState extends State<LoginScreen>
                 top: _startExpansion
                     ? 0
                     : _reverseExpansion
-                        ? -50
-                        : -50,
+                        ? -100
+                        : -100,
                 bottom: _startExpansion
                     ? 0
                     : _reverseExpansion

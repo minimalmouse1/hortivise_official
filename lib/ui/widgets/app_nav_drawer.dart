@@ -160,14 +160,25 @@ class AppNavDrawer extends StatelessWidget {
   }
 
   Widget _buildMenuItem(MenuItem item) {
+    final isSelected = currentItem == item;
+
     return Padding(
       padding: const EdgeInsets.only(left: 16),
       child: ListTile(
-        selected: currentItem == item,
-        selectedTileColor: AppColors.colorWhite,
+        selected: isSelected,
+        selectedTileColor:
+            AppColors.colorGreen, // Background color for selected tile
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        leading: Icon(item.icon),
-        title: Text(item.title),
+        leading: Icon(
+          item.icon,
+          color: isSelected ? Colors.white : AppColors.colorGray,
+        ),
+        title: Text(
+          item.title,
+          style: TextStyle(
+            color: isSelected ? Colors.white : AppColors.colorGray,
+          ),
+        ),
         onTap: () => onSelectItem(item),
       ),
     );
