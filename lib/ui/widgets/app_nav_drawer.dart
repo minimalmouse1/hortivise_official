@@ -22,7 +22,11 @@ class MenuItems {
   static const chat = MenuItem(title: 'Chat', icon: AppIcons.ic_chat_outlined);
   static const profile = MenuItem(title: 'Profile', icon: Icons.person_2);
   static const logOut = MenuItem(title: 'Logout', icon: Icons.logout);
-  static const all = <MenuItem>[home, chat, profile, logOut];
+  static const all = <MenuItem>[
+    home,
+    chat,
+    profile,
+  ];
 }
 
 class MenuItem {
@@ -86,7 +90,7 @@ class _ZoomDrawerScreenState extends State<ZoomDrawerScreen> {
 
   Widget _getScreen() {
     final currentUser = context.read<UserProvider>().getCurrentUser();
-    if (currentUser == null) return LandingScreen();
+    if (currentUser == null) return const LandingScreen();
 
     switch (currentItem) {
       case MenuItems.home:
@@ -136,6 +140,16 @@ class AppNavDrawer extends StatelessWidget {
   }
 
   Widget _buildUserInfo() {
+    String formatUserName(String? userName) {
+      if (userName == null || userName.isEmpty) return 'N/A';
+
+      // Capitalize the first letter and add ellipsis if length > 6
+      String formattedName = userName[0].toUpperCase() + userName.substring(1);
+      return formattedName.length > 8
+          ? '${formattedName.substring(0, 8)}...'
+          : formattedName;
+    }
+
     return ListTile(
       leading: CircleAvatar(
         radius: 24,
@@ -144,7 +158,7 @@ class AppNavDrawer extends StatelessWidget {
             : null,
       ),
       title: Text(
-        user?.userName ?? 'N/A',
+        formatUserName(user?.userName),
         style: AppTextStyles.titleStyle
             .changeColor(AppColors.colorGreen)
             .changeSize(18),

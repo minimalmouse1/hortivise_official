@@ -5,9 +5,8 @@ import 'package:horti_vige/data/models/consultation/consultation_model.dart';
 import 'package:horti_vige/data/models/user/user_model.dart';
 import 'package:horti_vige/ui/screens/common/conversation_screen.dart';
 import 'package:horti_vige/ui/utils/styles/text_styles.dart';
-import 'package:horti_vige/ui/widgets/exit_bottom_sheet.dart';
+import 'package:horti_vige/ui/widgets/app_nav_drawer.dart';
 import 'package:intl/intl.dart';
-
 import 'package:horti_vige/core/utils/app_consts.dart';
 import 'package:horti_vige/data/models/inbox/inbox_user.dart';
 import 'package:horti_vige/ui/utils/colors/colors.dart';
@@ -17,74 +16,69 @@ class Conversations extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        showModalBottomSheet(
-          context: context,
-          backgroundColor: AppColors.colorBeige,
-          builder: (context) {
-            return const ExitBottomSheet();
-          },
-        );
-        return false;
-      },
-      child: Scaffold(
-        backgroundColor: AppColors.colorBeige,
-        appBar: AppBar(
+    return Scaffold(
+      backgroundColor: AppColors.colorBeige,
+      appBar: AppBar(
           title: Text(
             'Chats',
             style: AppTextStyles.titleStyle.changeSize(20),
           ),
           backgroundColor: AppColors.colorBeige,
-        ),
-        body: LayoutBuilder(
-          builder: (context, con) {
-            return SizedBox(
-              width: con.maxWidth,
-              height: con.maxHeight,
-              child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('Chats')
-                    .where(
-                      FieldPath(const ['consultant', 'userId']),
-                      isEqualTo: FirebaseAuth.instance.currentUser!.uid,
-                    )
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
+          automaticallyImplyLeading: true, // Show the back button
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              // Navigate to BottomNavigationBarScreen when back button is pressed
+              Navigator.pushNamed(context, ZoomDrawerScreen.routeName);
+            },
+          )),
+      body: LayoutBuilder(
+        builder: (context, con) {
+          return SizedBox(
+            width: con.maxWidth,
+            height: con.maxHeight,
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('Chats')
+                  .where(
+                    FieldPath(const ['consultant', 'userId']),
+                    isEqualTo: FirebaseAuth.instance.currentUser!.uid,
+                  )
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (snapshot.hasError) {
+                  return const Center(
+                    child: Text('Something went wrong'),
+                  );
+                } else if (snapshot.hasData) {
+                  // print(snapshot.data!.docs.first.data().toString());
+                  if (snapshot.data!.docs.isEmpty) {
                     return const Center(
-                      child: CircularProgressIndicator(),
+                      child: Text('No converstion found'),
                     );
-                  } else if (snapshot.hasError) {
-                    return const Center(
-                      child: Text('Something went wrong'),
+                  } else {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: snapshot.data!.docs.length,
+                      itemBuilder: (context, index) {
+                        final model = ConversationModel.fromJson(
+                          snapshot.data!.docs[index].data()!
+                              as Map<String, dynamic>,
+                        );
+                        return conversationTile(model, context);
+                      },
                     );
-                  } else if (snapshot.hasData) {
-                    // print(snapshot.data!.docs.first.data().toString());
-                    if (snapshot.data!.docs.isEmpty) {
-                      return const Center(
-                        child: Text('No converstion found'),
-                      );
-                    } else {
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: snapshot.data!.docs.length,
-                        itemBuilder: (context, index) {
-                          final model = ConversationModel.fromJson(
-                            snapshot.data!.docs[index].data()!
-                                as Map<String, dynamic>,
-                          );
-                          return conversationTile(model, context);
-                        },
-                      );
-                    }
                   }
-                  return const SizedBox();
-                },
-              ),
-            );
-          },
-        ),
+                }
+                return const SizedBox();
+              },
+            ),
+          );
+        },
       ),
     );
   }

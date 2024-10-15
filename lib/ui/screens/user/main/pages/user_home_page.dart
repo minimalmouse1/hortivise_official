@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:horti_vige/core/utils/helpers/preference_manager.dart';
-import 'package:horti_vige/data/enums/specialist_category.dart';
 import 'package:horti_vige/providers/user_provider.dart';
 import 'package:horti_vige/ui/items/item_consultant_home.dart';
 import 'package:horti_vige/ui/screens/user/consultant_details_screen.dart';
@@ -23,7 +22,7 @@ class UserHomePage extends StatefulWidget {
 
 class _UserHomePageState extends State<UserHomePage> {
   Map<DateTime, List<dynamic>> _consultationDates = {};
-  DateTime _focusedDay = DateTime.now();
+  final DateTime _focusedDay = DateTime.now();
   final currentUserId =
       PreferenceManager.getInstance().getCurrentUser()?.id ?? '';
   TextEditingController searchController = TextEditingController();
@@ -36,14 +35,14 @@ class _UserHomePageState extends State<UserHomePage> {
         .where('customer.id', isEqualTo: currentUserId)
         .get();
 
-    final Map<DateTime, List<dynamic>> consultationMap = {};
+    final consultationMap = <DateTime, List<dynamic>>{};
 
     for (final doc in snapshot.docs) {
       final data = doc.data();
 
-      final DateTime consultationDate = DateTime.parse(data['startTime']);
+      final consultationDate = DateTime.parse(data['startTime']);
 
-      final DateTime dateOnly = DateTime(
+      final dateOnly = DateTime(
           consultationDate.year, consultationDate.month, consultationDate.day);
 
       // Add consultation date to the map
@@ -78,78 +77,107 @@ class _UserHomePageState extends State<UserHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    List<dynamic> _getEventsForDay(DateTime day) {
-      DateTime normalizedDay = DateTime(day.year, day.month, day.day);
+    List<dynamic> getEventsForDay(DateTime day) {
+      final normalizedDay = DateTime(day.year, day.month, day.day);
       return _consultationDates[normalizedDay] ?? [];
     }
 
-    Widget _buildMarker(Object event) {
-      return Container(
-        width: 6.0,
-        height: 6.0,
-        margin: const EdgeInsets.symmetric(horizontal: 1.5),
-        decoration: BoxDecoration(
-          color: AppColors.colorGreen,
-          shape: BoxShape.circle,
-        ),
+    Widget buildMarker(int bookingCount) {
+      return Stack(
+        alignment: Alignment.center,
+        children: [
+          const Icon(
+            Icons.bookmark_outlined,
+            color: Colors.amber,
+            size: 20, // Adjust size as needed
+          ),
+          if (bookingCount > 0) // Only show count if there are bookings
+            Positioned(
+              top: 2, // Adjust this value to control the count position
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  child: Text(
+                    bookingCount.toString(),
+                    style: const TextStyle(
+                      color: Colors.white, // Text color
+                      fontSize: 8, // Font size for the booking count
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       );
     }
 
-    void _showCalendar(BuildContext context) {
+    void showCalendar(BuildContext context) {
       showModalBottomSheet(
         context: context,
-        builder: (BuildContext context) {
+        builder: (context) {
           return ColoredBox(
             color: AppColors.colorBeige,
             child: Padding(
               padding: const EdgeInsets.all(10),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Small dot indicates the appointment date',
-                    style: AppTextStyles.titleStyle.changeSize(16),
+              child: TableCalendar(
+                weekNumbersVisible: false,
+                firstDay: DateTime.utc(2010, 10, 16),
+                lastDay: DateTime.utc(2030, 3, 14),
+                focusedDay: _focusedDay,
+                eventLoader: getEventsForDay,
+                calendarStyle: const CalendarStyle(
+                  todayTextStyle: TextStyle(color: Colors.black),
+                  todayDecoration: BoxDecoration(
+                    color: Colors.green,
+                    shape: BoxShape.circle,
                   ),
-                  TableCalendar(
-                    firstDay: DateTime.utc(2010, 10, 16),
-                    lastDay: DateTime.utc(2030, 3, 14),
-                    focusedDay: _focusedDay,
-                    eventLoader: _getEventsForDay,
-                    calendarStyle: const CalendarStyle(
-                      todayTextStyle: TextStyle(color: Colors.black),
-                      todayDecoration: BoxDecoration(
-                        color: Colors.transparent,
-                        shape: BoxShape.circle,
-                      ),
-                      selectedDecoration: BoxDecoration(
-                        color: Colors.blue,
-                        shape: BoxShape.circle,
-                      ),
-                      markerDecoration: BoxDecoration(
-                        color: AppColors.colorGreen,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    onDaySelected: (selectedDay, focusedDay) {},
-                    calendarBuilders: CalendarBuilders(
-                      markerBuilder: (context, date, events) {
-                        if (events.isNotEmpty) {
-                          return Positioned(
-                            top:
-                                5, // Adjust this value to control the marker position
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: events
-                                  .map((event) => _buildMarker(event!))
-                                  .toList(),
-                            ),
-                          );
-                        }
-                        return null;
-                      },
-                    ),
+                  selectedDecoration: BoxDecoration(
+                    color: Colors.blue,
+                    shape: BoxShape.circle,
                   ),
-                ],
+                  markerDecoration: BoxDecoration(
+                    color: Color.fromARGB(255, 119, 8, 8),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                onDaySelected: (selectedDay, focusedDay) {},
+                calendarBuilders: CalendarBuilders(
+                  markerBuilder: (context, date, events) {
+                    if (events.isNotEmpty) {
+                      return Positioned(
+                        top:
+                            5, // Adjust this value to control the marker position
+                        child: buildMarker(events.length),
+                      );
+                    }
+                    return null;
+                  },
+                  defaultBuilder: (context, date, _) {
+                    final hasBookings = getEventsForDay(date).isNotEmpty;
+                    final isToday = date.isAtSameMomentAs(DateTime.now());
+
+                    return Container(
+                      decoration: BoxDecoration(
+                        border: hasBookings || isToday
+                            ? Border.all(
+                                color: Colors.green,
+                                width:
+                                    0.4) // Red border if bookings are available
+                            : Border.all(color: Colors.transparent),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          date.day.toString(),
+                          style: const TextStyle(
+                              color:
+                                  Colors.black), // Change text color as needed
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           );
@@ -234,7 +262,7 @@ class _UserHomePageState extends State<UserHomePage> {
             ),
             IconButton(
               onPressed: () {
-                _showCalendar(context);
+                showCalendar(context);
               },
               icon: const Icon(
                 Icons.calendar_month,
