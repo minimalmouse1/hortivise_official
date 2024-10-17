@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:horti_vige/data/enums/user_type.dart';
+import 'package:horti_vige/ui/screens/auth/login_screen.dart';
 import 'package:horti_vige/ui/widgets/exit_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -51,12 +52,10 @@ class _ZoomDrawerScreenState extends State<ZoomDrawerScreen> {
   void initState() {
     super.initState();
     Provider.of<UserProvider>(context, listen: false).updateFCMToken();
-    // NotificationService.askForNotificationPermission();
   }
 
   @override
   Widget build(BuildContext context) {
-    print(Provider.of<UserProvider>(context, listen: false).getCurrentUser());
     return ZoomDrawer(
       controller: ZoomDrawerController(),
       menuScreen: AppNavDrawer(
@@ -67,25 +66,17 @@ class _ZoomDrawerScreenState extends State<ZoomDrawerScreen> {
           setState(() {
             currentItem = item;
           });
-          ZoomDrawer.of(context)?.close();
-          if (item == MenuItems.logOut) _logOut(context);
+          ZoomDrawer.of(context)?.close(); // Close the drawer after selection
         },
       ),
-      mainScreen: Material(elevation: 2, child: _getScreen()),
+      mainScreen: Material(
+        elevation: 2,
+        child: _getScreen(), // Display the correct screen
+      ),
       angle: 0,
       borderRadius: 0,
       menuBackgroundColor: AppColors.colorBeige,
     );
-  }
-
-  void _logOut(BuildContext context) {
-    Provider.of<UserProvider>(context, listen: false).logoutUser().then((_) {
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        LandingScreen.routeName,
-        (route) => false,
-      );
-    });
   }
 
   Widget _getScreen() {
@@ -130,7 +121,9 @@ class AppNavDrawer extends StatelessWidget {
           const SizedBox(height: 60),
           _buildUserInfo(),
           const SizedBox(height: 20),
-          ...MenuItems.all.map((item) => _buildMenuItem(item)).toList(),
+          ...MenuItems.all
+              .map((item) => _buildMenuItem(item, context))
+              .toList(),
           if (user?.specialist != null) _buildChatTile(context),
           const Spacer(),
           _buildFooter(context),
@@ -173,7 +166,7 @@ class AppNavDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem(MenuItem item) {
+  Widget _buildMenuItem(MenuItem item, context) {
     final isSelected = currentItem == item;
 
     return Padding(
@@ -193,7 +186,11 @@ class AppNavDrawer extends StatelessWidget {
             color: isSelected ? Colors.white : AppColors.colorGray,
           ),
         ),
-        onTap: () => onSelectItem(item),
+        onTap: () {
+          // Close the Zoom Drawer and navigate to the selected screen
+          ZoomDrawer.of(context)?.close();
+          onSelectItem(item); // Trigger the callback to update the main screen
+        },
       ),
     );
   }
@@ -211,7 +208,7 @@ class AppNavDrawer extends StatelessWidget {
     return Column(
       children: [
         if (user?.specialist != null) _buildStripeTile(),
-        _buildLogoutTile(),
+        _buildLogoutTile(context),
       ],
     );
   }
@@ -229,9 +226,12 @@ class AppNavDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildLogoutTile() {
+  Widget _buildLogoutTile(context) {
     return ListTile(
-      onTap: () => onSelectItem(MenuItems.logOut),
+      onTap: () {
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => const LoginScreen()));
+      },
       leading: const Icon(Icons.logout),
       title: const Text('Logout', style: AppTextStyles.bodyStyleMedium),
     );

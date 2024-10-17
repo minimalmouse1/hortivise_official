@@ -53,7 +53,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
     if (!mounted) return;
     Navigator.pop(context);
-    context.showSnack(message: 'Congrats, password changed successfully');
   }
 
   @override

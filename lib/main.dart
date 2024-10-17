@@ -19,7 +19,8 @@ import 'package:horti_vige/ui/screens/auth/forgot_password_screen.dart';
 import 'package:horti_vige/ui/screens/auth/login_screen.dart';
 import 'package:horti_vige/ui/screens/auth/signup_screen.dart';
 import 'package:horti_vige/ui/screens/common/blog_detail_screen.dart';
-import 'package:horti_vige/ui/screens/common/conversation_screen.dart';
+import 'package:horti_vige/ui/screens/consultant/conversations.dart';
+
 import 'package:horti_vige/ui/screens/common/landing_screen.dart';
 import 'package:horti_vige/ui/screens/common/profile_screen.dart';
 import 'package:horti_vige/ui/screens/consultant/consultation_details_screen.dart';
@@ -135,7 +136,6 @@ class MyApp extends StatelessWidget {
                 const ConsultantMainScreen(),
             ConsultationDetailsScreen.routeName: (ctx) =>
                 const ConsultationDetailsScreen(),
-            ConversationScreen.routeName: (ctx) => const ConversationScreen(),
             EditAvailabilityScreen.routeName: (ctx) =>
                 const EditAvailabilityScreen(),
             ConsultationRequestScreen.routeName: (ctx) =>

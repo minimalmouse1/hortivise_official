@@ -67,7 +67,7 @@ class _AnimatedLandingScreenState extends State<AnimatedLandingScreen>
     _finalUiOpacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _finalUiController, curve: Curves.easeInOut),
     );
-
+    startAnimation();
     super.initState();
   }
 
@@ -91,7 +91,7 @@ class _AnimatedLandingScreenState extends State<AnimatedLandingScreen>
         backgroundColor: AppColors.colorBeige,
         body: GestureDetector(
           onTap: () {
-            !animationPlayed ? startAnimation() : null;
+            //  !animationPlayed ? startAnimation() : null;
           },
           child: Stack(
             children: [
