@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:horti_vige/data/enums/user_type.dart';
+import 'package:horti_vige/data/services/auth_service.dart';
 import 'package:horti_vige/ui/screens/auth/login_screen.dart';
 import 'package:horti_vige/ui/widgets/exit_bottom_sheet.dart';
 import 'package:provider/provider.dart';
@@ -229,6 +230,7 @@ class AppNavDrawer extends StatelessWidget {
   Widget _buildLogoutTile(context) {
     return ListTile(
       onTap: () {
+        AuthService().signOut();
         Navigator.of(context)
             .push(MaterialPageRoute(builder: (context) => const LoginScreen()));
       },

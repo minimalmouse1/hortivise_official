@@ -42,17 +42,28 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     );
 
     try {
-      await Provider.of<UserProvider>(context, listen: false).changePassword(
+      final value = await Provider.of<UserProvider>(context, listen: false)
+          .changePassword(
         oldPassword: _oldPassword,
         newPassword: _password,
+        context: context,
       );
+
+      if (value == 'something_went_wrong') {
+        context.showSnack(message: 'Something went wrong');
+      } else if (value == 'invalid_password') {
+        context.showSnack(message: 'Check Current Password');
+      } else {
+        context.showSnack(message: 'Password Updated ');
+      }
     } catch (e) {
       if (!mounted) return;
       context.showSnack(message: 'Something went wrong, $e');
+    } finally {
+      if (mounted) {
+        Navigator.pop(context); // Close the progress dialog
+      }
     }
-
-    if (!mounted) return;
-    Navigator.pop(context);
   }
 
   @override
@@ -65,69 +76,71 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         backgroundColor: AppColors.colorWhite,
         shadowColor: AppColors.colorWhite,
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: 12.allPadding,
-            child: const Text(
-              'Create new password to login\n'
-              'Password must be at least 6 characters long',
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: 12.allPadding,
+              child: const Text(
+                'Create new password to login\n'
+                'Password must be at least 6 characters long',
+              ),
             ),
-          ),
-          32.height,
-          AppTextInput(
-            hint: 'Current Password',
-            floatHint: false,
-            fieldHeight: 50,
-            errorText: _oldPasswordError,
-            isPasswordField: true,
-            onUpdateInput: (value) {
-              _oldPassword = value;
-              setState(() {
-                _oldPasswordError = isPasswordValid(_oldPassword);
-              });
-              debugPrint('Email -> $_oldPassword');
-            },
-          ),
-          12.height,
-          AppTextInput(
-            hint: 'Password',
-            floatHint: false,
-            fieldHeight: 50,
-            errorText: _passwordError,
-            isPasswordField: true,
-            onUpdateInput: (value) {
-              _password = value;
-              setState(() {
-                _passwordError = isPasswordValid(_password);
-              });
-              debugPrint('Email -> $_password');
-            },
-          ),
-          12.height,
-          AppTextInput(
-            hint: 'Confirm Password ',
-            floatHint: false,
-            isPasswordField: true,
-            fieldHeight: 50,
-            errorText: _confirmPasswordError,
-            onUpdateInput: (value) {
-              _confirmPassword = value;
-              setState(() {
-                _confirmPasswordError =
-                    isConfirmPasswordValid(_password, _confirmPassword);
-              });
-              debugPrint('Email -> $_confirmPassword');
-            },
-          ),
-          36.height,
-          AppFilledButton(
-            onPress: _updatePassword,
-            title: 'Update Password',
-          ),
-          30.height,
-        ],
+            32.height,
+            AppTextInput(
+              hint: 'Current Password',
+              floatHint: false,
+              fieldHeight: 50,
+              errorText: _oldPasswordError,
+              isPasswordField: true,
+              onUpdateInput: (value) {
+                _oldPassword = value;
+                setState(() {
+                  _oldPasswordError = isPasswordValid(_oldPassword);
+                });
+                debugPrint('Email -> $_oldPassword');
+              },
+            ),
+            12.height,
+            AppTextInput(
+              hint: 'Password',
+              floatHint: false,
+              fieldHeight: 50,
+              errorText: _passwordError,
+              isPasswordField: true,
+              onUpdateInput: (value) {
+                _password = value;
+                setState(() {
+                  _passwordError = isPasswordValid(_password);
+                });
+                debugPrint('Email -> $_password');
+              },
+            ),
+            12.height,
+            AppTextInput(
+              hint: 'Confirm Password ',
+              floatHint: false,
+              isPasswordField: true,
+              fieldHeight: 50,
+              errorText: _confirmPasswordError,
+              onUpdateInput: (value) {
+                _confirmPassword = value;
+                setState(() {
+                  _confirmPasswordError =
+                      isConfirmPasswordValid(_password, _confirmPassword);
+                });
+                debugPrint('Email -> $_confirmPassword');
+              },
+            ),
+            36.height,
+            AppFilledButton(
+              onPress: _updatePassword,
+              title: 'Update Password',
+            ),
+            30.height,
+          ],
+        ),
       ),
     );
   }

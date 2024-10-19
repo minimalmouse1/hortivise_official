@@ -384,7 +384,11 @@ class _LoginScreenState extends State<LoginScreen>
 
     setState(() {
       animationPlayed = true;
-      _imageOpacity = 1.0;
+    });
+    Future.delayed(const Duration(seconds: 1), () {
+      setState(() {
+        _imageOpacity = 1.0;
+      });
     });
     Future.delayed(const Duration(seconds: 2), () {
       setState(() {

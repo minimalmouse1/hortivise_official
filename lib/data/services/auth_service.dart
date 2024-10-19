@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:horti_vige/core/exceptions/app_exception.dart';
 import 'package:horti_vige/core/utils/firebase_error_code_handler.dart';
 
@@ -8,7 +9,7 @@ abstract class BaseAuthService {
   Future<User> signInWithEmailAndPassword(String email, String password);
   Future<User> createUserWithEmailAndPassword(String email, String password);
   Future<void> resetPassword(String email);
-  Future<bool> changePassword(String oldPassword, String newPassword);
+  Future<String> changePassword(String oldPassword, String newPassword);
   Future<bool> deleteAccount(String password);
   Future<void> signOut();
 }
@@ -93,24 +94,23 @@ class AuthService implements BaseAuthService {
   }
 
   @override
-  Future<bool> changePassword(String oldPassword, String newPassword) async {
+  Future<String> changePassword(
+    String oldPassword,
+    String newPassword,
+  ) async {
     try {
       final userCred = await _reauthenticateUser(oldPassword);
-      if (userCred == null) return false;
-      if (userCred.user == null) return false;
+      if (userCred == null) return 'something_went_wrong';
+      if (userCred.user == null) return 'something_went_wrong';
 
       await userCred.user!.updatePassword(newPassword);
-      return true;
+      return 'password_updated';
     } on FirebaseAuthException catch (e) {
-      throw AppException(
-        message: e.message ?? '',
-        title: 'Something went wrong',
-      );
+      debugPrint('log: FirebaseAuthException: ${e.message}');
+      return 'invalid_password';
     } catch (e) {
-      throw AppException(
-        title: 'Password Change Failed',
-        message: e.toString(),
-      );
+      debugPrint('log: Unexpected Error: $e');
+      return 'something_went_wrong';
     }
   }
 

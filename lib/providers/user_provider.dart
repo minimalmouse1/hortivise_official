@@ -145,11 +145,12 @@ class UserProvider extends ChangeNotifier {
   }
 
   // change password
-  Future<void> changePassword({
+  Future<String> changePassword({
     required String oldPassword,
     required String newPassword,
+    required BuildContext context,
   }) async {
-    _authService.changePassword(oldPassword, newPassword);
+    return _authService.changePassword(oldPassword, newPassword);
   }
 
   Future<void> updateProfilePhoto({String profileUri = ''}) async {
