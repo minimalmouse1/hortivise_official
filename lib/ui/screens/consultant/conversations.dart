@@ -10,9 +10,26 @@ import 'package:intl/intl.dart';
 import 'package:horti_vige/core/utils/app_consts.dart';
 import 'package:horti_vige/data/models/inbox/inbox_user.dart';
 import 'package:horti_vige/ui/utils/colors/colors.dart';
+import 'dart:developer' as dev;
 
 class Conversations extends StatelessWidget {
   const Conversations({super.key});
+
+  void getAllChats() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('Chats').get();
+
+      for (var doc in querySnapshot.docs) {
+        dev.log('log: Document ID: ${doc.id}');
+        dev.log('log: Data: ${doc.data()}');
+        dev.log(
+            'log: current user id : ${FirebaseAuth.instance.currentUser!.uid}');
+      }
+    } catch (e) {
+      dev.log('Error retrieving chats: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +72,7 @@ class Conversations extends StatelessWidget {
                     child: Text('Something went wrong'),
                   );
                 } else if (snapshot.hasData) {
-                  // print(snapshot.data!.docs.first.data().toString());
+                  dev.log('${snapshot.data!.docs.length}');
                   if (snapshot.data!.docs.isEmpty) {
                     return const Center(
                       child: Text('No converstion found'),
