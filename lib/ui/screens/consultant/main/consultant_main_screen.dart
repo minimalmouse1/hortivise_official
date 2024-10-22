@@ -8,6 +8,7 @@ import 'package:horti_vige/ui/screens/user/main/pages/user_consultants_page.dart
 import 'package:horti_vige/ui/screens/user/main/pages/user_notifications_page.dart';
 import 'package:horti_vige/ui/utils/colors/colors.dart';
 import 'package:horti_vige/ui/utils/styles/text_styles.dart';
+import 'package:horti_vige/ui/widgets/exit_bottom_sheet.dart';
 
 class ConsultantMainScreen extends StatefulWidget {
   const ConsultantMainScreen({super.key});
@@ -36,57 +37,75 @@ class _ConsultantMainScreenState extends State<ConsultantMainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.colorBeige,
-      body: _pages[_index],
-      bottomNavigationBar: ClipRRect(
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(12),
-          topRight: Radius.circular(12),
-        ),
-        child: BottomNavigationBar(
-          onTap: (index) {
-            setState(() {
-              _index = index;
-            });
-          },
-          currentIndex: _index,
-          selectedItemColor: AppColors.colorGreen,
-          unselectedItemColor: AppColors.colorGray.withAlpha(80),
-          showUnselectedLabels: true,
-          showSelectedLabels: true,
-          selectedIconTheme: const IconThemeData(size: 22),
-          unselectedIconTheme: const IconThemeData(size: 22),
-          selectedFontSize: 12,
-          type: BottomNavigationBarType.fixed,
-          selectedLabelStyle: AppTextStyles.bottomTabTextStyle,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(AppIcons.home_outlined),
-              activeIcon: Icon(AppIcons.home_filled),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(AppIcons.consultations_outlined),
-              activeIcon: Icon(AppIcons.consultations_filled),
-              label: 'Consultation',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(AppIcons.wallet_outlined),
-              activeIcon: Icon(AppIcons.wallet_filled),
-              label: 'Wallet',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(AppIcons.notifications_outlined),
-              activeIcon: Icon(AppIcons.notificatins_filled),
-              label: 'Notifications',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(AppIcons.blog_outlined),
-              activeIcon: Icon(AppIcons.blog_filled),
-              label: 'Blogs',
-            ),
-          ],
+    return WillPopScope(
+      onWillPop: () async {
+        if (_index == 0) {
+          showModalBottomSheet(
+            context: context,
+            backgroundColor: AppColors.colorBeige,
+            builder: (context) {
+              return const ExitBottomSheet();
+            },
+          );
+        } else {
+          setState(() {
+            _index = 0;
+          });
+        }
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.colorBeige,
+        body: _pages[_index],
+        bottomNavigationBar: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(12),
+            topRight: Radius.circular(12),
+          ),
+          child: BottomNavigationBar(
+            onTap: (index) {
+              setState(() {
+                _index = index;
+              });
+            },
+            currentIndex: _index,
+            selectedItemColor: AppColors.colorGreen,
+            unselectedItemColor: AppColors.colorGray.withAlpha(80),
+            showUnselectedLabels: true,
+            showSelectedLabels: true,
+            selectedIconTheme: const IconThemeData(size: 22),
+            unselectedIconTheme: const IconThemeData(size: 22),
+            selectedFontSize: 12,
+            type: BottomNavigationBarType.fixed,
+            selectedLabelStyle: AppTextStyles.bottomTabTextStyle,
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(AppIcons.home_outlined),
+                activeIcon: Icon(AppIcons.home_filled),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(AppIcons.consultations_outlined),
+                activeIcon: Icon(AppIcons.consultations_filled),
+                label: 'Consultation',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(AppIcons.wallet_outlined),
+                activeIcon: Icon(AppIcons.wallet_filled),
+                label: 'Wallet',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(AppIcons.notifications_outlined),
+                activeIcon: Icon(AppIcons.notificatins_filled),
+                label: 'Notifications',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(AppIcons.blog_outlined),
+                activeIcon: Icon(AppIcons.blog_filled),
+                label: 'Blogs',
+              ),
+            ],
+          ),
         ),
       ),
     );
