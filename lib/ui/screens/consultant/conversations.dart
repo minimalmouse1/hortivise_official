@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:horti_vige/data/enums/user_type.dart';
 import 'package:horti_vige/data/models/consultation/consultation_model.dart';
 import 'package:horti_vige/data/models/user/user_model.dart';
+import 'package:horti_vige/providers/user_provider.dart';
 import 'package:horti_vige/ui/screens/common/conversation_screen.dart';
 import 'package:horti_vige/ui/utils/styles/text_styles.dart';
 import 'package:horti_vige/ui/widgets/app_nav_drawer.dart';
@@ -11,6 +13,8 @@ import 'package:horti_vige/core/utils/app_consts.dart';
 import 'package:horti_vige/data/models/inbox/inbox_user.dart';
 import 'package:horti_vige/ui/utils/colors/colors.dart';
 import 'dart:developer' as dev;
+
+import 'package:provider/provider.dart';
 
 class Conversations extends StatelessWidget {
   const Conversations({super.key});
@@ -33,6 +37,7 @@ class Conversations extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = context.read<UserProvider>().getCurrentUser();
     return Scaffold(
       backgroundColor: AppColors.colorBeige,
       appBar: AppBar(
@@ -55,13 +60,21 @@ class Conversations extends StatelessWidget {
             width: con.maxWidth,
             height: con.maxHeight,
             child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('Chats')
-                  .where(
-                    FieldPath(const ['consultant', 'userId']),
-                    isEqualTo: FirebaseAuth.instance.currentUser!.uid,
-                  )
-                  .snapshots(),
+              stream: currentUser!.type == UserType.CUSTOMER
+                  ? FirebaseFirestore.instance
+                      .collection('Chats')
+                      .where(
+                        FieldPath(const ['user', 'userId']),
+                        isEqualTo: FirebaseAuth.instance.currentUser!.uid,
+                      )
+                      .snapshots()
+                  : FirebaseFirestore.instance
+                      .collection('Chats')
+                      .where(
+                        FieldPath(const ['consultant', 'userId']),
+                        isEqualTo: FirebaseAuth.instance.currentUser!.uid,
+                      )
+                      .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
@@ -86,7 +99,7 @@ class Conversations extends StatelessWidget {
                           snapshot.data!.docs[index].data()!
                               as Map<String, dynamic>,
                         );
-                        return conversationTile(model, context);
+                        return conversationTile(currentUser, model, context);
                       },
                     );
                   }
@@ -100,7 +113,8 @@ class Conversations extends StatelessWidget {
     );
   }
 
-  Widget conversationTile(ConversationModel model, BuildContext context) {
+  Widget conversationTile(
+      UserModel currentUser, ConversationModel model, BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8),
       child: ListTile(
@@ -113,6 +127,8 @@ class Conversations extends StatelessWidget {
           if (data.docs.isNotEmpty) {
             user = UserModel.fromJson(data.docs.first.data());
           }
+          debugPrint(
+              'log: user logged in id ${FirebaseAuth.instance.currentUser!.uid} ');
           Navigator.pushNamed(
             context,
             ConversationScreen.routeName,
@@ -125,11 +141,17 @@ class Conversations extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
         tileColor: Colors.white,
         leading: CircleAvatar(
-          backgroundImage: NetworkImage(model.user!.profileUrl),
+          backgroundImage: NetworkImage(
+            currentUser.type == UserType.CUSTOMER
+                ? model.consultant!.profileUrl
+                : model.user!.profileUrl,
+          ),
           radius: 24,
         ),
         title: Text(
-          model.user!.userName,
+          currentUser.type == UserType.CUSTOMER
+              ? model.consultant!.userName
+              : model.user!.userName,
           style: AppTextStyles.titleStyle.changeSize(14),
         ),
         subtitle: Text(

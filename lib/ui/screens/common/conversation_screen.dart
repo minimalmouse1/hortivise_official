@@ -23,6 +23,7 @@ class ConversationScreen extends StatefulWidget {
 }
 
 class _ConversationScreenState extends State<ConversationScreen> {
+  
   String _inputMessage = '';
 
   final TextEditingController _editingController = TextEditingController();
@@ -246,8 +247,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                         ),
                                       ),
                                     ),
-                                    if (otherUser.type == UserType.SPECIALIST &&
-                                        sentMessages < 50)
+                                    if (sentMessages < 50)
                                       Container(
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 12,

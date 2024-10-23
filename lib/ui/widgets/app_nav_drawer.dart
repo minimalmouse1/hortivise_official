@@ -125,7 +125,7 @@ class AppNavDrawer extends StatelessWidget {
           ...MenuItems.all
               .map((item) => _buildMenuItem(item, context))
               .toList(),
-          if (user?.specialist != null) _buildChatTile(context),
+          // if (user?.specialist != null) _buildChatTile(context),
           const Spacer(),
           _buildFooter(context),
         ],

@@ -449,6 +449,7 @@ class _ConsultationDetailsScreenState extends State<ConsultationDetailsScreen> {
   ) {
     // consultation.toJson().log();
     if (consultation.packageType == PackageType.text) {
+      debugPrint('log: user type:${isCustomer ? 'Customer' : 'Doctor'}');
       Navigator.pushNamed(
         context,
         ConversationScreen.routeName,
