@@ -23,7 +23,6 @@ class ConversationScreen extends StatefulWidget {
 }
 
 class _ConversationScreenState extends State<ConversationScreen> {
-  
   String _inputMessage = '';
 
   final TextEditingController _editingController = TextEditingController();
@@ -43,6 +42,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
       await setMessageCount();
       loading = false;
       setState(() {});
+
+      debugPrint('log: other user data  ${otherUser.userName}');
     });
   }
 

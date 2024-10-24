@@ -113,19 +113,46 @@ class Conversations extends StatelessWidget {
     );
   }
 
+  // void getUsersWithUid() async {
+  //   try {
+  //     final QuerySnapshot snapshot =
+  //         await FirebaseFirestore.instance.collection('Users').get();
+
+  //     if (snapshot.docs.isNotEmpty) {
+  //       for (var doc in snapshot.docs) {
+  //         print('Document ID Data: ${doc.id}');
+  //         print('User Data: ${doc.data()}');
+  //       }
+  //     }
+  //   } catch (e) {
+  //     print('Error fetching users: $e');
+  //   }
+  // }
+
   Widget conversationTile(
       UserModel currentUser, ConversationModel model, BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8),
       child: ListTile(
         onTap: () async {
+          // getUsersWithUid();
           UserModel? user;
-          final data = await FirebaseFirestore.instance
-              .collection('Users')
-              .where('uId', isEqualTo: model.user!.userId)
-              .get();
+          final data = currentUser.type == UserType.CUSTOMER
+              ? await FirebaseFirestore.instance
+                  .collection('Users')
+                  .where('email',
+                      isEqualTo:
+                          'testConsultant@gmail.com') // Replace with your actual condition
+                  .get()
+              : await FirebaseFirestore.instance
+                  .collection('Users')
+                  .where('uId', isEqualTo: model.user!.userId)
+                  .get();
+
           if (data.docs.isNotEmpty) {
             user = UserModel.fromJson(data.docs.first.data());
+
+            debugPrint('log: user model detail ${user.userName}');
           }
           debugPrint(
               'log: user logged in id ${FirebaseAuth.instance.currentUser!.uid} ');
