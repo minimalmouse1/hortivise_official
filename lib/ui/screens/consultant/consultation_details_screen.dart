@@ -2,9 +2,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:horti_vige/ui/screens/video_call/video_call_screen.dart';
-import 'package:provider/provider.dart';
-
 import 'package:horti_vige/core/utils/app_consts.dart';
 import 'package:horti_vige/core/utils/app_date_utils.dart';
 import 'package:horti_vige/data/enums/consultation_status.dart';
@@ -16,13 +13,14 @@ import 'package:horti_vige/ui/dialogs/confirmation_bottom_dialog.dart';
 import 'package:horti_vige/ui/dialogs/update_consultation_bottom_dialog.dart';
 import 'package:horti_vige/ui/resources/app_icons_icons.dart';
 import 'package:horti_vige/ui/resources/strings.dart';
+import 'package:horti_vige/ui/screens/common/conversation_screen.dart';
+import 'package:horti_vige/ui/screens/video_call/video_call_screen.dart';
 import 'package:horti_vige/ui/utils/colors/colors.dart';
 import 'package:horti_vige/ui/utils/extensions/extensions.dart';
 import 'package:horti_vige/ui/utils/styles/text_styles.dart';
 import 'package:horti_vige/ui/widgets/app_filled_button.dart';
 import 'package:horti_vige/ui/widgets/app_outlined_button.dart';
-
-import 'package:horti_vige/ui/screens/common/conversation_screen.dart';
+import 'package:provider/provider.dart';
 
 class ConsultationDetailsScreen extends StatefulWidget {
   const ConsultationDetailsScreen({
@@ -290,6 +288,20 @@ class _ConsultationDetailsScreenState extends State<ConsultationDetailsScreen> {
                               ),
                             ),
                             12.height,
+                            ElevatedButton(
+                                onPressed: () {
+                                  debugPrint(
+                                    'log: user type:${isCustomer ? 'Customer' : 'Doctor'}',
+                                  );
+                                  debugPrint(
+                                      'call start time :${consultation.startTime.millisecondsSinceEpoch}');
+                                  _onStartConsultation(
+                                    context,
+                                    isCustomer,
+                                    consultation,
+                                  );
+                                },
+                                child: const Text('Press Me')),
                             if (consultation.status !=
                                 ConsultationStatus.canceled)
                               Expanded(
@@ -303,6 +315,8 @@ class _ConsultationDetailsScreenState extends State<ConsultationDetailsScreen> {
                                         children: [
                                           AppFilledButton(
                                             onPress: () {
+                                              debugPrint(
+                                                  'log: user type:${isCustomer ? 'Customer' : 'Doctor'}');
                                               _onStartConsultation(
                                                 context,
                                                 isCustomer,
@@ -311,6 +325,8 @@ class _ConsultationDetailsScreenState extends State<ConsultationDetailsScreen> {
                                             },
                                             title: (consultation.packageType ==
                                                         PackageType.text &&
+                                                    consultation.packageType ==
+                                                        PackageType.video &&
                                                     AppDateUtils
                                                             .getTimeGapByMilliseconds(
                                                           milliseconds: consultation
@@ -323,6 +339,8 @@ class _ConsultationDetailsScreenState extends State<ConsultationDetailsScreen> {
                                             isEnabled: consultation.isEnabled ||
                                                 (consultation.packageType ==
                                                         PackageType.text &&
+                                                    consultation.packageType ==
+                                                        PackageType.video &&
                                                     AppDateUtils
                                                             .getTimeGapByMilliseconds(
                                                           milliseconds: consultation
@@ -447,6 +465,7 @@ class _ConsultationDetailsScreenState extends State<ConsultationDetailsScreen> {
     bool isCustomer,
     ConsultationModel consultation,
   ) {
+    debugPrint('log: user type:${isCustomer ? 'Customer' : 'Doctor'}');
     // consultation.toJson().log();
     if (consultation.packageType == PackageType.text) {
       debugPrint('log: user type:${isCustomer ? 'Customer' : 'Doctor'}');

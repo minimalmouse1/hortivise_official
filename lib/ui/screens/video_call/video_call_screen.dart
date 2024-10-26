@@ -5,11 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:horti_vige/core/utils/helpers/preference_manager.dart';
 import 'package:horti_vige/data/models/consultation/consultation_model.dart';
 import 'package:horti_vige/data/models/user/user_model.dart';
+import 'package:horti_vige/data/services/token_service.dart';
 import 'package:horti_vige/data/services/video_service.dart';
 import 'package:horti_vige/ui/utils/extensions/extensions.dart';
 import 'package:stream_video_flutter/stream_video_flutter.dart';
-
-import 'package:horti_vige/data/services/token_service.dart';
 
 class VideoCallScreen extends StatefulWidget {
   const VideoCallScreen({
@@ -40,6 +39,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     super.initState();
     final currentUserId =
         PreferenceManager.getInstance().getCurrentUser()?.id ?? '';
+
     if (currentUserId == widget.consultationModel.customer.id) {
       currentUser = widget.consultationModel.customer;
       otherUser = widget.consultationModel.specialist;
@@ -48,6 +48,9 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       currentUser = widget.consultationModel.specialist;
     }
     Future.delayed(Duration.zero, () async {
+      debugPrint('current video user id: $currentUserId');
+      debugPrint('current video user mail:${currentUser.email}');
+      debugPrint('other video user mail:${otherUser.email}');
       await VideoService.instance
           .init(currentUser, widget.consultationModel.id);
       await setTimer(widget.consultationModel);
@@ -60,111 +63,117 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        body: SizedBox(
-          width: context.width,
-          height: context.safeHeight,
-          // child: Stack(
-          //   children: [
-          //     receivingStreamWidget(),
-          //     sendingStreamWidget(),
-          //     streamingMenuWidget(),
-          //     timerWidget(),
-          //   ],
-          // ),
-          child: isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : StreamCallContainer(
-                  callContentBuilder: (context, call, callState) {
-                    return StreamCallContent(
-                      callAppBarBuilder: (context, call, callState) {
-                        return const PreferredSize(
-                          preferredSize:
-                              Size.fromHeight(0), // here the desired height
-                          child: SizedBox(),
-                        );
-                      },
-                      call: call,
-                      callState: callState,
-                      callControlsBuilder: (context, call, callState) {
-                        return const SizedBox();
-                        // return StreamCallControls(
-                        //   borderRadius: BorderRadius.zero,
-                        //   backgroundColor: Colors.transparent,
-                        //   options: [
-                        //     // Custom call option toggles the chat while on a call.
-                        //     CallControlOption(
-                        //         icon: const Icon(Icons.chat_outlined),
-                        //         onPressed: () {}),
-                        //     ToggleMicrophoneOption(
-                        //       call: call,
-                        //       localParticipant: localParticipant,
-                        //     ),
-                        //     ToggleCameraOption(
-                        //       call: call,
-                        //       localParticipant: localParticipant,
-                        //     ),
-                        //     LeaveCallOption(
-                        //       call: call,
-                        //       onLeaveCallTap: () => call.leave(),
-                        //     ),
-                        //   ],
-                        // );
-                      },
-                      callParticipantsBuilder: (context, call, callState) {
-                        return Stack(
-                          children: [
-                            receivingStreamWidget(
-                              call,
-                              callState.otherParticipants.isNotEmpty
-                                  ? callState.otherParticipants.last
-                                  : callState.localParticipant!,
-                            ),
-                            if (callState.callParticipants.length != 1)
-                              sendingStreamWidget(
+      child: WillPopScope(
+        onWillPop: () async {
+          await VideoService.instance.call.end();
+          return true;
+        },
+        child: Scaffold(
+          body: SizedBox(
+            width: context.width,
+            height: context.safeHeight,
+            // child: Stack(
+            //   children: [
+            //     receivingStreamWidget(),
+            //     sendingStreamWidget(),
+            //     streamingMenuWidget(),
+            //     timerWidget(),
+            //   ],
+            // ),
+            child: isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : StreamCallContainer(
+                    callContentBuilder: (context, call, callState) {
+                      return StreamCallContent(
+                        callAppBarBuilder: (context, call, callState) {
+                          return const PreferredSize(
+                            preferredSize:
+                                Size.fromHeight(0), // here the desired height
+                            child: SizedBox(),
+                          );
+                        },
+                        call: call,
+                        callState: callState,
+                        callControlsBuilder: (context, call, callState) {
+                          return const SizedBox();
+                          // return StreamCallControls(
+                          //   borderRadius: BorderRadius.zero,
+                          //   backgroundColor: Colors.transparent,
+                          //   options: [
+                          //     // Custom call option toggles the chat while on a call.
+                          //     CallControlOption(
+                          //         icon: const Icon(Icons.chat_outlined),
+                          //         onPressed: () {}),
+                          //     ToggleMicrophoneOption(
+                          //       call: call,
+                          //       localParticipant: localParticipant,
+                          //     ),
+                          //     ToggleCameraOption(
+                          //       call: call,
+                          //       localParticipant: localParticipant,
+                          //     ),
+                          //     LeaveCallOption(
+                          //       call: call,
+                          //       onLeaveCallTap: () => call.leave(),
+                          //     ),
+                          //   ],
+                          // );
+                        },
+                        callParticipantsBuilder: (context, call, callState) {
+                          return Stack(
+                            children: [
+                              receivingStreamWidget(
+                                call,
+                                callState.otherParticipants.isNotEmpty
+                                    ? callState.otherParticipants.last
+                                    : callState.localParticipant!,
+                              ),
+                              if (callState.callParticipants.length != 1)
+                                sendingStreamWidget(
+                                  context,
+                                  call,
+                                  callState.localParticipant!,
+                                ),
+                              streamingMenuWidget(
                                 context,
                                 call,
                                 callState.localParticipant!,
                               ),
-                            streamingMenuWidget(
-                              context,
-                              call,
-                              callState.localParticipant!,
-                            ),
-                            streamTimerWidget(
-                              context,
-                              call,
-                              callState.localParticipant!,
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                    // return SizedBox(
-                    //   width: context.width,
-                    //   height: context.safeHeight,
-                    //   child: Stack(
-                    //     children: [
-                    //       receivingStreamWidget(),
-                    //       sendingStreamWidget(
-                    //         context,
-                    //         call,
-                    //         callState.localParticipant!,
-                    //       ),
-                    //       streamingMenuWidget(
-                    //         context,
-                    //         call,
-                    //         callState.localParticipant!,
-                    //       ),
-                    //       //   timerWidget(),
-                    //     ],
-                    //   ),
-                    // );
-                  },
-                  call: VideoService.instance.call,
-                ),
+                              streamTimerWidget(
+                                context,
+                                call,
+                                callState.localParticipant!,
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                      // return SizedBox(
+                      //   width: context.width,
+                      //   height: context.safeHeight,
+                      //   child: Stack(
+                      //     children: [
+                      //       receivingStreamWidget(),
+                      //       sendingStreamWidget(
+                      //         context,
+                      //         call,
+                      //         callState.localParticipant!,
+                      //       ),
+                      //       streamingMenuWidget(
+                      //         context,
+                      //         call,
+                      //         callState.localParticipant!,
+                      //       ),
+                      //       //   timerWidget(),
+                      //     ],
+                      //   ),
+                      // );
+                    },
+                    call: VideoService.instance.call,
+                  ),
+          ),
         ),
       ),
     );
@@ -175,14 +184,18 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     minut = consultationModel.endTime.difference(DateTime.now()).inMinutes;
     ticker = Timer.periodic(const Duration(seconds: 1), (timer) async {
       if (second == 0) {
-        setState(() {
-          minut--;
-          second = 60;
-        });
+        if (mounted) {
+          setState(() {
+            minut--;
+            second = 60;
+          });
+        }
       } else {
-        setState(() {
-          second--;
-        });
+        if (mounted) {
+          setState(() {
+            second--;
+          });
+        }
       }
       if (minut == 0 && second == 0) {
         ticker.cancel();
@@ -375,7 +388,9 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
               ),
               LeaveCallOption(
                 call: call,
-                onLeaveCallTap: () => call.leave(),
+                onLeaveCallTap: () {
+                  endCall();
+                },
               ),
             ],
           ),

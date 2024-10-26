@@ -49,6 +49,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   Future<void> setMessageCount() async {
     totalMessages = int.parse(consultationModel.title.split(' ').first);
+    debugPrint(
+        'total message: ${totalMessages} , sent message: ${sentMessages}');
   }
 
   @override
@@ -248,7 +250,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                         ),
                                       ),
                                     ),
-                                    if (sentMessages < 50)
+                                    if (totalMessages - sentMessages > -1)
                                       Container(
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 12,
@@ -291,11 +293,15 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                             ),
                                             IconButton(
                                               onPressed: () {
-                                                validateAndSendMessage(
-                                                  otherUser,
-                                                  _inputMessage,
-                                                  context,
-                                                );
+                                                totalMessages - sentMessages >
+                                                        -1
+                                                    ? validateAndSendMessage(
+                                                        otherUser,
+                                                        _inputMessage,
+                                                        context,
+                                                      )
+                                                    : debugPrint(
+                                                        'quota exceeds');
                                                 setState(() {});
                                               },
                                               icon: const Icon(
