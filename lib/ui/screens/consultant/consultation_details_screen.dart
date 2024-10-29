@@ -21,6 +21,9 @@ import 'package:horti_vige/ui/utils/styles/text_styles.dart';
 import 'package:horti_vige/ui/widgets/app_filled_button.dart';
 import 'package:horti_vige/ui/widgets/app_outlined_button.dart';
 import 'package:provider/provider.dart';
+import 'dart:developer' as d;
+
+import 'dart:async';
 
 class ConsultationDetailsScreen extends StatefulWidget {
   const ConsultationDetailsScreen({
@@ -37,6 +40,10 @@ class _ConsultationDetailsScreenState extends State<ConsultationDetailsScreen> {
   late ConsultationModel consultation;
   late bool fromUserConsultationPage;
   Timer? timer;
+
+  Timer? statusTimer;
+  String status = '';
+
   bool loading = true;
   @override
   void initState() {
@@ -50,13 +57,47 @@ class _ConsultationDetailsScreenState extends State<ConsultationDetailsScreen> {
       loading = false;
       startTimer();
       setState(() {});
+
+      d.log(
+        'consultation data customer${consultation.customer}, description ${consultation.description} , duration time  ${consultation.durationTime}, end date time${consultation.endDateTime} , end time ${consultation.endTime} , id  ${consultation.id}, start time${consultation.startTime}, start date time${consultation.startDateTime} , package type ${consultation.packageType},}',
+      );
+      startMonitoring(consultation);
     });
   }
 
   @override
   void dispose() {
     timer?.cancel();
+    statusTimer?.cancel();
     super.dispose();
+  }
+
+  // abdul rehnman  function to get status
+  void startMonitoring(ConsultationModel consultation) {
+    statusTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      DateTime now = DateTime.now();
+
+      if (now.isBefore(consultation.startTime)) {
+        // Status before the appointment starts
+        setState(() {
+          status = 'soon';
+        });
+      } else if (now.isAfter(consultation.startTime) &&
+          now.isBefore(consultation.endTime)) {
+        // Status when the appointment is ongoing
+        setState(() {
+          status = 'started';
+        });
+      } else {
+        // Status when the appointment has expired
+        setState(() {
+          status = 'expired';
+        });
+        timer.cancel(); // Stop the timer when expired
+      }
+
+      d.log('status: $status'); // Optional: Log status for verification
+    });
   }
 
   Future<void> startTimer() async {
@@ -174,10 +215,13 @@ class _ConsultationDetailsScreenState extends State<ConsultationDetailsScreen> {
                                 if (consultation.status !=
                                     ConsultationStatus.canceled)
                                   Text(
-                                    AppDateUtils.getTimeGapByMilliseconds(
-                                      milliseconds: consultation
-                                          .startTime.millisecondsSinceEpoch,
-                                    ),
+                                    status == 'soon'
+                                        ? 'Starting Soon'
+                                        : status == 'started'
+                                            ? 'Appointment Started'
+                                            : status == 'expired'
+                                                ? 'Expired'
+                                                : '',
                                     style: AppTextStyles.bodyStyle
                                         .changeSize(12)
                                         .changeColor(AppColors.colorOrange),
@@ -288,6 +332,7 @@ class _ConsultationDetailsScreenState extends State<ConsultationDetailsScreen> {
                               ),
                             ),
                             12.height,
+                            // dummy call joining button
                             ElevatedButton(
                                 onPressed: () {
                                   debugPrint(
