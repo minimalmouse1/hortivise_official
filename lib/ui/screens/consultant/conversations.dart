@@ -5,6 +5,7 @@ import 'package:horti_vige/data/enums/user_type.dart';
 import 'package:horti_vige/data/models/consultation/consultation_model.dart';
 import 'package:horti_vige/data/models/user/user_model.dart';
 import 'package:horti_vige/providers/user_provider.dart';
+
 import 'package:horti_vige/ui/screens/common/conversation_screen.dart';
 import 'package:horti_vige/ui/utils/styles/text_styles.dart';
 import 'package:horti_vige/ui/widgets/app_nav_drawer.dart';
@@ -15,6 +16,7 @@ import 'package:horti_vige/ui/utils/colors/colors.dart';
 import 'dart:developer' as dev;
 
 import 'package:provider/provider.dart';
+
 
 class Conversations extends StatelessWidget {
   const Conversations({super.key});
@@ -41,19 +43,20 @@ class Conversations extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.colorBeige,
       appBar: AppBar(
-          title: Text(
-            'Chats',
-            style: AppTextStyles.titleStyle.changeSize(20),
-          ),
-          backgroundColor: AppColors.colorBeige,
-          automaticallyImplyLeading: true, // Show the back button
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              // Navigate to BottomNavigationBarScreen when back button is pressed
-              Navigator.pushNamed(context, ZoomDrawerScreen.routeName);
-            },
-          )),
+        title: Text(
+          'Chats',
+          style: AppTextStyles.titleStyle.changeSize(20),
+        ),
+        backgroundColor: AppColors.colorBeige,
+        automaticallyImplyLeading: true, // Show the back button
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            // Navigate to BottomNavigationBarScreen when back button is pressed
+            Navigator.pushNamed(context, ZoomDrawerScreen.routeName);
+          },
+        ),
+      ),
       body: LayoutBuilder(
         builder: (context, con) {
           return SizedBox(
