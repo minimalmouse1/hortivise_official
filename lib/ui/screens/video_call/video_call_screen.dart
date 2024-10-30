@@ -211,10 +211,15 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     return Container(
       child: StreamVideoRenderer(
         placeholderBuilder: (context) {
-          final nameList = localParticipantAction.name.split(' ');
+          final name = localParticipantAction.name ?? '';
+          final nameList = name.isNotEmpty ? name.split(' ') : ['?'];
+
+          // Extract initials safely
           var txt = '';
           for (final val in nameList) {
-            txt += val.characters.first;
+            if (val.isNotEmpty) {
+              txt += val.characters.first;
+            }
           }
           return Center(
             child: Container(

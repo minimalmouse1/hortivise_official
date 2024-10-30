@@ -334,19 +334,26 @@ class _ConsultationDetailsScreenState extends State<ConsultationDetailsScreen> {
                             12.height,
                             // dummy call joining button
                             ElevatedButton(
-                                onPressed: () {
-                                  debugPrint(
-                                    'log: user type:${isCustomer ? 'Customer' : 'Doctor'}',
-                                  );
-                                  debugPrint(
-                                      'call start time :${consultation.startTime.millisecondsSinceEpoch}');
-                                  _onStartConsultation(
-                                    context,
-                                    isCustomer,
-                                    consultation,
-                                  );
-                                },
-                                child: const Text('Press Me')),
+                              onPressed: () {
+                                debugPrint(
+                                  'log: user type:${isCustomer ? 'Customer' : 'Doctor'}',
+                                );
+                                debugPrint(
+                                    'call start time :${consultation.startTime.millisecondsSinceEpoch}');
+                                _onStartConsultation(
+                                  context,
+                                  isCustomer,
+                                  consultation,
+                                );
+                              },
+                              child: consultation.packageType ==
+                                          PackageType.text &&
+                                      consultation.packageType ==
+                                          PackageType.video &&
+                                      status == 'expired'
+                                  ? Text('Expired')
+                                  : Text('See conversation'),
+                            ),
                             if (consultation.status !=
                                 ConsultationStatus.canceled)
                               Expanded(
@@ -368,31 +375,28 @@ class _ConsultationDetailsScreenState extends State<ConsultationDetailsScreen> {
                                                 consultation,
                                               );
                                             },
-                                            title: (consultation.packageType ==
-                                                        PackageType.text &&
-                                                    consultation.packageType ==
-                                                        PackageType.video &&
-                                                    AppDateUtils
-                                                            .getTimeGapByMilliseconds(
-                                                          milliseconds: consultation
-                                                              .startTime
-                                                              .millisecondsSinceEpoch,
-                                                        ) ==
-                                                        'Expired')
-                                                ? 'See conversation'
-                                                : 'Start Consultation',
-                                            isEnabled: consultation.isEnabled ||
-                                                (consultation.packageType ==
-                                                        PackageType.text &&
-                                                    consultation.packageType ==
-                                                        PackageType.video &&
-                                                    AppDateUtils
-                                                            .getTimeGapByMilliseconds(
-                                                          milliseconds: consultation
-                                                              .startTime
-                                                              .millisecondsSinceEpoch,
-                                                        ) ==
-                                                        'Expired'),
+                                            title: status.isEmpty
+                                                ? ''
+                                                : (consultation.packageType ==
+                                                                PackageType
+                                                                    .text &&
+                                                            status ==
+                                                                'expired') ||
+                                                        (consultation
+                                                                    .packageType ==
+                                                                PackageType
+                                                                    .video &&
+                                                            status == 'expired')
+                                                    ? 'See conversation'
+                                                    : 'Start Consultation',
+                                            isEnabled: status.isEmpty
+                                                ? false
+                                                : (consultation.packageType ==
+                                                            PackageType.text &&
+                                                        status != 'expired') ||
+                                                    (consultation.packageType ==
+                                                            PackageType.video &&
+                                                        status != 'expired'),
                                           ),
                                           20.height,
                                           consultation.startTime
@@ -564,3 +568,46 @@ class _ConsultationDetailsScreenState extends State<ConsultationDetailsScreen> {
     );
   }
 }
+
+
+
+
+// old app filled button 
+/*
+   AppFilledButton(
+                                            onPress: () {
+                                              debugPrint(
+                                                  'log: user type:${isCustomer ? 'Customer' : 'Doctor'}');
+                                              _onStartConsultation(
+                                                context,
+                                                isCustomer,
+                                                consultation,
+                                              );
+                                            },
+                                            title: (consultation.packageType ==
+                                                        PackageType.text &&
+                                                    consultation.packageType ==
+                                                        PackageType.video &&
+                                                    AppDateUtils
+                                                            .getTimeGapByMilliseconds(
+                                                          milliseconds: consultation
+                                                              .startTime
+                                                              .millisecondsSinceEpoch,
+                                                        ) ==
+                                                        'Expired')
+                                                ? 'See conversation'
+                                                : 'Start Consultation',
+                                            isEnabled: consultation.isEnabled ||
+                                                (consultation.packageType ==
+                                                        PackageType.text &&
+                                                    consultation.packageType ==
+                                                        PackageType.video &&
+                                                    AppDateUtils
+                                                            .getTimeGapByMilliseconds(
+                                                          milliseconds: consultation
+                                                              .startTime
+                                                              .millisecondsSinceEpoch,
+                                                        ) ==
+                                                        'Expired'),
+                                          ),
+*/
