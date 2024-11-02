@@ -12,6 +12,7 @@ import 'package:horti_vige/ui/utils/styles/text_styles.dart';
 import 'package:horti_vige/core/utils/app_consts.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'dart:developer' as d;
 
 class UserHomePage extends StatefulWidget {
   const UserHomePage({super.key});
@@ -56,7 +57,7 @@ class _UserHomePageState extends State<UserHomePage> {
     setState(() {
       _consultationDates = consultationMap;
     });
-    debugPrint('collection of dates:$_consultationDates');
+    d.log('collection of dates:$_consultationDates');
   }
 
   @override

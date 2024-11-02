@@ -17,10 +17,14 @@ import 'dart:developer' as dev;
 
 import 'package:provider/provider.dart';
 
-
-class Conversations extends StatelessWidget {
+class Conversations extends StatefulWidget {
   const Conversations({super.key});
 
+  @override
+  State<Conversations> createState() => _ConversationsState();
+}
+
+class _ConversationsState extends State<Conversations> {
   void getAllChats() async {
     try {
       QuerySnapshot querySnapshot =
@@ -35,6 +39,12 @@ class Conversations extends StatelessWidget {
     } catch (e) {
       dev.log('Error retrieving chats: $e');
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getAllChats();
   }
 
   @override
@@ -117,21 +127,6 @@ class Conversations extends StatelessWidget {
   }
 
   // void getUsersWithUid() async {
-  //   try {
-  //     final QuerySnapshot snapshot =
-  //         await FirebaseFirestore.instance.collection('Users').get();
-
-  //     if (snapshot.docs.isNotEmpty) {
-  //       for (var doc in snapshot.docs) {
-  //         print('Document ID Data: ${doc.id}');
-  //         print('User Data: ${doc.data()}');
-  //       }
-  //     }
-  //   } catch (e) {
-  //     print('Error fetching users: $e');
-  //   }
-  // }
-
   Widget conversationTile(
       UserModel currentUser, ConversationModel model, BuildContext context) {
     return Padding(
@@ -140,17 +135,21 @@ class Conversations extends StatelessWidget {
         onTap: () async {
           // getUsersWithUid();
           UserModel? user;
-          final data = currentUser.type == UserType.CUSTOMER
-              ? await FirebaseFirestore.instance
-                  .collection('Users')
-                  .where('email',
-                      isEqualTo:
-                          'testConsultant@gmail.com') // Replace with your actual condition
-                  .get()
-              : await FirebaseFirestore.instance
-                  .collection('Users')
-                  .where('uId', isEqualTo: model.user!.userId)
-                  .get();
+          // final data = currentUser.type == UserType.CUSTOMER
+          //     ? await FirebaseFirestore.instance
+          //         .collection('Users')
+          //         .where('email',
+          //             isEqualTo:
+          //                 'testConsultant@gmail.com') // Replace with your actual condition
+          //         .get()
+          //     : await FirebaseFirestore.instance
+          //         .collection('Users')
+          //         .where('uId', isEqualTo: model.user!.userId)
+          //         .get();
+          final data = await FirebaseFirestore.instance
+              .collection('Users')
+              .where('uId', isEqualTo: model.user!.userId)
+              .get();
 
           if (data.docs.isNotEmpty) {
             user = UserModel.fromJson(data.docs.first.data());

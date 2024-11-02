@@ -61,7 +61,9 @@ class _ConsultationDetailsScreenState extends State<ConsultationDetailsScreen> {
       d.log(
         'consultation data customer${consultation.customer}, description ${consultation.description} , duration time  ${consultation.durationTime}, end date time${consultation.endDateTime} , end time ${consultation.endTime} , id  ${consultation.id}, start time${consultation.startTime}, start date time${consultation.startDateTime} , package type ${consultation.packageType},}',
       );
-      startMonitoring(consultation);
+      consultation.packageType == PackageType.text
+          ? startMonitoringTextTier(consultation)
+          : startMonitoring(consultation);
     });
   }
 
@@ -97,6 +99,30 @@ class _ConsultationDetailsScreenState extends State<ConsultationDetailsScreen> {
       }
 
       d.log('status: $status'); // Optional: Log status for verification
+    });
+  }
+
+  void startMonitoringTextTier(ConsultationModel consultation) {
+    statusTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      DateTime now = DateTime.now();
+
+      if (now.isBefore(consultation.startTime)) {
+        setState(() {
+          status = 'soon';
+        });
+      } else if (now.isAfter(consultation.startTime) &&
+          now.isBefore(consultation.startTime.add(Duration(hours: 1)))) {
+        setState(() {
+          status = 'started';
+        });
+      } else {
+        setState(() {
+          status = 'expired';
+        });
+        timer.cancel();
+      }
+
+      d.log('status: $status');
     });
   }
 
@@ -333,27 +359,27 @@ class _ConsultationDetailsScreenState extends State<ConsultationDetailsScreen> {
                             ),
                             12.height,
                             // dummy call joining button
-                            ElevatedButton(
-                              onPressed: () {
-                                debugPrint(
-                                  'log: user type:${isCustomer ? 'Customer' : 'Doctor'}',
-                                );
-                                debugPrint(
-                                    'call start time :${consultation.startTime.millisecondsSinceEpoch}');
-                                _onStartConsultation(
-                                  context,
-                                  isCustomer,
-                                  consultation,
-                                );
-                              },
-                              child: consultation.packageType ==
-                                          PackageType.text &&
-                                      consultation.packageType ==
-                                          PackageType.video &&
-                                      status == 'expired'
-                                  ? Text('Expired')
-                                  : Text('See conversation'),
-                            ),
+                            // ElevatedButton(
+                            //   onPressed: () {
+                            //     debugPrint(
+                            //       'log: user type:${isCustomer ? 'Customer' : 'Doctor'}',
+                            //     );
+                            //     debugPrint(
+                            //         'call start time :${consultation.startTime.millisecondsSinceEpoch}');
+                            //     _onStartConsultation(
+                            //       context,
+                            //       isCustomer,
+                            //       consultation,
+                            //     );
+                            //   },
+                            //   child: consultation.packageType ==
+                            //               PackageType.text &&
+                            //           consultation.packageType ==
+                            //               PackageType.video &&
+                            //           status == 'expired'
+                            //       ? Text('Expired')
+                            //       : Text('See conversation'),
+                            // ),
                             if (consultation.status !=
                                 ConsultationStatus.canceled)
                               Expanded(
@@ -393,10 +419,10 @@ class _ConsultationDetailsScreenState extends State<ConsultationDetailsScreen> {
                                                 ? false
                                                 : (consultation.packageType ==
                                                             PackageType.text &&
-                                                        status != 'expired') ||
+                                                        status == 'started') ||
                                                     (consultation.packageType ==
                                                             PackageType.video &&
-                                                        status != 'expired'),
+                                                        status == 'started'),
                                           ),
                                           20.height,
                                           consultation.startTime

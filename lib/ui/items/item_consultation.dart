@@ -5,6 +5,7 @@ import 'package:horti_vige/ui/utils/colors/colors.dart';
 import 'package:horti_vige/ui/utils/extensions/extensions.dart';
 import 'package:horti_vige/ui/utils/styles/text_styles.dart';
 import 'package:horti_vige/core/utils/app_date_utils.dart';
+import 'package:horti_vige/data/enums/package_type.dart';
 
 class ItemConsultation extends StatelessWidget {
   const ItemConsultation({
@@ -19,6 +20,7 @@ class ItemConsultation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    DateTime now = DateTime.now();
     return Container(
       padding: 1.verticalPadding,
       child: InkWell(
@@ -142,6 +144,39 @@ class ItemConsultation extends StatelessWidget {
                   ),
                 ],
               ),
+              8.height,
+              consultation.packageType == PackageType.text &&
+                      (now.isAfter(consultation.startTime) &&
+                          !now.isBefore(
+                              consultation.startTime.add(Duration(hours: 1))))
+                  ? Align(
+                      alignment: Alignment.topLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 10.0),
+                        child: Text(
+                          'Expired',
+                          style: AppTextStyles.bodyStyle
+                              .changeSize(15)
+                              .changeColor(AppColors.colorOrange),
+                        ),
+                      ),
+                    )
+                  : consultation.packageType == PackageType.video &&
+                          (now.isAfter(consultation.startTime) &&
+                              !now.isBefore(consultation.endTime))
+                      ? Align(
+                          alignment: Alignment.topLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 10.0),
+                            child: Text(
+                              'Expired',
+                              style: AppTextStyles.bodyStyle
+                                  .changeSize(15)
+                                  .changeColor(AppColors.colorOrange),
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
               8.height,
             ],
           ),
