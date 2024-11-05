@@ -143,42 +143,54 @@ class _UserHomePageState extends State<UserHomePage> {
                   ),
                 ),
                 onDaySelected: (selectedDay, focusedDay) {},
-                calendarBuilders: CalendarBuilders(
-                  markerBuilder: (context, date, events) {
-                    if (events.isNotEmpty) {
-                      return Positioned(
-                        top:
-                            5, // Adjust this value to control the marker position
-                        child: buildMarker(events.length),
-                      );
-                    }
-                    return null;
-                  },
-                  defaultBuilder: (context, date, _) {
-                    final hasBookings = getEventsForDay(date).isNotEmpty;
-                    final isToday = date.isAtSameMomentAs(DateTime.now());
+                calendarBuilders:
+                    CalendarBuilders(markerBuilder: (context, date, events) {
+                  if (events.isNotEmpty) {
+                    final DateTime now = DateTime.now();
+                    final isPast =
+                        date.isBefore(DateTime(now.year, now.month, now.day));
+                    final isToday = date.isAtSameMomentAs(
+                        DateTime(now.year, now.month, now.day));
+                    Color markerColor;
 
-                    return Container(
-                      decoration: BoxDecoration(
-                        border: hasBookings || isToday
-                            ? Border.all(
-                                color: Colors.green,
-                                width:
-                                    0.4) // Red border if bookings are available
-                            : Border.all(color: Colors.transparent),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Text(
-                          date.day.toString(),
-                          style: const TextStyle(
-                              color:
-                                  Colors.black), // Change text color as needed
+                    defaultBuilder:
+                    (context, date, _) {
+                      final hasBookings = getEventsForDay(date).isNotEmpty;
+                      final isToday = date.isAtSameMomentAs(DateTime.now());
+                      final isPast = date.isBefore(DateTime.now());
+                      Color borderColor;
+
+                      if (isPast && hasBookings) {
+                        borderColor = Colors.red; // Red border for past events
+                      } else if (hasBookings && isToday) {
+                        borderColor =
+                            Colors.purple; // Purple border for ongoing events
+                      } else if (hasBookings) {
+                        borderColor =
+                            Colors.blue; // Blue border for upcoming events
+                      } else {
+                        borderColor =
+                            Colors.transparent; // No border if no bookings
+                      }
+
+                      return DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: borderColor,
+                          border: Border.all(color: borderColor, width: 0.4),
+                          shape: BoxShape.circle,
                         ),
-                      ),
-                    );
-                  },
-                ),
+                        child: Center(
+                          child: Text(
+                            date.day.toString(),
+                            style: const TextStyle(
+                                color: Colors
+                                    .black), // Change text color as needed
+                          ),
+                        ),
+                      );
+                    };
+                  }
+                }),
               ),
             ),
           );
