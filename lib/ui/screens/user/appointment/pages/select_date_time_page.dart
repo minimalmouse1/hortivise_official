@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:horti_vige/data/enums/days.dart';
@@ -15,28 +16,29 @@ import 'package:horti_vige/core/utils/app_date_utils.dart';
 import 'package:provider/provider.dart';
 
 class SelectDateTimePage extends StatefulWidget {
-  const SelectDateTimePage({
-    super.key,
-    required this.bookNowClick,
-    required this.availability,
-    required this.packages,
-  });
+  const SelectDateTimePage(
+      {super.key,
+      required this.bookNowClick,
+      required this.availability,
+      required this.packages,
+      required this.consultantEmail});
   final Availability availability;
   final List<PackageModel> packages;
   final Function(DateTime selectedTime, PackageModel selectedPackage)
       bookNowClick;
 
+  final String consultantEmail;
   @override
   State<SelectDateTimePage> createState() => _SelectDateTimePageState();
 }
 
 class _SelectDateTimePageState extends State<SelectDateTimePage> {
   int selected = 0;
-
   int selectedDay = DateTime.now().day;
   int selectedMonth = DateTime.now().month;
   int selectedHour = DateTime.now().hour;
   int selectedMinute = DateTime.now().minute;
+  bool gettingTimes = true;
   PackageModel? selectedPkg;
   late final selectableDays = widget.availability.days
       .map((e) => e.day.name.substring(0, 3).capitalizeFirstLetter())
@@ -44,6 +46,7 @@ class _SelectDateTimePageState extends State<SelectDateTimePage> {
 
   List<String> availableTimes = [];
   List<PackageModel> packages = [];
+  List<Map<String, dynamic>> consultations = []; // Store fetched consultations
 
   @override
   void initState() {
@@ -61,7 +64,10 @@ class _SelectDateTimePageState extends State<SelectDateTimePage> {
       final dayEum = DayEnum.values.firstWhere(
         (element) => element.name.substring(0, 3) == day,
       );
-      _selectTimes(dayEum);
+
+      Future.delayed(const Duration(seconds: 2), () async {
+        _selectTimes(dayEum);
+      });
       Future.delayed(Duration.zero, () async {
         packages = await context.read<PackagesProvider>().getAllPackages();
       });
@@ -78,6 +84,7 @@ class _SelectDateTimePageState extends State<SelectDateTimePage> {
     } catch (e) {
       e.logError();
     }
+    getConsultations();
   }
 
   @override
@@ -138,37 +145,41 @@ class _SelectDateTimePageState extends State<SelectDateTimePage> {
             horizontalPadding: 12,
           ),
           25.height,
-          Padding(
-            padding: 12.horizontalPadding,
-            child: Text(
-              availableTimes.isEmpty
-                  ? 'No slot available for this date'
-                  : 'Select a Time',
-              style: AppTextStyles.titleStyle.changeSize(14),
-            ),
-          ),
-          7.height,
-          availableTimes.isEmpty
+          gettingTimes
               ? const SizedBox.shrink()
-              : AppHorizontalChoiceChips(
-                  chips: availableTimes,
-                  defaultSelection: const [],
-                  onSelected: (index) {
-                    final selectedTime = availableTimes[index];
-                    final hour = int.parse(selectedTime.split(':')[0]);
-                    final minutes = int.parse(selectedTime.split(':')[1]);
-                    selectedHour = hour;
-                    selectedMinute = minutes;
-                    debugPrint(
-                        'selected hour:$selectedHour and selectedMinute:$selectedMinute');
-                    debugPrint('availableTimes:$availableTimes');
-                  },
-                  cornerRadius: 2,
-                  selectedChipColor: AppColors.appGreenMaterial,
-                  selectedLabelColor: AppColors.colorWhite,
-                  unSelectedLabelColor: AppColors.colorGray,
-                  horizontalPadding: 8,
+              : Padding(
+                  padding: 12.horizontalPadding,
+                  child: Text(
+                    availableTimes.isEmpty
+                        ? 'No slot available for this date'
+                        : 'Select a Time',
+                    style: AppTextStyles.titleStyle.changeSize(14),
+                  ),
                 ),
+          7.height,
+          gettingTimes
+              ? Text(
+                  'Fetching Available Hours',
+                  style: AppTextStyles.titleStyle.changeSize(14),
+                )
+              : availableTimes.isEmpty
+                  ? const SizedBox.shrink()
+                  : AppHorizontalChoiceChips(
+                      chips: availableTimes,
+                      defaultSelection: const [],
+                      onSelected: (index) {
+                        final selectedTime = availableTimes[index];
+                        final hour = int.parse(selectedTime.split(':')[0]);
+                        final minutes = int.parse(selectedTime.split(':')[1]);
+                        selectedHour = hour;
+                        selectedMinute = minutes;
+                      },
+                      cornerRadius: 2,
+                      selectedChipColor: AppColors.appGreenMaterial,
+                      selectedLabelColor: AppColors.colorWhite,
+                      unSelectedLabelColor: AppColors.colorGray,
+                      horizontalPadding: 8,
+                    ),
           10.height,
           Padding(
             padding: 12.horizontalPadding,
@@ -214,9 +225,6 @@ class _SelectDateTimePageState extends State<SelectDateTimePage> {
                           );
                           return;
                         }
-                        print('while sending ${date.month} , ${date.day}');
-                        print('Millies -> ${date.millisecondsSinceEpoch}');
-
                         widget.bookNowClick(date, selectedPkg!);
                       }
                     },
@@ -239,26 +247,21 @@ class _SelectDateTimePageState extends State<SelectDateTimePage> {
     final fromHour = from.hour;
     final toHour = to.hour;
 
-    // Get the current date and time
     final currentDateTime = DateTime.now();
 
-    // Check if the selected date is today
     final isToday = selectedDay == currentDateTime.day &&
         selectedMonth == currentDateTime.month;
 
     for (var i = fromHour; i <= toHour; i++) {
       final hour = i.toString().padLeft(2, '0');
-
       final fromMin = from.minute;
       final toMin = to.minute;
 
-      // Generate minutes for this hour
       final minutes = List.generate(
         toMin - fromMin + 1,
         (index) => '$hour:${(fromMin + index).toString().padLeft(2, '0')}',
       ).toList();
 
-      // Add times to availableTimes if they are in the future
       for (var time in minutes) {
         final hour = int.parse(time.split(':')[0]);
         final minute = int.parse(time.split(':')[1]);
@@ -271,14 +274,17 @@ class _SelectDateTimePageState extends State<SelectDateTimePage> {
           minute,
         );
 
-        // Add time if it is either not today, or it is today and in the future
-        if (!isToday || selectedDateTime.isAfter(currentDateTime)) {
+        final isFutureTime =
+            !isToday || selectedDateTime.isAfter(currentDateTime);
+        final isNonOverlappingTime =
+            !isTimeWithinConsultations(selectedDateTime);
+
+        if (isFutureTime && isNonOverlappingTime) {
           availableTimes.add(time);
         }
       }
     }
 
-    // Set default selected hour and minute to the first available time
     if (availableTimes.isNotEmpty) {
       final firstAvailableTime = availableTimes.first;
       selectedHour = int.parse(firstAvailableTime.split(':')[0]);
@@ -288,7 +294,67 @@ class _SelectDateTimePageState extends State<SelectDateTimePage> {
       selectedMinute = from.minute;
     }
 
+    setState(() {
+      gettingTimes = false;
+    });
+  }
+
+  bool isTimeWithinConsultations(DateTime time) {
+    for (var consultation in consultations) {
+      DateTime startDateTime = DateTime.parse(consultation['startDateTime']);
+      DateTime endDateTime = DateTime.parse(consultation['endDateTime']);
+
+      if (time.isAfter(startDateTime) && time.isBefore(endDateTime) ||
+          time.isAtSameMomentAs(startDateTime) ||
+          time.isAtSameMomentAs(endDateTime)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Future<void> getConsultations() async {
+    List<Map<String, dynamic>> results =
+        await fetchConsultationsBySpecialistEmail(
+            email: widget.consultantEmail);
+    consultations = results;
     setState(() {});
-    debugPrint('time:$availableTimes');
+  }
+
+  Future<List<Map<String, dynamic>>> fetchConsultationsBySpecialistEmail(
+      {required String email}) async {
+    try {
+      CollectionReference consultationsCollection =
+          FirebaseFirestore.instance.collection('Consultations');
+
+      QuerySnapshot querySnapshot = await consultationsCollection
+          .where('specialist.email', isEqualTo: email)
+          .where('status', isEqualTo: 'accepted')
+          .get();
+
+      List<Map<String, dynamic>> consultations = querySnapshot.docs.map((doc) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        return {
+          'id': doc.id,
+          'title': data['title'] ?? 'N/A',
+          'totalAmount': data['totalAmount'] ?? 0.0,
+          'tax': data['tax'] ?? 0.0,
+          'startDateTime': data['startDateTime'],
+          'endDateTime': data['endDateTime'],
+          'status': data['status'] ?? 'N/A',
+          'packageType': data['packageType'] ?? 'N/A',
+          'specialist': data['specialist'] ?? {},
+          'customer': data['customer'] ?? {}
+        };
+      }).toList();
+      setState(() {});
+      debugPrint('${consultations}');
+      return consultations;
+    } catch (e) {
+      print("Error fetching consultations: $e");
+      setState(() {});
+      return [];
+    }
   }
 }

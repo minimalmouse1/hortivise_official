@@ -161,6 +161,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen>
               });
               debugPrint('_selectedDate$_selectedDate');
             },
+            consultantEmail: user.email,
           ),
           ConfirmBookingPage(
             selectedPackage: _selectedPkg,
