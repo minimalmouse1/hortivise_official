@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:horti_vige/Services/patient_side_notification.dart';
 
 import 'package:horti_vige/ui/resources/app_icons_icons.dart';
 import 'package:horti_vige/ui/screens/user/main/pages/user_blogs_page.dart';
@@ -26,6 +27,12 @@ class _UserMainScreenState extends State<UserMainScreen> {
   ];
 
   int _index = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    PatientSideNotificationService().startUserSideService();
+  }
 
   @override
   Widget build(BuildContext context) {

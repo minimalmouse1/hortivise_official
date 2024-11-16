@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:horti_vige/Services/consultant_side_service.dart';
 
 import 'package:horti_vige/ui/resources/app_icons_icons.dart';
 import 'package:horti_vige/ui/screens/consultant/main/pages/consultant_home_page.dart';
@@ -28,6 +29,13 @@ class _ConsultantMainScreenState extends State<ConsultantMainScreen> {
   ];
 
   int _index = 0;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    ConsultantSideNotificationService().startConsultantSideService();
+  }
 
   @override
   void dispose() {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
+import 'package:horti_vige/Services/consultant_side_service.dart';
 import 'package:horti_vige/providers/consultation_pricing_provider.dart';
 import 'package:horti_vige/ui/screens/consultant/consultation_pricing/consultation_pricing_screen.dart';
 import 'package:horti_vige/ui/widgets/app_filled_button.dart';
@@ -48,6 +49,7 @@ class _ConsultantHomePageState extends State<ConsultantHomePage> {
     Future.delayed(const Duration(seconds: 5), () {
       StripeController.instance.findStripeSttatus(context);
     });
+
     // });
   }
 

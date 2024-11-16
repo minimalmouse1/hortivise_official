@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
+import 'package:horti_vige/Services/patient_side_notification.dart';
 import 'package:horti_vige/core/utils/helpers/preference_manager.dart';
 import 'package:horti_vige/providers/user_provider.dart';
 import 'package:horti_vige/ui/items/item_consultant_home.dart';
@@ -57,7 +58,6 @@ class _UserHomePageState extends State<UserHomePage> {
     setState(() {
       _consultationDates = consultationMap;
     });
-    d.log('collection of dates:$_consultationDates');
   }
 
   @override
