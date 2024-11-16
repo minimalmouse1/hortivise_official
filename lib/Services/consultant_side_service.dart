@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+
 import 'package:horti_vige/firebase_options.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
@@ -91,16 +92,20 @@ void onStart(ServiceInstance service) async {
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   d.log('Consultant Firestore initialized in background service');
-
+  d.log(' current user id: ${FirebaseAuth.instance.currentUser!.uid}');
   firestore
       .collection('Consultations')
-      .where('specialist.id', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+      .where('specialist.uId',
+          isEqualTo: FirebaseAuth.instance.currentUser!.uid)
       .where('status', isEqualTo: 'accepted')
       .snapshots()
       .listen((snapshot) {
     d.log('Received snapshot update with ${snapshot.docs.length} documents');
 
     for (var doc in snapshot.docs) {
+      String uId = doc['specialist']['uId'];
+
+      d.log('Consultation document: ${uId}');
       final data = doc.data();
       final consultationDate = DateTime.parse(data['startTime']);
       final customerName = data['customer']['userName'];
