@@ -1,6 +1,12 @@
 // import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'dart:io';
+
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:horti_vige/data/services/notification_service.dart';
 import 'package:horti_vige/firebase_options.dart';
@@ -42,7 +48,9 @@ import 'package:horti_vige/ui/utils/styles/text_styles.dart';
 import 'package:horti_vige/ui/widgets/app_nav_drawer.dart';
 import 'package:horti_vige/core/utils/app_consts.dart';
 import 'package:horti_vige/core/utils/helpers/preference_manager.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
+import 'dart:developer' as developer;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -62,15 +70,61 @@ Future<void> main() async {
   //   await VideoService.instance.initAgora();
   // }
 
+  FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.instance;
+  if (kDebugMode) {
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+    FlutterError.onError = (errorDetails) {
+      bool isFatal = (errorDetails.exception is HttpException ||
+              errorDetails.exception is SocketException ||
+              errorDetails.exception is HandshakeException ||
+              errorDetails.exception is PlatformException ||
+              errorDetails.exception is ClientException ||
+              errorDetails.exception is FlutterError ||
+              errorDetails.exception is FileSystemException)
+          ? false
+          : true;
+      developer.log('error ocurred: $errorDetails');
+      developer.log('error isFatal: $isFatal');
+      FirebaseCrashlytics.instance.recordFlutterError(
+        errorDetails,
+        fatal: isFatal,
+      );
+    };
+  } else {
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+    FlutterError.onError = (errorDetails) {
+      FirebaseCrashlytics.instance.recordFlutterError(
+        errorDetails,
+        fatal: !(errorDetails.exception is HttpException ||
+            errorDetails.exception is SocketException ||
+            errorDetails.exception is HandshakeException ||
+            errorDetails.exception is PlatformException ||
+            errorDetails.exception is ClientException ||
+            errorDetails.exception is FlutterError ||
+            errorDetails.exception is FileSystemException),
+      );
+    };
+  }
+
   runApp(
     const MyApp(),
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
