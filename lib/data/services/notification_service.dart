@@ -1,16 +1,23 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:horti_vige/firebase_options.dart';
 import 'package:horti_vige/ui/utils/colors/colors.dart';
 import 'package:horti_vige/ui/utils/extensions/extensions.dart';
 import 'package:timezone/data/latest.dart' as latestTz;
 import 'package:timezone/standalone.dart' as standaloneTz;
 import 'package:timezone/timezone.dart' as latestTz;
 import 'package:http/http.dart' as http;
+import 'dart:developer' as d;
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 
 class NotificationService {
   NotificationService._();
@@ -46,8 +53,8 @@ class NotificationService {
           },
         ),
       ),
-      onDidReceiveNotificationResponse: notificationTapBackground,
-      onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
+      // onDidReceiveNotificationResponse: notificationTapBackground,   these handlers are causing multiple thread running issue
+      // onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
   }
 
@@ -88,7 +95,7 @@ class NotificationService {
         _onNotification(message);
       });
 
-      FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+      // FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
       FirebaseMessaging.instance.getInitialMessage().then((message) {
         if (message != null) {
@@ -225,8 +232,110 @@ class NotificationService {
   static Future<void> cancelScheduledNotifications() async {
     FlutterLocalNotificationsPlugin().cancelAll();
   }
+
+  // static Future<void> initializePatientService() async {
+  //   final service = FlutterBackgroundService();
+  //   await service.configure(
+  //     androidConfiguration: AndroidConfiguration(
+  //       onStart: onPatientStart,
+  //       autoStart: true,
+  //       isForegroundMode: true,
+  //     ),
+  //     iosConfiguration: IosConfiguration(),
+  //   );
+  //   await service.startService();
+  //   d.log('Patient Background service initialized and started');
+  // }
+
+  // static Future<void> schedulePatientNotification(
+  //     DateTime appointmentDateTime, String message, int id) async {
+  //   d.log(
+  //       'Patient Attempting to schedule a notification for: $appointmentDateTime');
+
+  //   AndroidNotificationChannel channel = AndroidNotificationChannel(
+  //       Random.secure().nextInt(100000).toString(),
+  //       'High Importance Notification',
+  //       importance: Importance.max);
+
+  //   await FlutterLocalNotificationsPlugin().zonedSchedule(
+  //     id,
+  //     'Consultation Reminder',
+  //     message,
+  //     latestTz.TZDateTime.from(appointmentDateTime, latestTz.local),
+  //     NotificationDetails(
+  //       android: AndroidNotificationDetails(
+  //         channel.id,
+  //         channel.name,
+  //         importance: Importance.max,
+  //         priority: Priority.high,
+  //       ),
+  //     ),
+  //     androidAllowWhileIdle: true,
+  //     uiLocalNotificationDateInterpretation:
+  //         UILocalNotificationDateInterpretation.absoluteTime,
+  //   );
+
+  //   d.log(
+  //       'Patient Notification scheduled for: ${appointmentDateTime.toLocal()}');
+  // }
 }
 
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
 }
+
+// void onPatientStart(ServiceInstance service) async {
+//   d.log('Patient Background service started');
+//   // latestTz.initializeTimeZones();
+//   d.log('Patient Timezones initialized in background service');
+
+//   // await Firebase.initializeApp(
+//   //   options: DefaultFirebaseOptions.currentPlatform,
+//   // );
+
+//   FirebaseFirestore firestore = FirebaseFirestore.instance;
+//   d.log('Patient Firestore initialized in background service');
+
+//   firestore
+//       .collection('Consultations')
+//       .where('customer.id', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+//       .where('status', isEqualTo: 'accepted')
+//       .snapshots()
+//       .listen((snapshot) {
+//     d.log('Received snapshot update with ${snapshot.docs.length} documents');
+
+//     for (var doc in snapshot.docs) {
+//       final data = doc.data();
+
+//       // Parse the startTime string to a DateTime
+//       final consultationDate = DateTime.parse(data['startTime']);
+//       final consultantName = data['specialist']['userName'];
+
+//       d.log(
+//           'doc id: ${doc.id} Patient Processing document for appointment at: $consultationDate with $consultantName');
+
+//       if (consultationDate.isAfter(DateTime.now())) {
+//         // Schedule the notification for 30 minutes before the actual time
+//         DateTime reminderTime =
+//             consultationDate.subtract(Duration(minutes: 30));
+
+//         if (reminderTime.isAfter(DateTime.now())) {
+//           d.log(
+//               'Patient Scheduling 30-minute reminder notification for: $reminderTime with $consultantName');
+//           NotificationService.schedulePatientNotification(
+//               reminderTime,
+//               'Reminder: Your consultation will start at ${consultationDate.toLocal()} with $consultantName',
+//               0);
+//         }
+
+//         // Schedule the actual consultation time notification
+//         d.log(
+//             'Scheduling notification for actual appointment at: $consultationDate with $consultantName');
+//         NotificationService.schedulePatientNotification(consultationDate,
+//             'Your consultation started with $consultantName', 1);
+//       } else {
+//         d.log('Patient Skipping past appointment at: $consultationDate');
+//       }
+//     }
+//   });
+// }

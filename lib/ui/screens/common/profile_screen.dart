@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
@@ -20,6 +21,8 @@ import 'package:horti_vige/ui/utils/styles/text_styles.dart';
 import 'package:horti_vige/ui/widgets/app_filled_button.dart';
 import 'package:horti_vige/ui/widgets/app_nav_drawer.dart';
 
+TextEditingController bioController = TextEditingController(text: '');
+
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
   static const String routeName = 'profile';
@@ -34,6 +37,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late TextEditingController _nameController;
   late TextEditingController _emailController;
 
+  bool currentUserPatient = false;
+
   UserModel getCurrentUser() {
     return Provider.of<UserProvider>(context, listen: false).getCurrentUser()!;
   }
@@ -41,11 +46,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _updateProfile() async {
     FocusScope.of(context).unfocus();
 
-    if (_nameController.text.trim().isEmpty ||
-        _emailController.text.trim().isEmpty) {
-      return;
+    if (currentUserPatient) {
+      if (_nameController.text.trim().isEmpty ||
+          _emailController.text.trim().isEmpty) {
+        return;
+      }
+    } else {
+      if (_nameController.text.trim().isEmpty ||
+          _emailController.text.trim().isEmpty ||
+          bioController.text.trim().isEmpty) {
+        return;
+      }
     }
-
     context.showProgressDialog(
       dialog: const WaitingDialog(status: 'Saving...'),
     );
@@ -55,8 +67,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
     await Provider.of<UserProvider>(context, listen: false)
         .updateUser(model: user);
+
     if (!mounted) return;
     Navigator.pushReplacementNamed(context, ZoomDrawerScreen.routeName);
+    //  Navigator.pop(context);
+  }
+
+  void fetchUserData(String docId) async {
+    try {
+      DocumentReference userDoc =
+          FirebaseFirestore.instance.collection('Users').doc(docId);
+
+      // Fetch the document
+      DocumentSnapshot snapshot = await userDoc.get();
+
+      if (snapshot.exists) {
+        Map<String, dynamic>? userData =
+            snapshot.data() as Map<String, dynamic>?;
+        print("User Data: $userData");
+        setState(() {
+          bioController = TextEditingController(
+              text: userData?['specialist']['bio'] ?? 'No Bio');
+          currentUserPatient = userData?['type'] == 'SPECIALIST' ? false : true;
+        });
+      } else {
+        print("No user found with the provided ID.");
+      }
+    } catch (e) {
+      print("Error fetching user data: $e");
+    }
   }
 
   @override
@@ -64,6 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     _nameController = TextEditingController(text: getCurrentUser().userName);
     _emailController = TextEditingController(text: getCurrentUser().email);
+    fetchUserData(getCurrentUser().email);
   }
 
   @override
@@ -226,6 +266,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ),
                               ),
+                              if (!currentUserPatient) ...[
+                                12.height,
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 6,
+                                    ),
+                                    child: TextFormField(
+                                      controller: bioController,
+                                      onChanged: (val) {
+                                        setState(() {
+                                          bioController.text = val;
+                                        });
+                                        print(
+                                            'controller: ${bioController.text}');
+                                      },
+                                      style: const TextStyle(
+                                        color: AppColors.colorBlack,
+                                      ),
+                                      decoration: const InputDecoration(
+                                        hintText: 'Your Bio',
+                                        border: UnderlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: AppColors.inputBorderColor,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                               12.height,
                               Align(
                                 alignment: Alignment.centerLeft,

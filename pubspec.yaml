@@ -46,7 +46,7 @@ dependencies:
   firebase_messaging: ^14.7.10
   flutter_local_notifications: ^17.0.0
   stream_video_flutter: ^0.3.4
-  stream_video_push_notification: ^0.3.4
+ # stream_video_push_notification: ^0.3.4
   stream_video: ^0.3.4
   dart_jsonwebtoken: ^2.13.0
   # agora_rtc_engine: ^6.3.0

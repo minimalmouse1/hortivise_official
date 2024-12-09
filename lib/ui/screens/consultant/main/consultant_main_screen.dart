@@ -32,9 +32,8 @@ class _ConsultantMainScreenState extends State<ConsultantMainScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    ConsultantSideNotificationService().startConsultantSideService();
+    // ConsultantSideNotificationService().startConsultantSideService();
   }
 
   @override

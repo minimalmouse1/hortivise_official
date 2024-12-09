@@ -14,6 +14,7 @@ import 'package:horti_vige/data/models/user/user_model.dart';
 import 'package:horti_vige/data/repositories/user_repository.dart';
 import 'package:horti_vige/data/services/auth_service.dart';
 import 'package:horti_vige/data/services/stripe.dart';
+import 'package:horti_vige/ui/screens/common/profile_screen.dart';
 import 'package:horti_vige/ui/utils/extensions/extensions.dart';
 import 'package:horti_vige/core/utils/helpers/preference_manager.dart';
 import 'package:horti_vige/ui/widgets/app_nav_drawer.dart';
@@ -78,6 +79,14 @@ class UserProvider extends ChangeNotifier {
 
     try {
       await UserRepository.updateUser(model);
+      if (model.type == UserType.SPECIALIST && bioController.text.isNotEmpty) {
+        await FirebaseFirestore.instance
+            .collection("Users")
+            .doc(model.email)
+            .update({
+          'specialist.bio': bioController.text.trim(),
+        });
+      }
       _prefManager.saveUserModelInPref(model);
     } catch (e) {
       e.logError();

@@ -52,7 +52,7 @@ import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'dart:developer' as developer;
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await PreferenceManager.getInstance().initSharedPreferences();
@@ -70,11 +70,12 @@ Future<void> main() async {
   //   await VideoService.instance.initAgora();
   // }
 
-  FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.instance;
+  final FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.instance;
   if (kDebugMode) {
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
     FlutterError.onError = (errorDetails) {
-      bool isFatal = (errorDetails.exception is HttpException ||
+      // ignore: avoid_bool_literals_in_conditional_expressions
+      final isFatal = (errorDetails.exception is HttpException ||
               errorDetails.exception is SocketException ||
               errorDetails.exception is HandshakeException ||
               errorDetails.exception is PlatformException ||
@@ -120,8 +121,14 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
+
+  Future<void> setUpAllThings() async {
+    await PreferenceManager.getInstance().initSharedPreferences();
+  }
+
   @override
   void initState() {
+    //  setUpAllThings();
     super.initState();
   }
 

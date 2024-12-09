@@ -654,14 +654,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.3.3"
-  flutter_callkit_incoming:
-    dependency: transitive
-    description:
-      name: flutter_callkit_incoming
-      sha256: "911978c1db30d2cf886daf80c874ac0beac8482682769b397c0dc3190f3f6cef"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.4+1"
   flutter_hidden_drawer:
     dependency: "direct main"
     description:
@@ -1482,14 +1474,6 @@ packages:
     description:
       name: stream_video_flutter
       sha256: fe2ea0d03e5c4ce6f5c3615589820b9de62bcae58c8a76dc35ffd9cd3f22c8f5
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.9"
-  stream_video_push_notification:
-    dependency: "direct main"
-    description:
-      name: stream_video_push_notification
-      sha256: a5b6e9e936c81ad11ac559184f01252b57dc696d5fc48aac5db62d45b8ff336a
       url: "https://pub.dev"
     source: hosted
     version: "0.3.9"
