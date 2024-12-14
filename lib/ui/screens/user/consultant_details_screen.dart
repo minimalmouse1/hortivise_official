@@ -26,6 +26,7 @@ class ConsultantDetailsScreen extends StatelessWidget {
     final arguments = (ModalRoute.of(context)?.settings.arguments ??
         <String, dynamic>{}) as Map;
     final userModel = arguments[Constants.userModel] as UserModel;
+
     final packagesProvider =
         Provider.of<PackagesProvider>(context, listen: false);
     return Scaffold(

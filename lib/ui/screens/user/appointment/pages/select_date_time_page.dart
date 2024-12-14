@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:horti_vige/data/enums/days.dart';
 import 'package:horti_vige/data/models/availability/availability.dart';
 
@@ -14,6 +15,9 @@ import 'package:horti_vige/ui/widgets/app_filled_button.dart';
 import 'package:horti_vige/ui/widgets/app_horizontal_choise_chips.dart';
 import 'package:horti_vige/core/utils/app_date_utils.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 class SelectDateTimePage extends StatefulWidget {
   const SelectDateTimePage(
@@ -38,6 +42,8 @@ class _SelectDateTimePageState extends State<SelectDateTimePage> {
   int selectedMonth = DateTime.now().month;
   int selectedHour = DateTime.now().hour;
   int selectedMinute = DateTime.now().minute;
+  String consultantTimeZone = '';
+  String patientTimeZone = '';
   bool gettingTimes = true;
   PackageModel? selectedPkg;
   late final selectableDays = widget.availability.days
@@ -239,13 +245,113 @@ class _SelectDateTimePageState extends State<SelectDateTimePage> {
     );
   }
 
+  Map<String, String> timeZoneMapping = {
+    'Etc/GMT-12': 'International Date Line West (GMT -12:00)',
+    'Etc/GMT-11': 'Coordinated Universal Time -11 (GMT -11:00)',
+    'Pacific/Honolulu': 'Hawaii (GMT -10:00)',
+    'America/Anchorage': 'Alaska (GMT -9:00)',
+    'America/Los_Angeles': 'Pacific Time (US & Canada) (GMT -8:00)',
+    'America/Phoenix': 'Arizona (GMT -7:00)',
+    'America/Denver': 'Mountain Time (US & Canada) (GMT -7:00)',
+    'America/Chicago': 'Central Time (US & Canada) (GMT -6:00)',
+    'America/Mexico_City': 'Mexico City (GMT -6:00)',
+    'Canada/Saskatchewan': 'Saskatchewan (GMT -6:00)',
+    'America/New_York': 'Eastern Time (US & Canada) (GMT -5:00)',
+    'America/Lima': 'Lima (GMT -5:00)',
+    'America/Bogota': 'Bogota (GMT -5:00)',
+    'America/Caracas': 'Caracas (GMT -4:30)',
+    'Canada/Atlantic': 'Atlantic Time (Canada) (GMT -4:00)',
+    'America/Santiago': 'Santiago (GMT -4:00)',
+    'America/La_Paz': 'La Paz (GMT -4:00)',
+    'Canada/Newfoundland': 'Newfoundland (GMT -3:30)',
+    'America/Sao_Paulo': 'Brasilia (GMT -3:00)',
+    'America/Argentina/Buenos_Aires': 'Buenos Aires (GMT -3:00)',
+    'America/Godthab': 'Greenland (GMT -3:00)',
+    'Atlantic/South_Georgia': 'Mid-Atlantic (GMT -2:00)',
+    'Atlantic/Cape_Verde': 'Cape Verde Islands (GMT -1:00)',
+    'Atlantic/Azores': 'Azores (GMT -1:00)',
+    'Europe/London': 'Dublin, Edinburgh, Lisbon, London (GMT +0:00)',
+    'Africa/Monrovia': 'Monrovia (GMT +0:00)',
+    'Africa/Casablanca': 'Casablanca (GMT +0:00)',
+    'UTC': 'UTC (GMT +0:00)',
+    'Europe/Belgrade':
+        'Belgrade, Bratislava, Budapest, Ljubljana, Prague (GMT +1:00)',
+    'Europe/Warsaw': 'Sarajevo, Skopje, Warsaw, Zagreb (GMT +1:00)',
+    'Europe/Paris': 'Brussels, Copenhagen, Madrid, Paris (GMT +1:00)',
+    'Europe/Berlin':
+        'Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna (GMT +1:00)',
+    'Africa/Lagos': 'West Central Africa (GMT +1:00)',
+    'Europe/Athens': 'Athens, Bucharest, Istanbul (GMT +2:00)',
+    'Europe/Helsinki':
+        'Helsinki, Kyiv, Riga, Sofia, Tallinn, Vilnius (GMT +2:00)',
+    'Africa/Cairo': 'Cairo (GMT +2:00)',
+    'Asia/Damascus': 'Damascus (GMT +2:00)',
+    'Asia/Jerusalem': 'Jerusalem (GMT +2:00)',
+    'Africa/Harare': 'Harare, Pretoria (GMT +2:00)',
+    'Asia/Baghdad': 'Baghdad (GMT +3:00)',
+    'Europe/Moscow': 'Moscow, St. Petersburg, Volgograd (GMT +3:00)',
+    'Asia/Kuwait': 'Kuwait, Riyadh (GMT +3:00)',
+    'Africa/Nairobi': 'Nairobi (GMT +3:00)',
+    'Asia/Tehran': 'Tehran (GMT +3:30)',
+    'Asia/Baku': 'Baku (GMT +4:00)',
+    'Asia/Tbilisi': 'Tbilisi (GMT +4:00)',
+    'Asia/Yerevan': 'Yerevan (GMT +4:00)',
+    'Asia/Dubai': 'Dubai (GMT +4:00)',
+    'Asia/Kabul': 'Kabul (GMT +4:30)',
+    'Asia/Karachi': 'Pakistan Standard Time (GMT +5:00)',
+    'Asia/Calcutta': 'Chennai, Kolkata, Mumbai, New Delhi (GMT +5:30)',
+    'Asia/Colombo': 'Sri Jayawardenepura (GMT +5:30)',
+    'Asia/Kathmandu': 'Kathmandu (GMT +5:45)',
+    'Asia/Dhaka': 'Astana, Dhaka (GMT +6:00)',
+    'Asia/Almaty': 'Almaty (GMT +6:00)',
+    'Asia/Rangoon': 'Rangoon (GMT +6:30)',
+    'Asia/Bangkok': 'Bangkok, Hanoi, Jakarta (GMT +7:00)',
+    'Asia/Irkutsk': 'Novosibirsk (GMT +7:00)',
+    'Asia/Shanghai': 'Beijing, Chongqing, Hong Kong, Urumqi (GMT +8:00)',
+    'Asia/Singapore': 'Singapore (GMT +8:00)',
+    'Australia/Perth': 'Perth (GMT +8:00)',
+    'Asia/Taipei': 'Taipei (GMT +8:00)',
+    'Asia/Ulaanbaatar': 'Ulaanbaatar (GMT +8:00)',
+    'Asia/Tokyo': 'Osaka, Sapporo, Tokyo (GMT +9:00)',
+    'Asia/Seoul': 'Seoul (GMT +9:00)',
+    'Asia/Yakutsk': 'Yakutsk (GMT +9:00)',
+    'Australia/Adelaide': 'Adelaide (GMT +9:30)',
+    'Australia/Darwin': 'Darwin (GMT +9:30)',
+    'Australia/Brisbane': 'Brisbane (GMT +10:00)',
+    'Australia/Sydney': 'Canberra, Melbourne, Sydney (GMT +10:00)',
+    'Australia/Hobart': 'Hobart (GMT +10:00)',
+    'Pacific/Guam': 'Guam, Port Moresby (GMT +10:00)',
+    'Asia/Vladivostok': 'Vladivostok (GMT +10:00)',
+    'Pacific/Guadalcanal': 'Solomon Islands (GMT +11:00)',
+    'Pacific/Noumea': 'New Caledonia (GMT +11:00)',
+    'Asia/Magadan': 'Magadan (GMT +12:00)',
+    'Pacific/Auckland': 'Auckland, Wellington (GMT +12:00)',
+    'Pacific/Fiji': 'Fiji (GMT +12:00)',
+    'Pacific/Tongatapu': 'Nuku\'alofa (GMT +13:00)',
+    'Pacific/Samoa': 'Samoa (GMT +13:00)',
+  };
+
+// Function to reverse-map the time zone
+  String getTimeZoneIdFromName(String humanReadableName) {
+    return timeZoneMapping.entries
+        .firstWhere((entry) => entry.value == humanReadableName,
+            orElse: () => const MapEntry('UTC', 'UTC'))
+        .key;
+  }
+
   void _selectTimes(DayEnum day) {
+    tz.initializeTimeZones();
+
     final from = widget.availability.days[day.index].from;
     final to = widget.availability.days[day.index].to;
     availableTimes = [];
 
     final fromHour = from.hour;
     final toHour = to.hour;
+    String consultantTimeZoneId = getTimeZoneIdFromName(consultantTimeZone);
+    String patientTimeZoneId = getTimeZoneIdFromName(patientTimeZone);
+    final consultantTimeZone1 = tz.getLocation(consultantTimeZoneId);
+    final patientTimeZone1 = tz.getLocation(patientTimeZoneId);
 
     final currentDateTime = DateTime.now();
 
@@ -266,21 +372,34 @@ class _SelectDateTimePageState extends State<SelectDateTimePage> {
         final hour = int.parse(time.split(':')[0]);
         final minute = int.parse(time.split(':')[1]);
 
-        final selectedDateTime = DateTime(
+        // final selectedDateTime = DateTime(
+        //   currentDateTime.year,
+        //   selectedMonth,
+        //   selectedDay,
+        //   hour,
+        //   minute,
+        // );
+        final selectedDateTimeConsultant = tz.TZDateTime(
+          consultantTimeZone1,
           currentDateTime.year,
-          selectedMonth,
-          selectedDay,
+          currentDateTime.month,
+          currentDateTime.day,
           hour,
           minute,
         );
 
         final isFutureTime =
-            !isToday || selectedDateTime.isAfter(currentDateTime);
+            !isToday || selectedDateTimeConsultant.isAfter(currentDateTime);
         final isNonOverlappingTime =
-            !isTimeWithinConsultations(selectedDateTime);
+            !isTimeWithinConsultations(selectedDateTimeConsultant);
 
         if (isFutureTime && isNonOverlappingTime) {
-          availableTimes.add(time);
+          final selectedDateTimePatient =
+              tz.TZDateTime.from(selectedDateTimeConsultant, patientTimeZone1);
+
+          availableTimes.add(
+              '${selectedDateTimePatient.hour.toString().padLeft(2, '0')}:${selectedDateTimePatient.minute.toString().padLeft(2, '0')}');
+          // availableTimes.add(time);
         }
       }
     }
@@ -324,6 +443,21 @@ class _SelectDateTimePageState extends State<SelectDateTimePage> {
   Future<List<Map<String, dynamic>>> fetchConsultationsBySpecialistEmail(
       {required String email}) async {
     try {
+      String localTimeZone = await FlutterTimezone.getLocalTimezone();
+
+      DocumentSnapshot userDocument =
+          await FirebaseFirestore.instance.collection('Users').doc(email).get();
+      Map<String, dynamic>? userData =
+          userDocument.data() as Map<String, dynamic>?;
+      debugPrint("User Data: $userData");
+
+      consultantTimeZone = userData!['timeZone'];
+      String? matchedTimeZone = timeZoneMapping[localTimeZone];
+      patientTimeZone = matchedTimeZone!;
+
+      setState(() {});
+      print('Patient Time Zone: $matchedTimeZone');
+      debugPrint("Consultant Time Zone: $consultantTimeZone");
       CollectionReference consultationsCollection =
           FirebaseFirestore.instance.collection('Consultations');
 

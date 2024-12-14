@@ -33,32 +33,32 @@ class ConsultationProvider extends ChangeNotifier {
 
   PreferenceManager prefs = PreferenceManager.getInstance();
 
-  Future<String> sendConsultationRequest({
-    required UserModel specialistUser,
-    required DateTime selectedDate,
-    required PackageModel selectedPackage,
-  }) async {
+  Future<String> sendConsultationRequest(
+      {required UserModel specialistUser,
+      required DateTime selectedDate,
+      required PackageModel selectedPackage,
+      required String timeZone}) async {
     final id = _consultationsCollectionRef.doc().id;
     final currentUser = PreferenceManager.getInstance().getCurrentUser()!;
     final totalAmount = selectedPackage.amount + taxAmount;
     final consultation = ConsultationModel(
-      id: id,
-      title: selectedPackage.title,
-      description: specialistUser.specialist?.bio ?? '',
-      durationTime: selectedPackage.duration,
-      startTime: selectedDate,
-      endTime: selectedDate.add(Duration(minutes: selectedPackage.duration)),
-      startDateTime: selectedDate,
-      endDateTime:
-          selectedDate.add(Duration(minutes: selectedPackage.duration)),
-      isEnabled: false,
-      specialist: specialistUser,
-      customer: currentUser,
-      packageId: selectedPackage.id,
-      tax: taxAmount,
-      totalAmount: totalAmount,
-      packageType: selectedPackage.type,
-    );
+        id: id,
+        title: selectedPackage.title,
+        description: specialistUser.specialist?.bio ?? '',
+        durationTime: selectedPackage.duration,
+        startTime: selectedDate,
+        endTime: selectedDate.add(Duration(minutes: selectedPackage.duration)),
+        startDateTime: selectedDate,
+        endDateTime:
+            selectedDate.add(Duration(minutes: selectedPackage.duration)),
+        isEnabled: false,
+        specialist: specialistUser,
+        customer: currentUser,
+        packageId: selectedPackage.id,
+        tax: taxAmount,
+        totalAmount: totalAmount,
+        packageType: selectedPackage.type,
+        timeZone: timeZone);
 
     final paymentService = PaymentsService();
 

@@ -24,6 +24,7 @@ class ConsultationModel {
     required this.totalAmount,
     this.status = ConsultationStatus.pending,
     required this.packageType,
+    required this.timeZone,
   });
 
   factory ConsultationModel.fromJson(Map<String, dynamic> json) =>
@@ -45,6 +46,7 @@ class ConsultationModel {
   PackageType packageType;
   // payment related variables will be added later
   ConsultationStatus status;
+  String timeZone;
 
   Map<String, dynamic> toJson() => _$ConsultationModelToJson(this);
 }

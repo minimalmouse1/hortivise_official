@@ -8,6 +8,7 @@ part of 'consultation_model.dart';
 
 ConsultationModel _$ConsultationModelFromJson(Map<String, dynamic> json) =>
     ConsultationModel(
+      timeZone: json['timeZone'] as String,
       id: json['id'] as String,
       title: json['title'] as String,
       description: json['description'] as String,
@@ -47,6 +48,7 @@ Map<String, dynamic> _$ConsultationModelToJson(ConsultationModel instance) =>
       'totalAmount': instance.totalAmount,
       'packageType': _$PackageTypeEnumMap[instance.packageType]!,
       'status': _$ConsultationStatusEnumMap[instance.status]!,
+      'timeZone': instance.timeZone
     };
 
 const _$ConsultationStatusEnumMap = {

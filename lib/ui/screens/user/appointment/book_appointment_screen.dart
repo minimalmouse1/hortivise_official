@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:horti_vige/constants.dart';
 import 'package:horti_vige/core/utils/app_consts.dart';
 import 'package:horti_vige/data/models/availability/availability.dart';
 import 'package:horti_vige/data/models/package/package_model.dart';
@@ -28,11 +30,23 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen>
 
   late DateTime _selectedDate;
   PackageModel? _selectedPkg;
+  String patientTimeZone = '';
 
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
+    Future.delayed(const Duration(milliseconds: 200), () {
+      setLocalTimeZone();
+    });
     super.initState();
+  }
+
+  void setLocalTimeZone() async {
+    String localTimeZone = await FlutterTimezone.getLocalTimezone();
+    String? matchedTimeZone = timeZoneMapping[localTimeZone];
+    patientTimeZone = matchedTimeZone!;
+    setState(() {});
+    debugPrint('patient local time zone :$patientTimeZone');
   }
 
   @override
@@ -167,10 +181,10 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen>
             selectedPackage: _selectedPkg,
             confirmBooking: (specialist) {
               submitConsultationRequest(
-                selectedDate: _selectedDate,
-                selectedPkg: _selectedPkg!,
-                specialist: specialist,
-              );
+                  selectedDate: _selectedDate,
+                  selectedPkg: _selectedPkg!,
+                  specialist: specialist,
+                  timeZone: patientTimeZone);
             },
           ),
         ],
@@ -182,12 +196,14 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen>
     required DateTime selectedDate,
     required PackageModel selectedPkg,
     required UserModel specialist,
+    required String timeZone,
   }) {
     context.showProgressDialog(
       dialog: const WaitingDialog(status: 'Sending Request'),
     );
     Provider.of<ConsultationProvider>(context, listen: false)
         .sendConsultationRequest(
+      timeZone: timeZone,
       specialistUser: specialist,
       selectedDate: selectedDate,
       selectedPackage: selectedPkg,

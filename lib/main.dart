@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:horti_vige/constants.dart';
 import 'package:horti_vige/data/services/notification_service.dart';
 import 'package:horti_vige/firebase_options.dart';
 import 'package:horti_vige/providers/availability_provider.dart';
@@ -51,6 +52,8 @@ import 'package:horti_vige/core/utils/helpers/preference_manager.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'dart:developer' as developer;
+import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -106,6 +109,9 @@ void main() async {
       );
     };
   }
+
+  getTimeZoneAndSave();
+  injectionFunction();
 
   runApp(
     const MyApp(),
@@ -219,4 +225,19 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+}
+
+// top class function to store the local time zone
+void getTimeZoneAndSave() async {
+  String localTimeZone =
+      await FlutterTimezone.getLocalTimezone(); // e.g., Asia/Karachi
+  print('Local time zone: $localTimeZone');
+  String? matchedTimeZone = timeZoneMapping[localTimeZone];
+  SharedPreferences sf = await SharedPreferences.getInstance();
+  sf.remove('localTimeZone');
+
+  sf.setString(
+      'localTimeZone', matchedTimeZone ?? 'Pakistan Standard Time (GMT +5:00)');
+
+  debugPrint('local time zone in cache:${sf.getString('localTimeZone')}');
 }
