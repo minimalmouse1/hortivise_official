@@ -190,12 +190,12 @@ class UserProvider extends ChangeNotifier {
     return _prefManager.getCurrentUser()?.type ?? UserType.CUSTOMER;
   }
 
-  Future<String> sendSpecialistRequest({
-    required String name,
-    required String email,
-    required String category,
-    required String bio,
-  }) async {
+  Future<String> sendSpecialistRequest(
+      {required String name,
+      required String email,
+      required String category,
+      required String bio,
+      required String password}) async {
     final stripeId = await _createStripeUser(name, email, UserType.SPECIALIST);
     final currentTimeZone = await FlutterTimezone.getLocalTimezone();
     final placeHolderName = getPlaceHolderName(name);
@@ -209,7 +209,7 @@ class UserProvider extends ChangeNotifier {
           'https://ui-avatars.com/api/?name=$placeHolderName&background=random&size=200',
       // 'https://firebasestorage.googleapis.com/v0/b/hortivige.appspot.com/o/defaults%2FDefault_pfp.svg.png?alt=media&token=acdad01c-7608-421c-b7cd-df899bf00feb&_gl=1*630m8s*_ga*MTYyNjI3NTU0MC4xNjk0NTkzODc3*_ga_CW55HF8NVT*MTY5NjY4Mjc5MS40Mi4xLjE2OTY2ODI4NjQuNDcuMC4w',
       uId: '',
-      isAuthenticated: false,
+      isAuthenticated: true,
       specialist: Specialist(
         isStripeActive: false,
         stripeId: stripeId,
@@ -232,8 +232,18 @@ class UserProvider extends ChangeNotifier {
     if (docs.docs.isNotEmpty) {
       return Future.error('User already exist with provided email');
     } else {
-      await _userCollectionRef.doc(userModel.email).set(userModel.toJson());
-      return 'Request submitted successfully!';
+      // run signup function here
+      try {
+        final user = await _authService.createUserWithEmailAndPassword(
+          email,
+          password,
+        );
+        await _userCollectionRef.doc(userModel.email).set(userModel.toJson());
+        return 'Request submitted successfully!';
+      } catch (e) {
+        debugPrint('error in consultant signup: ${e.toString()}');
+      }
+      return 'Error in Request submission . Try again later!';
     }
   }
 

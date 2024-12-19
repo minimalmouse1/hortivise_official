@@ -28,6 +28,16 @@ class _BecomeConsultantScreenState extends State<BecomeConsultantScreen> {
   String? _categoryError;
   String _bio = '';
   String? _bioError;
+  String _consultantPassword = '';
+  String? _passwordError;
+  String? isPasswordValid(String password) {
+    String? error;
+    if (password.isEmpty || password.length < 6) {
+      error = 'Password must be at-least 6 characters';
+    }
+
+    return error;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -125,6 +135,22 @@ class _BecomeConsultantScreenState extends State<BecomeConsultantScreen> {
                     ),
                     12.height,
                     AppTextInput(
+                      hint: 'Password',
+                      floatHint: false,
+                      fieldHeight: 50,
+                      filledColor: AppColors.colorGrayBg,
+                      isPasswordField: true,
+                      errorText: _passwordError,
+                      onUpdateInput: (value) {
+                        _consultantPassword = value;
+                        setState(() {
+                          _passwordError = isPasswordValid(_consultantPassword);
+                        });
+                        debugPrint('Password -> $_consultantPassword');
+                      },
+                    ),
+                    12.height,
+                    AppTextInput(
                       maxLength: 300,
                       hint: 'Tell us about you...',
                       floatHint: false,
@@ -197,6 +223,10 @@ class _BecomeConsultantScreenState extends State<BecomeConsultantScreen> {
       setState(() {
         _bioError = isBioValid(_bio);
       });
+    } else if (isPasswordValid(_consultantPassword) != null) {
+      setState(() {
+        _passwordError = 'Please enter valid password';
+      });
     } else {
       setState(() {
         _hortistNameError = null;
@@ -212,6 +242,7 @@ class _BecomeConsultantScreenState extends State<BecomeConsultantScreen> {
         email: _hortistEmail,
         category: _category,
         bio: _bio,
+        password: _consultantPassword,
       )
           .then((value) {
         Navigator.pop(context);
