@@ -181,10 +181,18 @@ class Constants {
   static const fromUserDetails = 'fromUserDetails';
 
   static const blogModel = 'BlogModel';
+
+  // old account keys
+  // static const kStripePublishKey =
+  //     'pk_test_51JsYwVJo0i9TcQEH7Vuj26hblM9vrZPGhK26ITZklHsBLpRgHIMz633hJsAEFaHo4CqKUpjMiVnRHSWnAT441R6N00DI0JCLkq';
+  // static const kSecretKey =
+  //     'sk_test_51JsYwVJo0i9TcQEHTCUOHytAX84Rd8QbnRBrTSmvAPaKkQmSxBqm9ARIVwR7kwJI1SbCuWp2uwb3KpjapdWXz9ff00AloPFG3a';
+
+  // account 1  miriah.spiers@icloud.com
   static const kStripePublishKey =
-      'pk_test_51JsYwVJo0i9TcQEH7Vuj26hblM9vrZPGhK26ITZklHsBLpRgHIMz633hJsAEFaHo4CqKUpjMiVnRHSWnAT441R6N00DI0JCLkq';
+      'pk_live_51QG6a2ELpHSTTuqJVrDIkIWws1KmSHJwUGyUfUubeIniIO7dAlhwlrYXAtEWlozPEMmETxpr58hsH9M6pCVC65VK00BXg5A3da';
   static const kSecretKey =
-      'sk_test_51JsYwVJo0i9TcQEHTCUOHytAX84Rd8QbnRBrTSmvAPaKkQmSxBqm9ARIVwR7kwJI1SbCuWp2uwb3KpjapdWXz9ff00AloPFG3a';
+      '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';
 }
 
 const String userAgreementData = """
