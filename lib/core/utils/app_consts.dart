@@ -189,10 +189,12 @@ class Constants {
   //     'sk_test_51JsYwVJo0i9TcQEHTCUOHytAX84Rd8QbnRBrTSmvAPaKkQmSxBqm9ARIVwR7kwJI1SbCuWp2uwb3KpjapdWXz9ff00AloPFG3a';
 
   // account 1  miriah.spiers@icloud.com
+
+  //
   static const kStripePublishKey =
-      'pk_live_51QG6a2ELpHSTTuqJVrDIkIWws1KmSHJwUGyUfUubeIniIO7dAlhwlrYXAtEWlozPEMmETxpr58hsH9M6pCVC65VK00BXg5A3da';
+      'pk_test_51QG6a2ELpHSTTuqJLq6NHoEl7FdFXwhIaPWW7BqFL4GHHNTwISKcSslUrbJbjBoU6HDQTuKj8UvtMQbiH4hNzYeE003YPnH69y';
   static const kSecretKey =
-      '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';
+      'sk_test_51QG6a2ELpHSTTuqJiywWHNZ80mmO5r3Zhe27TIKS4yB4Ye7o2KHPuWiXAloMrfIyYdAQfkIoxo6aIYs2ddhUaIWC00Xoih7Rt9';
 }
 
 const String userAgreementData = """
