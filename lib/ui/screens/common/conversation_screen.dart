@@ -43,7 +43,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
       loading = false;
       setState(() {});
 
-      debugPrint('log: other user data  ${otherUser.userName}');
+      debugPrint('log: other user data  ${otherUser.uId}');
     });
   }
 

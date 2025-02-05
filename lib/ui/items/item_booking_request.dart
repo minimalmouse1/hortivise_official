@@ -64,16 +64,16 @@ class ItemBookingRequest extends StatelessWidget {
                   style: AppTextStyles.titleStyle.changeSize(14),
                 ),
               ),
-              Padding(
-                padding: 12.horizontalPadding,
-                child: Text(
-                  requestModel.description,
-                  style: AppTextStyles.bodyStyle,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.start,
-                ),
-              ),
+              // Padding(
+              //   padding: 12.horizontalPadding,
+              //   child: Text(
+              //     requestModel.description,
+              //     style: AppTextStyles.bodyStyle,
+              //     maxLines: 3,
+              //     overflow: TextOverflow.ellipsis,
+              //     textAlign: TextAlign.start,
+              //   ),
+              // ),
               6.height,
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,

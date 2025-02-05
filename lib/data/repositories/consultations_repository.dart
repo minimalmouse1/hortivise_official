@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 import 'package:horti_vige/core/exceptions/app_exception.dart';
 import 'package:horti_vige/core/utils/helpers/preference_manager.dart';
@@ -46,12 +47,18 @@ class ConsultationRepository {
 
   static Stream<List<ConsultationModel>>
       getPendingConsultationRequestsBySpecialist() {
+    // Get current DateTime
+    DateTime now = DateTime.now();
+
     return _consultationsCollectionRef
         .where(
           FieldPath(const ['specialist', 'id']),
           isEqualTo: PreferenceManager.getInstance().getCurrentUser()!.id,
         )
         .where('status', isEqualTo: ConsultationStatus.pending.name)
+        .where('startTime',
+            isGreaterThan:
+                now.toIso8601String()) // Filter expired consultations
         .orderBy('startTime', descending: true)
         .snapshots()
         .map((querySnapshots) {
@@ -59,6 +66,9 @@ class ConsultationRepository {
       for (final DocumentSnapshot<Map<String, dynamic>> doc
           in querySnapshots.docs) {
         requests.add(ConsultationModel.fromJson(doc.data()!));
+      }
+      for (var req in requests) {
+        debugPrint('consultation id: ${req.id}');
       }
       return requests;
     });

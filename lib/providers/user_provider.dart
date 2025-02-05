@@ -259,17 +259,20 @@ class UserProvider extends ChangeNotifier {
         .where('type', isEqualTo: UserType.SPECIALIST.name)
         .get();
     _specialistsList.clear();
+
     for (final element in querySnapshots.docs) {
-      final model = UserModel.fromJson(element.data());
-      if (model.specialist!.isStripeActive == true) {
+      final data = element.data();
+      debugPrint('Raw data from Firestore: $data');
+
+      final model = UserModel.fromJson(data);
+
+      // Debug print stripe status
+      debugPrint('Parsed Stripe Status: ${model.toJson()}');
+
+      if (model.specialist?.isStripeActive == true) {
         _specialistsList.add(model);
       }
     }
-    // _specialistsList.addAll(
-    //   querySnapshots.docs.map((doc) {
-    //     return UserModel.fromJson(doc.data());
-    //   }).toList(),
-    // );
     return _specialistsList;
   }
 

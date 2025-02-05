@@ -311,6 +311,7 @@ class _UserHomePageState extends State<UserHomePage> {
                         );
                       default:
                         if (snapshots.hasError) {
+                          debugPrint('snap shot error${snapshots.error}');
                           return Center(
                             child: Text(
                               'Something went wrong when connecting to server, please try again later! ${snapshots.error}',

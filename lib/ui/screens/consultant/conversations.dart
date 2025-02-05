@@ -84,8 +84,8 @@ class _ConversationsState extends State<Conversations> {
                   : FirebaseFirestore.instance
                       .collection('Chats')
                       .where(
-                        FieldPath(const ['consultant', 'userId']),
-                        isEqualTo: FirebaseAuth.instance.currentUser!.uid,
+                        FieldPath(const ['consultion', 'specialist', 'email']),
+                        isEqualTo: FirebaseAuth.instance.currentUser!.email,
                       )
                       .snapshots(),
               builder: (context, snapshot) {
