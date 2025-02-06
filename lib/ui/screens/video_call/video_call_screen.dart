@@ -383,14 +383,14 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                 call: call,
                 localParticipant: localParticipantAction,
               ),
-              CallControlOption(
-                disabledIconColor: const Color(0xff087750),
-                icon: const Icon(
-                  Icons.chat_outlined,
-                  color: Color(0xff087750),
-                ),
-                onPressed: () {},
-              ),
+              // CallControlOption(
+              //   disabledIconColor: const Color(0xff087750),
+              //   icon: const Icon(
+              //     Icons.chat_outlined,
+              //     color: Color(0xff087750),
+              //   ),
+              //   onPressed: () {},
+              // ),
               LeaveCallOption(
                 call: call,
                 onLeaveCallTap: () {
