@@ -65,6 +65,8 @@ class ChatProvider extends ChangeNotifier {
         'lastMessage': message,
         'time': DateTime.now(),
         'consultion': consultationModel.toJson(),
+        'consultantInChat': false,
+        'patientInChat': true,
       },
     );
     // new send new message on specific channel
@@ -83,6 +85,14 @@ class ChatProvider extends ChangeNotifier {
         .collection('Messages')
         .doc(chatModel.messageId)
         .set(chatModel.toJson());
+    await _chatsCollection
+        .doc(channelId)
+        .collection('Messages')
+        .doc(chatModel.messageId)
+        .set({
+      'senderEmail': FirebaseAuth.instance.currentUser!.email,
+      'messageSeen': false
+    }, SetOptions(merge: true));
 
     final notificationId = _notificationsCollectionRef.doc().id;
     final notificationModel = NotificationModel(
