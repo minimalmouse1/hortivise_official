@@ -280,6 +280,8 @@ class _ConsultationDetailsTileState extends State<ConsultationDetailsTile> {
           consultation: widget.list[widget.index],
           isCustomer: widget.provider.isCustomer(),
           onItemClick: (model) {
+            debugPrint(
+                'consultation id :${widget.snapshots.data!.docs[widget.index].id}');
             Navigator.pushNamed(
               context,
               ConsultationDetailsScreen.routeName,

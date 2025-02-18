@@ -59,7 +59,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
       loading = false;
       setState(() {});
 
-      debugPrint('log: other user data  ${otherUser.uId}');
+      debugPrint('log: other user data  ${otherUser.type}');
       changeUserActiveStatus(status: true);
     });
   }
@@ -203,77 +203,72 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                                 reverse: true,
                                                 itemCount: chats.length,
                                               ),
-                                              if (otherUser.type ==
-                                                  UserType.SPECIALIST)
-                                                Align(
-                                                  alignment:
-                                                      Alignment.topCenter,
-                                                  child: Material(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                      500,
+                                              // if (otherUser.type ==
+                                              //     UserType.SPECIALIST)
+                                              Align(
+                                                alignment: Alignment.topCenter,
+                                                child: Material(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                    500,
+                                                  ),
+                                                  color: Colors.white,
+                                                  elevation: 3,
+                                                  child: Container(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                      horizontal: 15,
+                                                      vertical: 7,
                                                     ),
-                                                    color: Colors.white,
-                                                    elevation: 3,
-                                                    child: Container(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                        horizontal: 15,
-                                                        vertical: 7,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                        500,
                                                       ),
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(
-                                                          500,
-                                                        ),
-                                                        color: Colors.white,
-                                                      ),
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: [
-                                                          if (sentMessages >=
-                                                              50)
-                                                            Text(
-                                                              'Consultation limit reached',
-                                                              style: AppTextStyles
-                                                                  .bodyStyleMedium
-                                                                  .changeSize(
-                                                                      16)
-                                                                  .changeColor(
-                                                                    Colors.red,
-                                                                  ),
-                                                            )
-                                                          else ...[
-                                                            Text(
-                                                              'Remaining Messages: ',
-                                                              style: AppTextStyles
-                                                                  .bodyStyleMedium
-                                                                  .changeSize(
-                                                                      16)
-                                                                  .changeColor(
-                                                                    AppColors
-                                                                        .colorGreen,
-                                                                  ),
+                                                      color: Colors.white,
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        if (sentMessages >= 50)
+                                                          Text(
+                                                            'Consultation limit reached',
+                                                            style: AppTextStyles
+                                                                .bodyStyleMedium
+                                                                .changeSize(16)
+                                                                .changeColor(
+                                                                  Colors.red,
+                                                                ),
+                                                          )
+                                                        else ...[
+                                                          Text(
+                                                            'Remaining Messages: ',
+                                                            style: AppTextStyles
+                                                                .bodyStyleMedium
+                                                                .changeSize(16)
+                                                                .changeColor(
+                                                                  AppColors
+                                                                      .colorGreen,
+                                                                ),
+                                                          ),
+                                                          Text(
+                                                            '${totalMessages - sentMessages}',
+                                                            style: AppTextStyles
+                                                                .bodyStyleMedium
+                                                                .changeSize(
+                                                              16,
                                                             ),
-                                                            Text(
-                                                              '${totalMessages - sentMessages}',
-                                                              style: AppTextStyles
-                                                                  .bodyStyleMedium
-                                                                  .changeSize(
-                                                                16,
-                                                              ),
-                                                            ),
-                                                          ],
+                                                          ),
                                                         ],
-                                                      ),
+                                                      ],
                                                     ),
                                                   ),
                                                 ),
+                                              ),
                                             ],
                                           ),
                                         ),

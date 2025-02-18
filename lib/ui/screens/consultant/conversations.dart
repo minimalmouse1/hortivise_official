@@ -162,7 +162,11 @@ class _ConversationsState extends State<Conversations> {
             context,
             ConversationScreen.routeName,
             arguments: {
-              Constants.userModel: user,
+              // Constants.userModel: user,
+              // 'consultation': model.consultationModel,
+              Constants.userModel: currentUser.type == UserType.CUSTOMER
+                  ? model.consultationModel!.specialist
+                  : model.consultationModel!.customer,
               'consultation': model.consultationModel,
             },
           );
