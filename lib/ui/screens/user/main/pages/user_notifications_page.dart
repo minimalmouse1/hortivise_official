@@ -14,7 +14,6 @@ class UserNotificationsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var lastDay = '';
     return Scaffold(
       backgroundColor: AppColors.colorBeige,
       appBar: AppBar(
@@ -27,7 +26,7 @@ class UserNotificationsPage extends StatelessWidget {
       body: Padding(
         padding: 12.allPadding,
         child: Consumer<NotificationsProvider>(
-          builder: (_, provider, __) => StreamBuilder(
+          builder: (_, provider, __) => StreamBuilder<List<NotificationModel>>(
             stream: provider.streamNotifications(),
             builder: (ctx, snapshots) {
               switch (snapshots.connectionState) {
@@ -43,11 +42,12 @@ class UserNotificationsPage extends StatelessWidget {
                   if (snapshots.hasError) {
                     return const Center(
                       child: Text(
-                        'Something went wrong when connecting to server, please try again later!',
+                        'Something went wrong when connecting to the server, please try again later!',
                       ),
                     );
                   } else {
-                    final notifications = snapshots.data!;
+                    final notifications = snapshots.data ?? [];
+
                     if (notifications.isEmpty) {
                       return Center(
                         child: Column(
@@ -68,50 +68,45 @@ class UserNotificationsPage extends StatelessWidget {
                         ),
                       );
                     }
-                    return ListView.separated(
+
+                    // Ensure notifications are sorted from latest to oldest
+                    notifications.sort((a, b) => b.time.compareTo(a.time));
+
+                    String lastDay = '';
+
+                    return ListView.builder(
+                      itemCount: notifications.length,
                       itemBuilder: (ctx, index) {
+                        final notification = notifications[index];
                         final currentDate = AppDateUtils.getDayViseDate(
-                          millis: notifications[index].time,
+                          millis: notification.time,
                         );
+
+                        bool showDateHeader = lastDay != currentDate;
+                        lastDay = currentDate;
+
                         return Column(
-                          mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            lastDay != currentDate
-                                ? Padding(
-                                    padding: index == 0 || index == 1
-                                        ? 5.verticalPadding
-                                        : 0.verticalPadding,
-                                    child: index <= 1
-                                        ? Center(
-                                            child: Text(
-                                              currentDate,
-                                              style: AppTextStyles
-                                                  .bodyStyleLarge
-                                                  .changeSize(12)
-                                                  .changeFontWeight(
-                                                    FontWeight.w600,
-                                                  ),
-                                            ),
-                                          )
-                                        : const SizedBox(),
-                                  )
-                                : 0.height,
+                            if (showDateHeader)
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 5),
+                                child: Center(
+                                  child: Text(
+                                    currentDate,
+                                    style: AppTextStyles.bodyStyleLarge
+                                        .changeSize(12)
+                                        .changeFontWeight(FontWeight.w600),
+                                  ),
+                                ),
+                              ),
                             ItemNotification(
-                              notification: notifications[index],
-                              description: provider
-                                  .getDisplayableMessage(notifications[index]),
+                              notification: notification,
+                              description:
+                                  provider.getDisplayableMessage(notification),
                             ),
                           ],
                         );
-                      },
-                      itemCount: notifications.length,
-                      separatorBuilder: (context, index) {
-                        final currentDate = AppDateUtils.getDayViseDate(
-                          millis: notifications[index].time,
-                        );
-                        lastDay = currentDate;
-                        return 0.height;
                       },
                     );
                   }
@@ -120,45 +115,6 @@ class UserNotificationsPage extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  Widget separator(int index) {
-    return Padding(
-      padding: index == 0 || index == 1 ? 5.verticalPadding : 0.verticalPadding,
-      child: index <= 1
-          ? Padding(
-              padding: 5.horizontalPadding,
-              child: Text(
-                index == 0
-                    ? 'Today'
-                    : index == 1
-                        ? 'Yesterday'
-                        : '',
-                style: AppTextStyles.bodyStyleLarge
-                    .changeSize(12)
-                    .changeFontWeight(FontWeight.w600),
-              ),
-            )
-          : const SizedBox(),
-    );
-  }
-
-  Widget withSeparator(
-    int index,
-    NotificationModel notificationModel,
-    NotificationsProvider provider,
-  ) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        separator(index),
-        ItemNotification(
-          notification: notificationModel,
-          description: provider.getDisplayableMessage(notificationModel),
-        ),
-      ],
     );
   }
 }

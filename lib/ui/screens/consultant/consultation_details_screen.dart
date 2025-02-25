@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:horti_vige/core/utils/app_consts.dart';
 import 'package:horti_vige/core/utils/app_date_utils.dart';
@@ -171,7 +172,7 @@ class _ConsultationDetailsScreenState extends State<ConsultationDetailsScreen> {
                             ? consultation.specialist.profileUrl
                             : consultation.customer.profileUrl,
                         height: 300,
-                        fit: BoxFit.fill,
+                        fit: BoxFit.contain,
                       ),
                     ),
                     Positioned(
@@ -380,117 +381,154 @@ class _ConsultationDetailsScreenState extends State<ConsultationDetailsScreen> {
                             //       ? Text('Expired')
                             //       : Text('See conversation'),
                             // ),
-                            if (consultation.status !=
-                                ConsultationStatus.canceled)
-                              Expanded(
-                                child: Stack(
-                                  children: [
-                                    Positioned(
-                                      bottom: 0,
-                                      left: 0,
-                                      right: 0,
-                                      child: Column(
-                                        children: [
-                                          AppFilledButton(
-                                            onPress: () {
-                                              debugPrint(
-                                                  'log: user type:${isCustomer ? 'Customer' : 'Doctor'}');
-                                              _onStartConsultation(
-                                                context,
-                                                isCustomer,
-                                                consultation,
-                                              );
-                                            },
-                                            title: status.isEmpty
-                                                ? ''
-                                                : (consultation.packageType ==
+                            consultation.status != ConsultationStatus.canceled
+                                ? Expanded(
+                                    child: Stack(
+                                      children: [
+                                        Positioned(
+                                          bottom: 0,
+                                          left: 0,
+                                          right: 0,
+                                          child: Column(
+                                            children: [
+                                              AppFilledButton(
+                                                onPress: () {
+                                                  debugPrint(
+                                                      'log: user type:${isCustomer ? 'Customer' : 'Doctor'}');
+                                                  _onStartConsultation(
+                                                    context,
+                                                    isCustomer,
+                                                    consultation,
+                                                  );
+                                                },
+                                                title: status.isEmpty
+                                                    ? ''
+                                                    : (consultation.packageType ==
+                                                                    PackageType
+                                                                        .text &&
+                                                                status ==
+                                                                    'expired') ||
+                                                            (consultation
+                                                                        .packageType ==
+                                                                    PackageType
+                                                                        .video &&
+                                                                status ==
+                                                                    'expired')
+                                                        ? 'See conversation'
+                                                        : 'Start Consultation',
+                                                isEnabled: status.isEmpty
+                                                    ? false
+                                                    : (consultation.packageType ==
                                                                 PackageType
                                                                     .text &&
                                                             status ==
-                                                                'expired') ||
+                                                                'started') ||
                                                         (consultation
                                                                     .packageType ==
                                                                 PackageType
                                                                     .video &&
-                                                            status == 'expired')
-                                                    ? 'See conversation'
-                                                    : 'Start Consultation',
-                                            isEnabled: status.isEmpty
-                                                ? false
-                                                : (consultation.packageType ==
-                                                            PackageType.text &&
-                                                        status == 'started') ||
-                                                    (consultation.packageType ==
-                                                            PackageType.video &&
-                                                        status == 'started'),
-                                          ),
-                                          20.height,
-                                          consultation.startTime
-                                                      .millisecondsSinceEpoch >
-                                                  DateTime.now()
-                                                      .millisecondsSinceEpoch
-                                              ? Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Expanded(
-                                                      child: isCustomer
-                                                          ? AppFilledButton(
-                                                              onPress: () {
-                                                                _onCancel(
-                                                                  context,
-                                                                  fromUserConsultationPage,
-                                                                  consultation,
-                                                                );
-                                                              },
-                                                              title: 'Cancel',
-                                                              color: AppColors
-                                                                  .colorRed,
-                                                              leftIcon:
-                                                                  const Icon(
-                                                                AppIcons
-                                                                    .ic_cross_round,
-                                                              ),
-                                                            )
-                                                          : 15.height,
-                                                    ),
-                                                    5.width,
-                                                    Expanded(
-                                                      child: isCustomer
-                                                          ? AppOutlinedButton(
-                                                              onPress: () {
-                                                                _showBottomSheet(
-                                                                  context,
-                                                                  UpdateConsultationBottomDialog(
-                                                                    consultation:
-                                                                        consultation,
-                                                                    onConsultationUpdate:
-                                                                        (cons) {
-                                                                      setState(
-                                                                          () {
-                                                                        consultation =
-                                                                            cons;
-                                                                      });
-                                                                    },
+                                                            status ==
+                                                                'started'),
+                                              ),
+                                              20.height,
+                                              consultation.startTime
+                                                          .millisecondsSinceEpoch >
+                                                      DateTime.now()
+                                                          .millisecondsSinceEpoch
+                                                  ? Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Expanded(
+                                                          child: isCustomer
+                                                              ? AppFilledButton(
+                                                                  onPress: () {
+                                                                    _onCancel(
+                                                                      context,
+                                                                      fromUserConsultationPage,
+                                                                      consultation,
+                                                                    );
+                                                                  },
+                                                                  title:
+                                                                      'Cancel',
+                                                                  color: AppColors
+                                                                      .colorRed,
+                                                                  leftIcon:
+                                                                      const Icon(
+                                                                    AppIcons
+                                                                        .ic_cross_round,
                                                                   ),
-                                                                );
-                                                              },
-                                                              title: 'Edit',
-                                                              btnColor: AppColors
-                                                                  .appGreenMaterial,
-                                                            )
-                                                          : 15.height,
-                                                    ),
-                                                  ],
-                                                )
-                                              : 15.height,
-                                        ],
+                                                                )
+                                                              : 15.height,
+                                                        ),
+                                                        5.width,
+                                                        Expanded(
+                                                          child: isCustomer
+                                                              ? AppOutlinedButton(
+                                                                  onPress: () {
+                                                                    _showBottomSheet(
+                                                                      context,
+                                                                      UpdateConsultationBottomDialog(
+                                                                        consultation:
+                                                                            consultation,
+                                                                        onConsultationUpdate:
+                                                                            (cons) {
+                                                                          setState(
+                                                                              () {
+                                                                            consultation =
+                                                                                cons;
+                                                                          });
+                                                                        },
+                                                                      ),
+                                                                    );
+                                                                  },
+                                                                  title: 'Edit',
+                                                                  btnColor:
+                                                                      AppColors
+                                                                          .appGreenMaterial,
+                                                                )
+                                                              : 15.height,
+                                                        ),
+                                                      ],
+                                                    )
+                                                  : 15.height,
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : GestureDetector(
+                                    onTap: () async {
+                                      try {
+                                        await FirebaseFirestore.instance
+                                            .collection('Consultations')
+                                            .doc(consultation.id)
+                                            .delete()
+                                            .then((value) {
+                                          Navigator.pop(context);
+                                        });
+                                      } catch (e) {
+                                        debugPrint(
+                                            'error in deleting consultation :${e.toString()}');
+                                      }
+                                    },
+                                    child: Container(
+                                      margin: const EdgeInsets.all(10),
+                                      height: 30,
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                        color: AppColors.colorRed,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: const Icon(
+                                        Icons.delete,
+                                        color: Colors.white,
+                                        size: 20,
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
+                                  )
                           ],
                         ),
                       ),

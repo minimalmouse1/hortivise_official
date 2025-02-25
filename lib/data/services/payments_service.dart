@@ -14,13 +14,17 @@ class PaymentsService {
   Future<JsonMap> createPaymentIntent(
     double amount,
   ) async {
+    final totalAmountInCents = calculateAmount(amount); // e.g., 1000 for $10
+
     try {
       //Request body
       final body = <String, dynamic>{
-        'amount': calculateAmount(amount),
+        'amount': totalAmountInCents,
         'currency': 'USD',
-        //'payment_method_types[]': '[card]',
+
         'setup_future_usage': 'off_session',
+
+        //'payment_method_types[]': '[card]',
       };
 
       //Make post request to Stripe
@@ -35,6 +39,7 @@ class PaymentsService {
       response.body.log();
       return json.decode(response.body);
     } catch (err) {
+      debugPrint('error in create payment intent:${err.toString()}');
       throw Exception(err.toString());
     }
   }
@@ -106,6 +111,7 @@ class PaymentsService {
       );
     } catch (e) {
       e.logError();
+      debugPrint('error in payment sheet');
     }
   }
 

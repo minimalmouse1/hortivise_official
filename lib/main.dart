@@ -75,7 +75,7 @@ void main() async {
 
   final FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.instance;
   if (kDebugMode) {
-    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
     FlutterError.onError = (errorDetails) {
       // ignore: avoid_bool_literals_in_conditional_expressions
       final isFatal = (errorDetails.exception is HttpException ||
@@ -87,7 +87,7 @@ void main() async {
               errorDetails.exception is FileSystemException)
           ? false
           : true;
-      developer.log('error ocurred: $errorDetails');
+      developer.log('error occurred: $errorDetails');
       developer.log('error isFatal: $isFatal');
       FirebaseCrashlytics.instance.recordFlutterError(
         errorDetails,

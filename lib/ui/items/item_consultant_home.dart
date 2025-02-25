@@ -35,6 +35,11 @@ class ItemConsultantHome extends StatelessWidget {
                   width: double.infinity,
                   height: imageHeight.toDouble(),
                   fit: BoxFit.fitHeight,
+                  errorWidget: (context, error, stackTrace) => const Icon(
+                    Icons.broken_image,
+                    size: 50,
+                    color: Colors.grey,
+                  ),
                 ),
               ),
               8.height,

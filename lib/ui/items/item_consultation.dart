@@ -220,10 +220,13 @@
 //   }
 // }
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:horti_vige/constants.dart';
+import 'package:horti_vige/data/enums/consultation_status.dart';
 import 'package:horti_vige/data/models/consultation/consultation_model.dart';
+import 'package:horti_vige/providers/consultations_provider.dart';
 import 'package:horti_vige/ui/resources/app_icons_icons.dart';
 import 'package:horti_vige/ui/utils/colors/colors.dart';
 import 'package:horti_vige/ui/utils/extensions/extensions.dart';
@@ -383,7 +386,16 @@ class ItemConsultation extends StatelessWidget {
                               !now.isBefore(consultation.endTime))
                       ? _expiredText()
                       : const SizedBox.shrink(),
-              8.height,
+              4.height,
+              (now.isAfter(localStartTime) &&
+                          !now.isBefore(
+                            localStartTime.add(
+                              const Duration(hours: 1),
+                            ),
+                          )) ||
+                      consultation.status == ConsultationStatus.canceled
+                  ? _deleteButton(docId: consultation.id, context: context)
+                  : const SizedBox.shrink(),
             ],
           ),
         ),
@@ -402,6 +414,35 @@ class ItemConsultation extends StatelessWidget {
           style: AppTextStyles.bodyStyle
               .changeSize(15)
               .changeColor(AppColors.colorOrange),
+        ),
+      ),
+    );
+  }
+
+  Widget _deleteButton({required String docId, required BuildContext context}) {
+    return GestureDetector(
+      onTap: () async {
+        try {
+          await FirebaseFirestore.instance
+              .collection('Consultations')
+              .doc(docId)
+              .delete();
+        } catch (e) {
+          debugPrint('error in deleting consultation :${e.toString()}');
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.all(10),
+        height: 30,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: AppColors.colorRed,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: const Icon(
+          Icons.delete,
+          color: Colors.white,
+          size: 20,
         ),
       ),
     );
