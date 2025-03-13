@@ -15,13 +15,14 @@ class PaymentsService {
     double amount,
   ) async {
     final totalAmountInCents = calculateAmount(amount); // e.g., 1000 for $10
-
+    final feeAmountInCents = calculateAmount(2.0);
     try {
       //Request body
       final body = <String, dynamic>{
         'amount': totalAmountInCents,
         'currency': 'USD',
-
+        'transfer_data[destination]': 'acct_1R1YUOCr1EEXn6Uy',
+        'application_fee_amount': feeAmountInCents,
         'setup_future_usage': 'off_session',
 
         //'payment_method_types[]': '[card]',
@@ -36,6 +37,8 @@ class PaymentsService {
         },
         body: body,
       );
+      debugPrint('Stripe Response: ${response.body}');
+
       response.body.log();
       return json.decode(response.body);
     } catch (err) {
@@ -169,6 +172,7 @@ class PaymentsService {
         'card[exp_year]': details.expiryYear,
         'card[cvc]': details.cvc,
         'customer': 'customerId',
+
         // this filed need to validate to add customer card.
       };
 
