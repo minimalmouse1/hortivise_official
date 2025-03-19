@@ -15,14 +15,14 @@ class PaymentsService {
     double amount,
   ) async {
     final totalAmountInCents = calculateAmount(amount); // e.g., 1000 for $10
-    final feeAmountInCents = calculateAmount(2.0);
+    // final feeAmountInCents = calculateAmount(2.0);
     try {
       //Request body
       final body = <String, dynamic>{
         'amount': totalAmountInCents,
         'currency': 'USD',
-        'transfer_data[destination]': 'acct_1R1YUOCr1EEXn6Uy',
-        'application_fee_amount': feeAmountInCents,
+        //  'transfer_data[destination]': 'acct_1R2dKNEOp6reOszI',
+        // 'application_fee_amount': feeAmountInCents,
         'setup_future_usage': 'off_session',
 
         //'payment_method_types[]': '[card]',
@@ -61,7 +61,7 @@ class PaymentsService {
       //STEP 2: Initialize Payment Sheet
       'Payment Intent ${paymentIntent['amount']}'.log();
 
-      // final amount = int.tryParse(paymentIntent['amount']) ?? 0 / 100;
+      //   final amount = int.tryParse(paymentIntent['amount']) ?? 0 / 100;
 
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(

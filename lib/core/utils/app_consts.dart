@@ -191,10 +191,18 @@ class Constants {
   // account 1  miriah.spiers@icloud.com
 
   //
-  static const kStripePublishKey =
-      'pk_test_51QG6a2ELpHSTTuqJLq6NHoEl7FdFXwhIaPWW7BqFL4GHHNTwISKcSslUrbJbjBoU6HDQTuKj8UvtMQbiH4hNzYeE003YPnH69y';
+  // static const kStripePublishKey =
+  //     'pk_test_51QG6a2ELpHSTTuqJLq6NHoEl7FdFXwhIaPWW7BqFL4GHHNTwISKcSslUrbJbjBoU6HDQTuKj8UvtMQbiH4hNzYeE003YPnH69y';
+  // static const kSecretKey =
+  //     'sk_test_51QG6a2ELpHSTTuqJiywWHNZ80mmO5r3Zhe27TIKS4yB4Ye7o2KHPuWiXAloMrfIyYdAQfkIoxo6aIYs2ddhUaIWC00Xoih7Rt9';
+  // key received on 3/14/2025
+  // static const kSecretKey =
+  //     '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';
+  // keys received on 3/17/2025
   static const kSecretKey =
       'sk_test_51QG6a2ELpHSTTuqJiywWHNZ80mmO5r3Zhe27TIKS4yB4Ye7o2KHPuWiXAloMrfIyYdAQfkIoxo6aIYs2ddhUaIWC00Xoih7Rt9';
+  static const kStripePublishKey =
+      'pk_test_51QG6a2ELpHSTTuqJLq6NHoEl7FdFXwhIaPWW7BqFL4GHHNTwISKcSslUrbJbjBoU6HDQTuKj8UvtMQbiH4hNzYeE003YPnH69y';
 }
 
 const String userAgreementData = """
