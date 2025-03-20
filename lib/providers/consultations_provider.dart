@@ -29,7 +29,7 @@ class ConsultationProvider extends ChangeNotifier {
   final _transCollectionRef =
       FirebaseFirestore.instance.collection('Transactions');
 
-  final double taxAmount = 2.75;
+  final double taxAmount = 0.00; //   2.75;
 
   PreferenceManager prefs = PreferenceManager.getInstance();
 

@@ -137,14 +137,31 @@ class AppDateUtils {
 
   static String getDurationHourMinutes({required int d}) {
     final minutes = d;
+    debugPrint('passed minutes:$minutes');
     if (minutes >= 60) {
       final hours = (minutes / 60).round();
       final remainMinutes = minutes % 60;
       if (remainMinutes > 0) {
         return '$hours Hours $remainMinutes minutes';
       } else {
+        debugPrint('hours $hours');
         return '$hours Hours';
       }
+    } else {
+      debugPrint('minutes $minutes');
+      return '$minutes Minutes';
+    }
+  }
+
+  static String getDurationHourMinutesForLastMinutes({
+    required int minutes,
+    required String duration,
+  }) {
+    debugPrint('passed minutes: $minutes, duration: $duration');
+
+    if (duration.toLowerCase() == 'hour') {
+      final hours = minutes * 60;
+      return '$hours Minutes';
     } else {
       return '$minutes Minutes';
     }

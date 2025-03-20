@@ -35,7 +35,8 @@ class _ConfirmBookingPageState extends State<ConfirmBookingPage> {
         Provider.of<UserProvider>(context, listen: false).getCurrentUser()!;
     final taxAmount =
         Provider.of<ConsultationProvider>(context, listen: false).taxAmount;
-    final total = (widget.selectedPackage?.amount ?? 0) + taxAmount;
+    final total = (widget.selectedPackage?.amount ?? 0);
+    // + taxAmount;
 
     return Scaffold(
       backgroundColor: AppColors.colorWhite,
@@ -135,8 +136,14 @@ class _ConfirmBookingPageState extends State<ConfirmBookingPage> {
                         ),
                         Text(
                           widget.selectedPackage?.type == PackageType.video
-                              ? AppDateUtils.getDurationHourMinutes(
-                                  d: widget.selectedPackage?.duration ?? 0,
+                              ? AppDateUtils
+                                  .getDurationHourMinutesForLastMinutes(
+                                  minutes:
+                                      widget.selectedPackage?.duration ?? 0,
+                                  duration: widget.selectedPackage!.title
+                                          .contains('Hour')
+                                      ? 'hour'
+                                      : 'minute',
                                 )
                               : '${widget.selectedPackage?.textLimit} Texts',
                           style: AppTextStyles.bodyStyle
@@ -202,19 +209,19 @@ class _ConfirmBookingPageState extends State<ConfirmBookingPage> {
                 ),
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Tax',
-                  style: AppTextStyles.bodyStyle,
-                ),
-                Text(
-                  '\$$taxAmount',
-                  style: AppTextStyles.bodyStyle,
-                ),
-              ],
-            ),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     const Text(
+            //       'Tax',
+            //       style: AppTextStyles.bodyStyle,
+            //     ),
+            //     Text(
+            //       '\$$taxAmount',
+            //       style: AppTextStyles.bodyStyle,
+            //     ),
+            //   ],
+            // ),
             const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -223,7 +230,7 @@ class _ConfirmBookingPageState extends State<ConfirmBookingPage> {
                   style: AppTextStyles.bodyStyle,
                 ),
                 Text(
-                  '__',
+                  'None',
                   style: AppTextStyles.bodyStyle,
                 ),
               ],
