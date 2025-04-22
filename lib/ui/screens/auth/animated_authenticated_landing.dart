@@ -276,4 +276,12 @@ class _AnimatedLandingScreenState extends State<AnimatedLandingScreen>
       });
     });
   }
+
+  @override
+  void dispose() {
+    // Dispose animation controllers
+    _textController.dispose();
+    _finalUiController.dispose();
+    super.dispose();
+  }
 }

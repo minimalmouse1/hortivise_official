@@ -13,10 +13,13 @@ import 'package:horti_vige/ui/widgets/app_filled_button.dart';
 import 'package:horti_vige/ui/widgets/app_text_input.dart';
 import 'package:horti_vige/ui/widgets/exit_bottom_sheet.dart';
 import 'package:provider/provider.dart';
+import 'package:horti_vige/ui/widgets/terms_privacy_text.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
-  static String routeName = 'Login';
+  const LoginScreen({Key? key}) : super(key: key);
+
+  static const String routeName = '/login';
+
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
@@ -322,19 +325,27 @@ class _LoginScreenState extends State<LoginScreen>
             ),
           ),
           20.height,
-          const Text(
-            'Not Registered?',
-            style: AppTextStyles.hintStyle,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Not Registered?',
+                style: AppTextStyles.hintStyle,
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, SignUpScreen.routeName);
+                },
+                child: Text(
+                  'Sign Up',
+                  style:
+                      AppTextStyles.bodyStyle.changeColor(AppColors.colorGreen),
+                ),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.pushNamed(context, SignUpScreen.routeName);
-            },
-            child: Text(
-              'Sign Up',
-              style: AppTextStyles.bodyStyle.changeColor(AppColors.colorGreen),
-            ),
-          ),
+        //  const TermsPrivacyText(),
         ],
       ),
     );

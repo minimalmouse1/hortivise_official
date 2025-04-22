@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:horti_vige/constants.dart';
-import 'package:horti_vige/data/enums/consultation_status.dart';
+import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/data/models/consultation/consultation_model.dart';
 import 'package:horti_vige/ui/resources/app_icons_icons.dart';
 import 'package:horti_vige/ui/utils/colors/colors.dart';

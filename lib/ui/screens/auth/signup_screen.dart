@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:horti_vige/core/exceptions/app_exception.dart';
 import 'package:horti_vige/core/utils/app_consts.dart';
-import 'package:horti_vige/data/enums/user_type.dart';
+import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/providers/user_provider.dart';
 import 'package:horti_vige/ui/dialogs/pick_image_dialog.dart';
 import 'package:horti_vige/ui/dialogs/waiting_dialog.dart';
@@ -17,6 +17,7 @@ import 'package:horti_vige/ui/widgets/app_outlined_button.dart';
 import 'package:horti_vige/ui/widgets/app_text_input.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:horti_vige/ui/widgets/terms_privacy_text.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -179,6 +180,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
               },
               title: 'Sign Up',
             ),
+            const SizedBox(height: 16),
+         //   const TermsPrivacyText(),
             TextButton(
               onPressed: () {
                 Navigator.pop(context);

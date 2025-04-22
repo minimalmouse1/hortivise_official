@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:horti_vige/core/utils/app_date_utils.dart';
-import 'package:horti_vige/data/enums/package_type.dart';
+import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/data/models/consultation/consultation_model.dart';
 import 'package:horti_vige/data/models/package/package_model.dart';
 import 'package:horti_vige/data/models/user/user_model.dart';

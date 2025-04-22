@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:horti_vige/data/enums/user_type.dart';
+import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/data/models/consultation/consultation_model.dart';
 import 'package:horti_vige/data/models/user/user_model.dart';
 import 'package:horti_vige/providers/user_provider.dart';

@@ -1,6 +1,3 @@
-// Developed By Muhammad Waleed.. Senior Android and Flutter developer..
-// waleedkalyar48@gmail.com/
-
 import 'package:flutter/material.dart';
 import 'package:horti_vige/ui/utils/colors/colors.dart';
 import 'package:provider/provider.dart';

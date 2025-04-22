@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:horti_vige/data/enums/user_type.dart';
+import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/ui/screens/consultant/consultation_pricing/consultation_pricing_screen.dart';
 import 'package:horti_vige/ui/widgets/exit_bottom_sheet.dart';
 import 'package:image_picker/image_picker.dart';

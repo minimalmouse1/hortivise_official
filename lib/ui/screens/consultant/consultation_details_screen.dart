@@ -1,12 +1,9 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:horti_vige/core/utils/app_consts.dart';
 import 'package:horti_vige/core/utils/app_date_utils.dart';
-import 'package:horti_vige/data/enums/consultation_status.dart';
-import 'package:horti_vige/data/enums/package_type.dart';
+import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/data/models/consultation/consultation_model.dart';
 import 'package:horti_vige/providers/consultations_provider.dart';
 import 'package:horti_vige/ui/dialogs/cancelation_feedback_bottom_dialog.dart';

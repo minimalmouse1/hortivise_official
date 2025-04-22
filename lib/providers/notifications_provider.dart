@@ -1,9 +1,6 @@
-// Developed By Muhammad Waleed.. Senior Android and Flutter developer..
-// waleedkalyar48@gmail.com/
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:horti_vige/data/enums/user_type.dart';
+import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/data/models/notification/notification_model.dart';
 import 'package:horti_vige/core/utils/helpers/preference_manager.dart';
 

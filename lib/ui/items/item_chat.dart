@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:horti_vige/data/enums/user_type.dart';
+import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/data/models/inbox/inbox_model.dart';
 import 'package:horti_vige/data/models/user/user_model.dart';
 import 'package:horti_vige/ui/utils/colors/colors.dart';

@@ -1,11 +1,8 @@
-// Developed By Muhammad Waleed.. Senior Android and Flutter developer..
-// waleedkalyar48@gmail.com/
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:horti_vige/core/typedefs.dart';
-import 'package:horti_vige/data/enums/transaction_status.dart';
-import 'package:horti_vige/data/enums/transaction_type.dart';
+import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/data/models/transaction/transaction_model.dart';
 import 'package:horti_vige/data/models/user/user_model.dart';
 import 'package:horti_vige/core/utils/helpers/preference_manager.dart';

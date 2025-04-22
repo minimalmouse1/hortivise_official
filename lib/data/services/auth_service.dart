@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:horti_vige/core/exceptions/app_exception.dart';
@@ -146,11 +147,18 @@ class AuthService implements BaseAuthService {
       if (userCred == null) return false;
       if (currentUser == null) return false;
 
-      await currentUser?.delete();
+      // Delete user data from Firestore first
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(currentUser!.email)
+          .delete();
+
+      // Delete the Firebase Auth account
+      await currentUser!.delete();
       return true;
     } on FirebaseAuthException catch (e) {
       throw AppException(
-        message: e.message ?? '',
+        message: e.message ?? 'Failed to delete account',
         title: 'Account Deletion Failed',
       );
     } catch (e) {

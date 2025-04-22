@@ -1,4 +1,4 @@
-import 'package:horti_vige/data/enums/firebase_enums.dart';
+import 'package:horti_vige/data/enums/enums.dart';
 
 class FirebaseErrorCodeHandler {
   FirebaseErrorCodeHandler._();

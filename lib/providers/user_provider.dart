@@ -6,8 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:horti_vige/core/exceptions/app_exception.dart';
-import 'package:horti_vige/data/enums/specialist_category.dart';
-import 'package:horti_vige/data/enums/user_type.dart';
+import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/data/models/availability/availability.dart';
 import 'package:horti_vige/data/models/user/specialist.dart';
 import 'package:horti_vige/data/models/user/user_model.dart';
@@ -331,5 +330,10 @@ class UserProvider extends ChangeNotifier {
     // final customerJson = json.decode(response.body);
     // print('stripe customer created -> $customerJson');
     // return customerJson['id'];
+  }
+
+  void clearUser() {
+    _prefManager.deleteUser();
+    notifyListeners();
   }
 }

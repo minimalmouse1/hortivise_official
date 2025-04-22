@@ -1,9 +1,7 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-
 import 'package:horti_vige/core/utils/app_consts.dart';
-import 'package:horti_vige/data/enums/days.dart';
+import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/data/models/availability/day_availability.dart';
 import 'package:horti_vige/providers/availability_provider.dart';
 import 'package:horti_vige/ui/dialogs/update_time_bottom_dialog.dart';

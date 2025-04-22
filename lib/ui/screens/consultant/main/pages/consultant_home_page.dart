@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
-import 'package:horti_vige/Services/consultant_side_service.dart';
+import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/providers/consultation_pricing_provider.dart';
 import 'package:horti_vige/ui/screens/consultant/consultation_pricing/consultation_pricing_screen.dart';
 import 'package:horti_vige/ui/widgets/app_filled_button.dart';
 import 'package:provider/provider.dart';
-
-import 'package:horti_vige/data/enums/consultation_status.dart';
-import 'package:horti_vige/data/enums/days.dart';
 import 'package:horti_vige/data/models/user/user_model.dart';
 import 'package:horti_vige/data/services/stripe.dart';
 import 'package:horti_vige/providers/consultations_provider.dart';
@@ -20,6 +16,8 @@ import 'package:horti_vige/ui/utils/colors/colors.dart';
 import 'package:horti_vige/ui/utils/extensions/extensions.dart';
 import 'package:horti_vige/ui/utils/styles/text_styles.dart';
 import 'package:horti_vige/ui/widgets/app_horizontal_choise_chips.dart';
+import 'package:horti_vige/data/enums/enums.dart';
+
 
 class ConsultantHomePage extends StatefulWidget {
   const ConsultantHomePage({super.key});

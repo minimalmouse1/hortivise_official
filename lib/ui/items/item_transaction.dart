@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:horti_vige/data/enums/transaction_type.dart';
+import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/data/models/transaction/transaction_model.dart';
 import 'package:horti_vige/ui/resources/app_icons_icons.dart';
 import 'package:horti_vige/ui/utils/colors/colors.dart';

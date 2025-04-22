@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:horti_vige/data/enums/consultation_status.dart';
+import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/data/models/consultation/consultation_model.dart';
 import 'package:horti_vige/providers/consultations_provider.dart';
 import 'package:horti_vige/ui/dialogs/waiting_dialog.dart';

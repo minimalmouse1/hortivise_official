@@ -1,9 +1,7 @@
-// Developed By Muhammad Waleed.. Senior Android and Flutter developer..
-// waleedkalyar48@gmail.com/
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
-import 'package:horti_vige/data/enums/package_type.dart';
+import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/data/models/package/package_model.dart';
 
 class PackagesProvider extends ChangeNotifier {

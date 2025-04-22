@@ -1,9 +1,5 @@
-// Developed By Muhammad Waleed.. Senior Android and Flutter developer..
-// waleedkalyar48@gmail.com/
-
-import 'package:horti_vige/data/enums/user_type.dart';
+import 'package:horti_vige/data/enums/enums.dart';
 import 'package:json_annotation/json_annotation.dart';
-
 part 'notification_user.g.dart';
 
 @JsonSerializable()

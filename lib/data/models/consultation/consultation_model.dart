@@ -1,5 +1,4 @@
-import 'package:horti_vige/data/enums/consultation_status.dart';
-import 'package:horti_vige/data/enums/package_type.dart';
+import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/data/models/user/user_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 

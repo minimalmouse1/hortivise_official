@@ -1,7 +1,7 @@
+import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/data/models/consultation_pricing/consultation_pricing.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import 'package:horti_vige/data/enums/user_type.dart';
 import 'package:horti_vige/data/models/availability/availability.dart';
 import 'package:horti_vige/data/models/user/specialist.dart';
 

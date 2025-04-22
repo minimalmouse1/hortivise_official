@@ -1,7 +1,4 @@
-// Developed By Muhammad Waleed.. Senior Android and Flutter developer..
-// waleedkalyar48@gmail.com/
-
-import 'package:horti_vige/data/enums/specialist_category.dart';
+import 'package:horti_vige/data/enums/enums.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import 'package:horti_vige/data/services/stripe.dart';

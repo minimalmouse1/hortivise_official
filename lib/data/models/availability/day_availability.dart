@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:horti_vige/data/enums/days.dart';
+import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/data/models/availability/availability.dart';
 import 'package:json_annotation/json_annotation.dart';
 

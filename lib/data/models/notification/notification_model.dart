@@ -1,4 +1,4 @@
-import 'package:horti_vige/data/enums/notification_type.dart';
+import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/data/models/notification/notification_user.dart';
 import 'package:json_annotation/json_annotation.dart';
 
