@@ -64,7 +64,8 @@ class TokenService {
 // Sign it (default with HS256 algorithm)
     final token = jwt.sign(
       SecretKey(
-        'qkcj3ksd7tvwrr656hyqjtnfgnqpjvqg42w7bwtt6fafgjef8v4sp6v4rgvygzsj',
+//        'qkcj3ksd7tvwrr656hyqjtnfgnqpjvqg42w7bwtt6fafgjef8v4sp6v4rgvygzsj',
+        'mkjxmay8edzkej398xgrehbqrrfbufjsqqpc2bgvzep3qtah37c8zpeunumvknsg',
       ),
     );
 

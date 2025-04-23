@@ -15,7 +15,8 @@ class VideoService {
     try {
       StreamVideo.reset();
       final userId = 'user_${currentUser.id}';
-      const apiKey = 's3qh79m4y2ct';
+//      const apiKey = 's3qh79m4y2ct';
+      const apiKey = 'x8ysr6cbakpu';
       final userToken = await const TokenService().create(userId: userId);
       final client = StreamVideo(
         apiKey,
@@ -82,62 +83,62 @@ class VideoService {
   final bool _localUserJoined = false;
   // late RtcEngine _engine;
 
-  Future<void> initAgora() async {
-    try {
-      // _engine = createAgoraRtcEngine();
+  // Future<void> initAgora() async {
+  //   try {
+  //     // _engine = createAgoraRtcEngine();
+  //
+  //     // await _engine.initialize(
+  //     //   const RtcEngineContext(
+  //     //     appId: Constants.kAppId,
+  //     //   ),
+  //     // );
+  //
+  //     // await _engine.enableVideo();
+  //
+  //     // // await _engine.joinChannel(
+  //     // //   token: Constants.kToken,
+  //     // //   channelId: channelName,
+  //     // //   uid: 1,
+  //     // //   options: const ChannelMediaOptions(),
+  //     // // );
+  //
+  //     // // await _engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
+  //     // // await _engine.startPreview();
+  //
+  //     // _engine.registerEventHandler(
+  //     //   RtcEngineEventHandler(
+  //     //     onJoinChannelSuccess: (connection, elapsed) {
+  //     //       debugPrint('local user ${connection.localUid} joined');
+  //     //       _localUserJoined = true;
+  //     //     },
+  //     //     onUserJoined: (connection, remoteUid, elapsed) {
+  //     //       debugPrint('remote user $remoteUid joined');
+  //     //       _remoteUid = remoteUid;
+  //     //     },
+  //     //     onUserOffline: (
+  //     //       connection,
+  //     //       remoteUid,
+  //     //       reason,
+  //     //     ) {
+  //     //       debugPrint('remote user $remoteUid left channel');
+  //     //       _remoteUid = null;
+  //     //     },
+  //     //     onTokenPrivilegeWillExpire: (connection, token) {
+  //     //       debugPrint(
+  //     //         '[onTokenPrivilegeWillExpire] connection: ${connection.toJson()}, token: $token',
+  //     //       );
+  //     //     },
+  //     //   ),
+  //     // );
+  //   } catch (e) {
+  //     e.logError();
+  //   }
+  // }
 
-      // await _engine.initialize(
-      //   const RtcEngineContext(
-      //     appId: Constants.kAppId,
-      //   ),
-      // );
-
-      // await _engine.enableVideo();
-
-      // // await _engine.joinChannel(
-      // //   token: Constants.kToken,
-      // //   channelId: channelName,
-      // //   uid: 1,
-      // //   options: const ChannelMediaOptions(),
-      // // );
-
-      // // await _engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
-      // // await _engine.startPreview();
-
-      // _engine.registerEventHandler(
-      //   RtcEngineEventHandler(
-      //     onJoinChannelSuccess: (connection, elapsed) {
-      //       debugPrint('local user ${connection.localUid} joined');
-      //       _localUserJoined = true;
-      //     },
-      //     onUserJoined: (connection, remoteUid, elapsed) {
-      //       debugPrint('remote user $remoteUid joined');
-      //       _remoteUid = remoteUid;
-      //     },
-      //     onUserOffline: (
-      //       connection,
-      //       remoteUid,
-      //       reason,
-      //     ) {
-      //       debugPrint('remote user $remoteUid left channel');
-      //       _remoteUid = null;
-      //     },
-      //     onTokenPrivilegeWillExpire: (connection, token) {
-      //       debugPrint(
-      //         '[onTokenPrivilegeWillExpire] connection: ${connection.toJson()}, token: $token',
-      //       );
-      //     },
-      //   ),
-      // );
-    } catch (e) {
-      e.logError();
-    }
-  }
-
-  Future<void> dispose() async {
-    // await _engine.leaveChannel();
-    // await _engine.release();
-  }
+  // Future<void> dispose() async {
+  //   // await _engine.leaveChannel();
+  //   // await _engine.release();
+  // }
 
   // RtcEngine get engine => _engine;
   int get remoteUid => _remoteUid ?? 0;
