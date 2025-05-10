@@ -46,209 +46,207 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     _userProvider = Provider.of<UserProvider>(context, listen: false);
-    return SafeArea(
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: AppColors.colorBeige,
-        body: Column(
-          children: [
-            20.height,
-            double.infinity.width,
-            CircleAvatar(
-              minRadius: 41,
-              maxRadius: 41,
-              backgroundColor: AppColors.colorGreen,
-              child: CircleAvatar(
-                minRadius: 40,
-                maxRadius: 40,
-                backgroundColor:
-                    _profileUrl.isEmpty ? AppColors.colorGrayBg : null,
-                backgroundImage: _profileUrl.isNotEmpty
-                    ? FileImage(File(_profileUrl))
-                    : null,
-                child: _profileUrl.isEmpty
-                    ? InkWell(
-                        onTap: () {
-                          context.showBottomSheet(
-                            bottomSheet: PickImageDialog(
-                              onGalleryClick: () {
-                                _pickImageFromGallery();
-                              },
-                              onCameraClick: () {
-                                _pickImageFromCamera();
-                              },
-                            ),
-                            dismissible: true,
-                          );
-                        },
-                        child: const Icon(
-                          Icons.camera_alt,
-                          color: AppColors.colorWhite,
-                        ),
-                      )
-                    : null,
-              ),
-            ),
-            5.height,
-            Wrap(
-              children: [
-                InkWell(
-                  onTap: () {
-                    print('Add photo');
-                    context.showBottomSheet(
-                      bottomSheet: PickImageDialog(
-                        onGalleryClick: () {
-                          _pickImageFromGallery();
-                        },
-                        onCameraClick: () {
-                          _pickImageFromCamera();
-                        },
-                      ),
-                      dismissible: true,
-                    );
-                  },
-                  child: Text(
-                    _profileUrl.isEmpty ? 'Add Picture' : 'Update Photo',
-                    style: AppTextStyles.titleStyle
-                        .changeSize(12)
-                        .changeColor(AppColors.appGreenMaterial),
-                  ),
-                ),
-              ],
-            ),
-            20.height,
-            AppTextInput(
-              hint: 'UserName',
-              floatHint: false,
-              fieldHeight: 50,
-              errorText: _nameError,
-              onUpdateInput: (value) {
-                _name = value;
-                setState(() {
-                  _nameError = isUserNameValid(_name);
-                });
-              },
-            ),
-            12.height,
-            AppTextInput(
-              hint: 'Email',
-              floatHint: false,
-              fieldHeight: 50,
-              errorText: _emailError,
-              onUpdateInput: (value) {
-                _email = value;
-                setState(() {
-                  _emailError = isEmailValid(_email);
-                });
-              },
-            ),
-            12.height,
-            AppTextInput(
-              hint: 'Password',
-              floatHint: false,
-              fieldHeight: 50,
-              errorText: _passwordError,
-              isPasswordField: true,
-              onUpdateInput: (value) {
-                _password = value;
-                setState(() {
-                  _passwordError = isPasswordValid(_password);
-                });
-              },
-            ),
-            12.height,
-            AppTextInput(
-              hint: 'Confirm Password',
-              floatHint: false,
-              fieldHeight: 50,
-              errorText: _confirmPassError,
-              isPasswordField: true,
-              onUpdateInput: (value) {
-                _confirmPassword = value;
-                setState(() {
-                  _confirmPassError =
-                      isConfirmPasswordValid(_password, _confirmPassword);
-                });
-              },
-            ),
-            45.height,
-            AppFilledButton(
-              onPress: () {
-                FocusScope.of(context).unfocus();
-
-                _signUpUser();
-              },
-              title: 'Sign Up',
-            ),
-            const SizedBox(height: 16),
-         //   const TermsPrivacyText(),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: RichText(
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: 'Already a member,',
-                      style: AppTextStyles.bodyStyle
-                          .changeColor(AppColors.colorGray),
-                    ),
-                    TextSpan(
-                      text: ' Login',
-                      style: AppTextStyles.bodyStyle
-                          .changeColor(AppColors.colorGreen),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            20.height,
-            Expanded(
-              child: Stack(
-                children: [
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      height: 120,
-                      width: double.infinity,
-                      padding: 12.allPadding,
-                      decoration: BoxDecoration(
-                        color: AppColors.colorGray.withAlpha(20),
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(12),
-                          topRight: Radius.circular(12),
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Want to become a Horticultural\nConsultant?',
-                            style: AppTextStyles.bodyStyleLarge.changeSize(12),
-                          ),
-                          12.height,
-                          AppOutlinedButton(
-                            onPress: () {
-                              Navigator.pushNamed(
-                                context,
-                                BecomeConsultantScreen.routeName,
-                              );
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: AppColors.colorBeige,
+      body: Column(
+        children: [
+          20.height,
+          double.infinity.width,
+          CircleAvatar(
+            minRadius: 41,
+            maxRadius: 41,
+            backgroundColor: AppColors.colorGreen,
+            child: CircleAvatar(
+              minRadius: 40,
+              maxRadius: 40,
+              backgroundColor:
+                  _profileUrl.isEmpty ? AppColors.colorGrayBg : null,
+              backgroundImage: _profileUrl.isNotEmpty
+                  ? FileImage(File(_profileUrl))
+                  : null,
+              child: _profileUrl.isEmpty
+                  ? InkWell(
+                      onTap: () {
+                        context.showBottomSheet(
+                          bottomSheet: PickImageDialog(
+                            onGalleryClick: () {
+                              _pickImageFromGallery();
                             },
-                            title: 'Learn More',
-                            btnColor: AppColors.colorGreen,
+                            onCameraClick: () {
+                              _pickImageFromCamera();
+                            },
                           ),
-                        ],
+                          dismissible: true,
+                        );
+                      },
+                      child: const Icon(
+                        Icons.camera_alt,
+                        color: AppColors.colorWhite,
                       ),
+                    )
+                  : null,
+            ),
+          ),
+          5.height,
+          Wrap(
+            children: [
+              InkWell(
+                onTap: () {
+                  print('Add photo');
+                  context.showBottomSheet(
+                    bottomSheet: PickImageDialog(
+                      onGalleryClick: () {
+                        _pickImageFromGallery();
+                      },
+                      onCameraClick: () {
+                        _pickImageFromCamera();
+                      },
                     ),
+                    dismissible: true,
+                  );
+                },
+                child: Text(
+                  _profileUrl.isEmpty ? 'Add Picture' : 'Update Photo',
+                  style: AppTextStyles.titleStyle
+                      .changeSize(12)
+                      .changeColor(AppColors.appGreenMaterial),
+                ),
+              ),
+            ],
+          ),
+          20.height,
+          AppTextInput(
+            hint: 'UserName',
+            floatHint: false,
+            fieldHeight: 50,
+            errorText: _nameError,
+            onUpdateInput: (value) {
+              _name = value;
+              setState(() {
+                _nameError = isUserNameValid(_name);
+              });
+            },
+          ),
+          12.height,
+          AppTextInput(
+            hint: 'Email',
+            floatHint: false,
+            fieldHeight: 50,
+            errorText: _emailError,
+            onUpdateInput: (value) {
+              _email = value;
+              setState(() {
+                _emailError = isEmailValid(_email);
+              });
+            },
+          ),
+          12.height,
+          AppTextInput(
+            hint: 'Password',
+            floatHint: false,
+            fieldHeight: 50,
+            errorText: _passwordError,
+            isPasswordField: true,
+            onUpdateInput: (value) {
+              _password = value;
+              setState(() {
+                _passwordError = isPasswordValid(_password);
+              });
+            },
+          ),
+          12.height,
+          AppTextInput(
+            hint: 'Confirm Password',
+            floatHint: false,
+            fieldHeight: 50,
+            errorText: _confirmPassError,
+            isPasswordField: true,
+            onUpdateInput: (value) {
+              _confirmPassword = value;
+              setState(() {
+                _confirmPassError =
+                    isConfirmPasswordValid(_password, _confirmPassword);
+              });
+            },
+          ),
+          45.height,
+          AppFilledButton(
+            onPress: () {
+              FocusScope.of(context).unfocus();
+
+              _signUpUser();
+            },
+            title: 'Sign Up',
+          ),
+          const SizedBox(height: 16),
+       //   const TermsPrivacyText(),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: 'Already a member?',
+                    style: AppTextStyles.bodyStyle
+                        .changeColor(AppColors.colorGray),
+                  ),
+                  TextSpan(
+                    text: ' Login',
+                    style: AppTextStyles.bodyStyle
+                        .changeColor(AppColors.colorGreen),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+          20.height,
+          Expanded(
+            child: Stack(
+              children: [
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    height: 120,
+                    width: double.infinity,
+                    padding: 12.allPadding,
+                    decoration: BoxDecoration(
+                      color: AppColors.colorGray.withAlpha(20),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        topRight: Radius.circular(12),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Want to become a Horticultural\nConsultant?',
+                          style: AppTextStyles.bodyStyleLarge.changeSize(12),
+                        ),
+                        12.height,
+                        AppOutlinedButton(
+                          onPress: () {
+                            Navigator.pushNamed(
+                              context,
+                              BecomeConsultantScreen.routeName,
+                            );
+                          },
+                          title: 'Learn More',
+                          btnColor: AppColors.colorGreen,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -10,6 +10,7 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
       id: json['id'] as String,
       userName: json['userName'] as String,
       email: json['email'] as String,
+     // password: json['password'] as String,
       type: $enumDecode(_$UserTypeEnumMap, json['type']),
       profession: json['profession'] as String? ?? '',
       profileUrl: json['profileUrl'] as String,

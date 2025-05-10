@@ -23,7 +23,7 @@ class _ConsultantMainScreenState extends State<ConsultantMainScreen> {
   final _pages = const [
     ConsultantHomePage(),
     UserConsultantsPage(),
-    MyWallet(),
+   // MyWallet(),
     UserNotificationsPage(),
     UserBlogsPage(),
   ];
@@ -96,11 +96,11 @@ class _ConsultantMainScreenState extends State<ConsultantMainScreen> {
                 activeIcon: Icon(AppIcons.consultations_filled),
                 label: 'Consultation',
               ),
-              BottomNavigationBarItem(
-                icon: Icon(AppIcons.wallet_outlined),
-                activeIcon: Icon(AppIcons.wallet_filled),
-                label: 'Wallet',
-              ),
+              // BottomNavigationBarItem(
+              //   icon: Icon(AppIcons.wallet_outlined),
+              //   activeIcon: Icon(AppIcons.wallet_filled),
+              //   label: 'Wallet',
+              // ),
               BottomNavigationBarItem(
                 icon: Icon(AppIcons.notifications_outlined),
                 activeIcon: Icon(AppIcons.notificatins_filled),

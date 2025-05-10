@@ -9,7 +9,7 @@ import 'package:horti_vige/ui/widgets/exit_bottom_sheet.dart';
 
 class LandingScreen extends StatefulWidget {
   const LandingScreen({super.key});
-  static String routeName = 'Landing';
+  static String landingScreen = 'Landing';
 
   @override
   State<LandingScreen> createState() => _LandingScreenState();

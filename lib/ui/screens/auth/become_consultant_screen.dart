@@ -64,6 +64,7 @@ class _BecomeConsultantScreenState extends State<BecomeConsultantScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+
                     Padding(
                       padding: 12.horizontalPadding,
                       child: Text(
@@ -94,6 +95,8 @@ class _BecomeConsultantScreenState extends State<BecomeConsultantScreen> {
                       errorText: _hortistNameError,
                       fieldHeight: 50,
                       filledColor: AppColors.colorGrayBg,
+                      textInputAction: TextInputAction.next,
+
                     ),
                     12.height,
                     AppTextInput(
@@ -108,6 +111,8 @@ class _BecomeConsultantScreenState extends State<BecomeConsultantScreen> {
                       },
                       errorText: _hortistEmailError,
                       filledColor: AppColors.colorGrayBg,
+                      textInputAction: TextInputAction.next,
+
                     ),
                     12.height,
                     AppDropdownInput(
@@ -141,6 +146,7 @@ class _BecomeConsultantScreenState extends State<BecomeConsultantScreen> {
                       filledColor: AppColors.colorGrayBg,
                       isPasswordField: true,
                       errorText: _passwordError,
+                      textInputAction: TextInputAction.next,
                       onUpdateInput: (value) {
                         _consultantPassword = value;
                         setState(() {
@@ -148,6 +154,7 @@ class _BecomeConsultantScreenState extends State<BecomeConsultantScreen> {
                         });
                         debugPrint('Password -> $_consultantPassword');
                       },
+
                     ),
                     12.height,
                     AppTextInput(
@@ -161,7 +168,7 @@ class _BecomeConsultantScreenState extends State<BecomeConsultantScreen> {
                         setState(() {
                           _bioError = isBioValid(_bio);
                         });
-                      },
+                      },textInputAction: TextInputAction.done,
                       errorText: _bioError,
                       minLines: 4,
                     ),

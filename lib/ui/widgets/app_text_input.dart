@@ -7,6 +7,7 @@ import 'package:super_tooltip/super_tooltip.dart';
 class AppTextInput extends StatefulWidget {
   AppTextInput({
     super.key,
+
     required this.hint,
     required this.floatHint,
     this.icon,
@@ -28,10 +29,14 @@ class AppTextInput extends StatefulWidget {
     this.suffixIcon,
     this.suffix,
     this.onPressedSuffix,
+    this.textInputAction,
+
   });
   final IconData? suffix;
   final dynamic suffixIcon;
   final VoidCallback? onPressedSuffix;
+  TextInputAction? textInputAction;
+
   String hint;
   bool floatHint;
   Widget? icon;
@@ -124,6 +129,7 @@ class _AppTextInputState extends State<AppTextInput> {
           borderRadius: BorderRadius.circular(widget.borderRadius ?? 8.0),
         ),
         child: TextFormField(
+          textInputAction: widget.textInputAction,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           validator: (value) {
             return null;

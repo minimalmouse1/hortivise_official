@@ -182,9 +182,9 @@ class _MyAppState extends State<MyApp> {
             ),
             fontFamily: 'Poppins',
           ),
-          initialRoute: LandingScreen.routeName,
+          initialRoute: LandingScreen.landingScreen,
           routes: {
-            LandingScreen.routeName: (ctx) => const LandingScreen(),
+            LandingScreen.landingScreen: (ctx) => const LandingScreen(),
             LoginScreen.routeName: (ctx) => const LoginScreen(),
             SignUpScreen.routeName: (ctx) => const SignUpScreen(),
             ZoomDrawerScreen.routeName: (ctx) => const ZoomDrawerScreen(),

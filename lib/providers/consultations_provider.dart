@@ -61,25 +61,25 @@ class ConsultationProvider extends ChangeNotifier {
 
     final paymentService = PaymentsService();
 
-    final paymentIntent = await paymentService.createPaymentIntent(
-      totalAmount,
-    );
-    await paymentService.initPaymentSheet(
-      paymentIntent,
-      specialistUser.email,
-      specialistUser.userName,
-    );
+    // final paymentIntent = await paymentService.createPaymentIntent(
+    //   totalAmount,
+    // );
+    // await paymentService.initPaymentSheet(
+    //   paymentIntent,
+    //   specialistUser.email,
+    //   specialistUser.userName,
+    // );
 
-    final isPaymentSuccess = await paymentService.displayPaymentSheet();
+   // final isPaymentSuccess = await paymentService.displayPaymentSheet();
 
-    if (!isPaymentSuccess) {
-      return Future.error('Payment failed');
-    }
-    await StripeController.instance.uplaodTopUpDetails(
-      paymentIntent['id'],
-      specialistUser.specialist!.stripeId,
-      id,
-    );
+    // if (!isPaymentSuccess) {
+    //   return Future.error('Payment failed')
+    // }
+    // await StripeController.instance.uplaodTopUpDetails(
+    //   paymentIntent['id'],
+    //   specialistUser.specialist!.stripeId,
+    //   id,
+    // );
     await ConsultationRepository.addConsultationRequest(consultation);
 
     final notificationId = _notificationsCollectionRef.doc().id;

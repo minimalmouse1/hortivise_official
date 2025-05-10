@@ -253,7 +253,7 @@ class _ConfirmBookingPageState extends State<ConfirmBookingPage> {
               child: Stack(
                 children: [
                   Positioned(
-                    bottom: 12,
+                    bottom: 20,
                     left: 0,
                     right: 0,
                     child: AppFilledButton(

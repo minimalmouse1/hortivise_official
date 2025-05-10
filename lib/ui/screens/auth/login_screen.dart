@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:horti_vige/core/exceptions/app_exception.dart';
-import 'package:horti_vige/generated/assets.dart';
 import 'package:horti_vige/providers/user_provider.dart';
 import 'package:horti_vige/ui/screens/auth/forgot_password_screen.dart';
 import 'package:horti_vige/ui/screens/auth/signup_screen.dart';
@@ -13,10 +12,9 @@ import 'package:horti_vige/ui/widgets/app_filled_button.dart';
 import 'package:horti_vige/ui/widgets/app_text_input.dart';
 import 'package:horti_vige/ui/widgets/exit_bottom_sheet.dart';
 import 'package:provider/provider.dart';
-import 'package:horti_vige/ui/widgets/terms_privacy_text.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   static const String routeName = '/login';
 

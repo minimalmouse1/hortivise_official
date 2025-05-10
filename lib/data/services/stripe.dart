@@ -93,63 +93,63 @@ class StripeController {
     }
   }
 
-  void findStripeSttatus(BuildContext context) {
-    if (doneDialoge) return;
-    Future.delayed(const Duration(), () {
-      doneDialoge = true;
-      if (_stripeId == null) {
-        _showAlertDialog(
-          context,
-          title: 'Stipe Account not found!',
-          subTitle: 'Please contact admin for further detaisl',
-          onCLick: () {
-            Navigator.of(context).pop();
-          },
-        );
-      }
-      if (_status != StripeStatus.enabled) {
-        _showAlertDialog(
-          context,
-          title: 'Stipe Account is Incomplete',
-          subTitle: 'Please visit profile  to complete your stripe detials',
-          onCLick: () {
-            Navigator.of(context).pop();
-          },
-        );
-      }
-    });
-  }
+  // void findStripeSttatus(BuildContext context) {
+  //   if (doneDialoge) return;
+  //   Future.delayed(const Duration(), () {
+  //     doneDialoge = true;
+  //     if (_stripeId == null) {
+  //       _showAlertDialog(
+  //         context,
+  //         title: 'Stipe Account not found!',
+  //         subTitle: 'Please contact admin for further detaisl',
+  //         onCLick: () {
+  //           Navigator.of(context).pop();
+  //         },
+  //       );
+  //     }
+  //     if (_status != StripeStatus.enabled) {
+  //       _showAlertDialog(
+  //         context,
+  //         title: 'Stipe Account is Incomplete',
+  //         subTitle: 'Please visit profile  to complete your stripe detials',
+  //         onCLick: () {
+  //           Navigator.of(context).pop();
+  //         },
+  //       );
+  //     }
+  //   });
+  // }
 
-  void _showAlertDialog(
-    BuildContext context, {
-    required String title,
-    required String subTitle,
-    required Function onCLick,
-  }) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(subTitle),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                onCLick();
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  // void _showAlertDialog(
+  //   BuildContext context, {
+  //   required String title,
+  //   required String subTitle,
+  //   required Function onCLick,
+  // }) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) {
+  //       return AlertDialog(
+  //         title: Text(title),
+  //         content: Text(subTitle),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () {
+  //               Navigator.of(context).pop();
+  //             },
+  //             child: const Text('Cancel'),
+  //           ),
+  //           TextButton(
+  //             onPressed: () {
+  //               onCLick();
+  //             },
+  //             child: const Text('OK'),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
   Future<void> uplaodTopUpDetails(
     String paymentId,

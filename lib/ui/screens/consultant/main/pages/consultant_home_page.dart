@@ -44,9 +44,9 @@ class _ConsultantHomePageState extends State<ConsultantHomePage> {
         await context.read<ConsultationPricingProvider>().init();
       },
     );
-    Future.delayed(const Duration(seconds: 5), () {
-      StripeController.instance.findStripeSttatus(context);
-    });
+    // Future.delayed(const Duration(seconds: 5), () {
+    //   StripeController.instance.findStripeSttatus(context);
+    // });
 
     // });
   }
