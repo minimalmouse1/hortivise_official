@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:horti_vige/core/utils/app_consts.dart';
+import 'package:horti_vige/core/utils/app_date_utils.dart';
 import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/data/models/availability/day_availability.dart';
 import 'package:horti_vige/providers/availability_provider.dart';
@@ -161,61 +162,80 @@ class _OnDayChecksState extends State<OnDayChecks> {
                         : AppColors.colorWhite,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        widget.radioOptions.elementAt(index),
-                        style: AppTextStyles.bodyStyleMedium
-                            .changeColor(
-                              isSelected
-                                  ? AppColors.colorWhite
-                                  : AppColors.colorBlack,
-                            )
-                            .changeSize(16),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      InkWell(
-                        onTap: () async {
-                          SelectedDay? result = await _showBottomSheet(
-                            context,
-                            StatefulBuilder(
-                              builder: (context, setState) =>
-                                  UpdateTimeBottomDialog(
-                                currentDay: selectedDay,
-                              ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            widget.radioOptions.elementAt(index),
+                            style: AppTextStyles.bodyStyleMedium
+                                .changeColor(
+                                  isSelected
+                                      ? AppColors.colorWhite
+                                      : AppColors.colorBlack,
+                                )
+                                .changeSize(16),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          InkWell(
+                            onTap: () async {
+                              SelectedDay? result = await _showBottomSheet(
+                                context,
+                                StatefulBuilder(
+                                  builder: (context, setState) =>
+                                      UpdateTimeBottomDialog(
+                                    currentDay: selectedDay,
+                                  ),
+                                ),
+                              );
+                              if (result == null) return;
+                              setState(() {
+                                _selections[index] = result!;
+                              });
+                              widget.onSelectionsUpdate(
+                                _selections
+                                    .where((element) => element.isSelected)
+                                    .toList(),
+                              );
+                              result = null;
+                            },
+                            child: Text(
+                              selectedDay.isSelected
+                                  ? '${Constants.timeOfDayFormat(selectedDay.from)} - ${Constants.timeOfDayFormat(selectedDay.to)}'
+                                  : '',
+                              style: AppTextStyles.bodyStyle
+                                  .changeColor(
+                                    isSelected
+                                        ? AppColors.colorWhite
+                                        : AppColors.colorGreen,
+                                  )
+                                  .changeDecoration(
+                                    TextDecoration.underline,
+                                    isSelected
+                                        ? AppColors.colorWhite
+                                        : AppColors.colorGreen,
+                                  ),
                             ),
-                          );
-                          if (result == null) return;
-                          setState(() {
-                            _selections[index] = result!;
-                          });
-                          widget.onSelectionsUpdate(
-                            _selections
-                                .where((element) => element.isSelected)
-                                .toList(),
-                          );
-                          result = null;
-                        },
-                        child: Text(
-                          selectedDay.isSelected
-                              ? '${Constants.timeOfDayFormat(selectedDay.from)} - ${Constants.timeOfDayFormat(selectedDay.to)}'
-                              : '',
-                          style: AppTextStyles.bodyStyle
-                              .changeColor(
-                                isSelected
-                                    ? AppColors.colorWhite
-                                    : AppColors.colorGreen,
-                              )
-                              .changeDecoration(
-                                TextDecoration.underline,
-                                isSelected
-                                    ? AppColors.colorWhite
-                                    : AppColors.colorGreen,
-                              ),
-                        ),
+                          ),
+                        ],
                       ),
+                      if (selectedDay.isSelected)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            'Available: ${AppDateUtils.calculateHoursBetween(selectedDay.from, selectedDay.to)}',
+                            style: AppTextStyles.bodyStyle
+                                .changeColor(
+                                  isSelected
+                                      ? AppColors.colorWhite
+                                      : AppColors.colorBlack,
+                                )
+                                .changeSize(12),
+                          ),
+                        ),
                     ],
                   ),
                 ),

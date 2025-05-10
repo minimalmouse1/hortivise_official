@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:horti_vige/core/utils/app_consts.dart';
+import 'package:horti_vige/core/utils/app_date_utils.dart';
 import 'package:horti_vige/providers/availability_provider.dart';
 import 'package:horti_vige/ui/resources/app_icons_icons.dart';
 import 'package:horti_vige/ui/utils/colors/colors.dart';
@@ -48,7 +49,7 @@ class _UpdateTimeBottomDialogState extends State<UpdateTimeBottomDialog> {
   @override
   Widget build(BuildContext context) {
     final initialSelection = _isDefault ? 0 : 1;
-    _isDefault.log();
+
     return Container(
       padding: 12.allPadding,
       decoration: const BoxDecoration(
@@ -142,11 +143,14 @@ class _UpdateTimeBottomDialogState extends State<UpdateTimeBottomDialog> {
                             floatHint: false,
                             onChanged: (value) {
                               if (value != null) {
-                                _from = Constants.getTimes()
-                                    .firstWhere(
-                                      (e) => e.timeString == value,
-                                    )
-                                    .time;
+                                setState(() {
+                                  _from = Constants.getTimes()
+                                      .firstWhere(
+                                        (element) =>
+                                            element.timeString == value,
+                                      )
+                                      .time;
+                                });
                               }
                             },
                           ),
@@ -168,31 +172,29 @@ class _UpdateTimeBottomDialogState extends State<UpdateTimeBottomDialog> {
                         ),
                         2.height,
                         Flexible(
-                          child: Builder(
-                            builder: (context) {
-                              return AppDropdownInput(
-                                hint: 'Time',
-                                fieldHeight: 50,
-                                isDisabled: _isDefault,
-                                options: Constants.getTimesString(),
-                                value: Constants.timeOfDayFormat(_to),
-                                endIcon: const Icon(
-                                  Icons.keyboard_arrow_down,
-                                  color: AppColors.colorBlack,
-                                ),
-                                getLabel: (value) => value,
-                                floatHint: false,
-                                onChanged: (value) {
-                                  if (value != null) {
-                                    _to = Constants.getTimes()
-                                        .firstWhere(
-                                          (element) =>
-                                              element.timeString == value,
-                                        )
-                                        .time;
-                                  }
-                                },
-                              );
+                          child: AppDropdownInput(
+                            hint: 'Time',
+                            fieldHeight: 50,
+                            isDisabled: _isDefault,
+                            options: Constants.getTimesString(),
+                            value: Constants.timeOfDayFormat(_to),
+                            endIcon: const Icon(
+                              Icons.keyboard_arrow_down,
+                              color: AppColors.colorBlack,
+                            ),
+                            getLabel: (value) => value,
+                            floatHint: false,
+                            onChanged: (value) {
+                              if (value != null) {
+                                setState(() {
+                                  _to = Constants.getTimes()
+                                      .firstWhere(
+                                        (element) =>
+                                            element.timeString == value,
+                                      )
+                                      .time;
+                                });
+                              }
                             },
                           ),
                         ),
@@ -200,6 +202,23 @@ class _UpdateTimeBottomDialogState extends State<UpdateTimeBottomDialog> {
                     ),
                   ),
                 ],
+              ),
+              15.height,
+              // Show available hours
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: AppColors.colorGreenLight,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'Available: ${AppDateUtils.calculateHoursBetween(_from, _to)}',
+                  style: AppTextStyles.bodyStyle
+                      .changeFontWeight(FontWeight.w600)
+                      .changeColor(AppColors.colorGreen),
+                  textAlign: TextAlign.center,
+                ),
               ),
               30.height,
               Consumer<AvailabilityProvider>(

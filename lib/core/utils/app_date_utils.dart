@@ -198,6 +198,30 @@ class AppDateUtils {
     final date = DateTime.fromMillisecondsSinceEpoch(millies);
     return DateFormat('hh:mm a').format(date);
   }
+
+  static String calculateHoursBetween(TimeOfDay from, TimeOfDay to) {
+    // Convert both times to minutes since midnight
+    int fromMinutes = from.hour * 60 + from.minute;
+    int toMinutes = to.hour * 60 + to.minute;
+
+    // If the end time is earlier than the start time, assume it's the next day
+    if (toMinutes < fromMinutes) {
+      toMinutes += 24 * 60; // Add a full day's minutes
+    }
+
+    // Calculate the difference in minutes
+    int diffMinutes = toMinutes - fromMinutes;
+
+    // Convert to hours and minutes
+    int hours = diffMinutes ~/ 60;
+    int minutes = diffMinutes % 60;
+
+    if (minutes == 0) {
+      return '$hours hours';
+    } else {
+      return '$hours hours $minutes mins';
+    }
+  }
 }
 
 extension DateHelpers on DateTime {

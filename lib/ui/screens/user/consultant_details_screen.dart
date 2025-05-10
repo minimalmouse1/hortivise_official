@@ -43,8 +43,7 @@ class ConsultantDetailsScreen extends StatelessWidget {
                       userModel.profileUrl,
                       fit: BoxFit.cover,
                       width: double.infinity,
-                      errorBuilder: (context, error, stackTrace) =>
-                          const Icon(
+                      errorBuilder: (context, error, stackTrace) => const Icon(
                         Icons.broken_image,
                         size: 50,
                         color: Colors.grey,
@@ -260,82 +259,71 @@ class ConsultantDetailsScreen extends StatelessWidget {
                 right: 16,
                 child: Consumer<ConsultationProvider>(
                   builder: (_, provider, __) {
-                    return FutureBuilder<ConsultationModel?>(
+                    return FutureBuilder<List<ConsultationModel>>(
                       future: provider
-                          .findConsultationBySpecialistEmail(userModel.email),
+                          .getAllConsultationsForSpecialist(userModel.email),
                       builder: (context, snapshot) {
-                        final isAppointmentActive = snapshot.data != null &&
-                            !AppDateUtils.isExpired(
-                              milliseconds: snapshot
-                                  .data!.startTime.millisecondsSinceEpoch,
-                            );
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return AppFilledButton(
+                            horizontalPadding: 0,
+                            showLoading: true,
+                            color: AppColors.colorGreen,
+                            onPress: () {},
+                            title: 'Book Appointment',
+                          );
+                        }
+
+                        if (snapshot.hasError) {
+                          return AppFilledButton(
+                            horizontalPadding: 0,
+                            color: AppColors.colorGreen,
+                            onPress: () {
+                              _handleBookAppointment(
+                                  context, userModel, packagesProvider);
+                            },
+                            title: 'Book Appointment',
+                          );
+                        }
+
+                        final consultations = snapshot.data ?? [];
+
+                        // Check if any current consultation is ongoing right now
+                        bool isOngoingConsultation =
+                            consultations.any((consultation) {
+                          final now = DateTime.now().millisecondsSinceEpoch;
+                          return now >=
+                                  consultation
+                                      .startTime.millisecondsSinceEpoch &&
+                              now <=
+                                  consultation.endTime.millisecondsSinceEpoch &&
+                              (consultation.status ==
+                                      ConsultationStatus.accepted ||
+                                  consultation.status ==
+                                      ConsultationStatus.pending);
+                        });
+
                         return AppFilledButton(
                           horizontalPadding: 0,
-                          showLoading: snapshot.connectionState ==
-                              ConnectionState.waiting,
-                          color: isAppointmentActive
+                          color: isOngoingConsultation
                               ? AppColors.inputBorderColor
                               : AppColors.colorGreen,
                           onPress: () {
-                            if (isAppointmentActive) {
+                            if (isOngoingConsultation) {
+                              // Cannot book when a consultation is ongoing right now
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(const SnackBar(
+                                content: Text(
+                                    'You have an ongoing consultation with this consultant.'),
+                              ));
                               return;
                             }
-                            //   Navigator.pushNamed(
-                            //     context,
-                            //     ConsultationDetailsScreen.routeName,
-                            //     arguments: {
-                            //       Constants.consultModel: snapshot.data,
-                            //       Constants.fromUserConsultationPage: false,
-                            //       Constants.docID: snapshot.data!.id,
-                            //     },
-                            //   );
-                            // } else {
 
-                            var packages = <PackageModel>[];
-
-                            if (userModel.consultationPricing == null) {
-                              packages = packagesProvider.packages;
-                            } else {
-                              packages = [
-                                ...userModel.consultationPricing!.textPackages
-                                    .mapIndexed((i, e) {
-                                  return PackageModel(
-                                    id: i.toString(),
-                                    type: PackageType.text,
-                                    title: '${e.noOfTexts} Texts',
-                                    amount: e.price,
-                                    duration: 0,
-                                    textLimit: e.noOfTexts,
-                                  );
-                                }),
-                                ...userModel
-                                    .consultationPricing!.videoPackages
-                                    .mapIndexed((i, e) {
-                                  return PackageModel(
-                                    id: i.toString(),
-                                    type: PackageType.video,
-                                    title:
-                                        '${e.noOf} ${e.duration.name.capitalizeFirstLetter()}${e.noOf > 1 ? 's' : ''} Call',
-                                    amount: e.price,
-                                    duration: e.noOf,
-                                    textLimit: 0,
-                                  );
-                                }),
-                              ];
-                            }
-
-                            Navigator.pushNamed(
-                              context,
-                              BookAppointmentScreen.routeName,
-                              arguments: {
-                                Constants.userModel: userModel,
-                                Constants.packages: packages,
-                              },
-                            );
-                            // }
+                            _handleBookAppointment(context, userModel,
+                                packagesProvider, consultations);
                           },
-                          title: isAppointmentActive
-                              ? 'Booked'
+                          title: isOngoingConsultation
+                              ? 'Ongoing Consultation'
                               : 'Book Appointment',
                         );
                       },
@@ -347,6 +335,50 @@ class ConsultantDetailsScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _handleBookAppointment(BuildContext context, UserModel userModel,
+      PackagesProvider packagesProvider,
+      [List<ConsultationModel> existingConsultations = const []]) {
+    var packages = <PackageModel>[];
+
+    if (userModel.consultationPricing == null) {
+      packages = packagesProvider.packages;
+    } else {
+      packages = [
+        ...userModel.consultationPricing!.textPackages.mapIndexed((i, e) {
+          return PackageModel(
+            id: i.toString(),
+            type: PackageType.text,
+            title: '${e.noOfTexts} Texts',
+            amount: e.price,
+            duration: 0,
+            textLimit: e.noOfTexts,
+          );
+        }),
+        ...userModel.consultationPricing!.videoPackages.mapIndexed((i, e) {
+          return PackageModel(
+            id: i.toString(),
+            type: PackageType.video,
+            title:
+                '${e.noOf} ${e.duration.name.capitalizeFirstLetter()}${e.noOf > 1 ? 's' : ''} Call',
+            amount: e.price,
+            duration: e.noOf,
+            textLimit: 0,
+          );
+        }),
+      ];
+    }
+
+    Navigator.pushNamed(
+      context,
+      BookAppointmentScreen.routeName,
+      arguments: {
+        Constants.userModel: userModel,
+        Constants.packages: packages,
+        Constants.consultations: existingConsultations,
+      },
     );
   }
 }

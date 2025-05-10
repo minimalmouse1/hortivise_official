@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:horti_vige/constants.dart';
 import 'package:horti_vige/core/utils/app_consts.dart';
+import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/data/models/availability/availability.dart';
+import 'package:horti_vige/data/models/consultation/consultation_model.dart';
 import 'package:horti_vige/data/models/package/package_model.dart';
 import 'package:horti_vige/data/models/user/user_model.dart';
 import 'package:horti_vige/data/services/notification_service.dart';
@@ -57,10 +59,12 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen>
 
   @override
   Widget build(BuildContext context) {
-    final user = (ModalRoute.of(context)!.settings.arguments!
-        as Map)[Constants.userModel];
-    final packages = (ModalRoute.of(context)!.settings.arguments!
-        as Map)[Constants.packages];
+    final arguments = ModalRoute.of(context)!.settings.arguments! as Map;
+    final user = arguments[Constants.userModel] as UserModel;
+    final packages = arguments[Constants.packages] as List<PackageModel>;
+    final existingConsultations = arguments.containsKey(Constants.consultations)
+        ? arguments[Constants.consultations] as List<ConsultationModel>
+        : <ConsultationModel>[];
 
     return Scaffold(
       backgroundColor: AppColors.colorWhite,
@@ -106,12 +110,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen>
             labelColor: AppColors.appGreenMaterial,
             indicatorPadding: 85.horizontalPadding,
             indicatorWeight: 1,
-            // indicator: UnderlineTabIndicator(
-            //   borderSide:
-            //       BorderSide(width: 1, color: AppColors.appGreenMaterial),
-            //   borderRadius: BorderRadius.circular(1),
-            //   insets:  const EdgeInsets.symmetric(horizontal: 80),
-            // ),
             tabs: [
               Tab(
                 icon: Container(
@@ -166,6 +164,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen>
           SelectDateTimePage(
             availability: user.availability ?? Availability.empty(),
             packages: packages,
+            existingConsultations: existingConsultations,
             bookNowClick: (selectedDate, selectedPackage) {
               setState(() {
                 _selectedDate = selectedDate;
@@ -198,6 +197,44 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen>
     required UserModel specialist,
     required String timeZone,
   }) {
+    // Get existing consultations from route arguments
+    final arguments = (ModalRoute.of(context)?.settings.arguments ??
+        <String, dynamic>{}) as Map;
+    final existingConsultations = arguments.containsKey(Constants.consultations)
+        ? arguments[Constants.consultations] as List<ConsultationModel>
+        : <ConsultationModel>[];
+
+    // Calculate end time based on package duration
+    final packageDurationMinutes =
+        selectedPkg.duration * 60; // Convert hours to minutes
+    final endDate = selectedDate.add(Duration(minutes: packageDurationMinutes));
+
+    // Check for overlapping consultations
+    bool hasOverlap = existingConsultations.any((consultation) {
+      // Skip canceled consultations
+      if (consultation.status == ConsultationStatus.canceled) {
+        return false;
+      }
+
+      // Check if selected time overlaps with any existing consultation
+      return (selectedDate.isAfter(consultation.startTime) &&
+              selectedDate.isBefore(consultation.endTime)) ||
+          (endDate.isAfter(consultation.startTime) &&
+              endDate.isBefore(consultation.endTime)) ||
+          (selectedDate.isAtSameMomentAs(consultation.startTime)) ||
+          (endDate.isAtSameMomentAs(consultation.endTime)) ||
+          (selectedDate.isBefore(consultation.startTime) &&
+              endDate.isAfter(consultation.endTime));
+    });
+
+    // Show error if there's an overlap
+    if (hasOverlap) {
+      context.showSnack(
+          message:
+              'You already have a consultation scheduled at this time with this consultant. Please select another time.');
+      return;
+    }
+
     context.showProgressDialog(
       dialog: const WaitingDialog(status: 'Sending Request'),
     );

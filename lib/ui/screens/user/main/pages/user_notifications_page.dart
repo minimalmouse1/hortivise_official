@@ -8,9 +8,48 @@ import 'package:horti_vige/ui/utils/extensions/extensions.dart';
 import 'package:horti_vige/ui/utils/styles/text_styles.dart';
 import 'package:horti_vige/core/utils/app_date_utils.dart';
 import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:horti_vige/core/utils/helpers/preference_manager.dart';
 
-class UserNotificationsPage extends StatelessWidget {
+class UserNotificationsPage extends StatefulWidget {
   const UserNotificationsPage({super.key});
+
+  @override
+  State<UserNotificationsPage> createState() => _UserNotificationsPageState();
+}
+
+class _UserNotificationsPageState extends State<UserNotificationsPage> {
+  // Keep track of read notification IDs
+  Set<String> _readNotificationIds = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchReadNotifications();
+
+    // Use a small delay to allow the page to be built before marking notifications as read
+    Future.delayed(Duration.zero, () {
+      if (mounted) {
+        Provider.of<NotificationsProvider>(context, listen: false)
+            .markAllNotificationsAsRead();
+      }
+    });
+  }
+
+  Future<void> _fetchReadNotifications() async {
+    final userId = PreferenceManager.getInstance().getCurrentUser()?.uId ?? '';
+
+    final readDocsSnapshot = await FirebaseFirestore.instance
+        .collection('ReadNotifications')
+        .where('userId', isEqualTo: userId)
+        .get();
+
+    setState(() {
+      _readNotificationIds = readDocsSnapshot.docs
+          .map((doc) => doc.data()['notificationId'] as String)
+          .toSet();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +121,10 @@ class UserNotificationsPage extends StatelessWidget {
                           millis: notification.time,
                         );
 
+                        // Check if notification is read
+                        final isRead =
+                            _readNotificationIds.contains(notification.id);
+
                         bool showDateHeader = lastDay != currentDate;
                         lastDay = currentDate;
 
@@ -90,7 +133,8 @@ class UserNotificationsPage extends StatelessWidget {
                           children: [
                             if (showDateHeader)
                               Padding(
-                                padding: EdgeInsets.symmetric(vertical: 5),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 5),
                                 child: Center(
                                   child: Text(
                                     currentDate,
@@ -100,10 +144,22 @@ class UserNotificationsPage extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                            ItemNotification(
-                              notification: notification,
-                              description:
-                                  provider.getDisplayableMessage(notification),
+                            GestureDetector(
+                              onTap: () {
+                                // Mark individual notification as read when tapped
+                                provider
+                                    .markNotificationAsRead(notification.id);
+                                // Update local state too
+                                setState(() {
+                                  _readNotificationIds.add(notification.id);
+                                });
+                              },
+                              child: ItemNotification(
+                                notification: notification,
+                                description: provider
+                                    .getDisplayableMessage(notification),
+                                isRead: isRead,
+                              ),
                             ),
                           ],
                         );

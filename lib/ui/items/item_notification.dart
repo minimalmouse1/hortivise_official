@@ -11,9 +11,11 @@ class ItemNotification extends StatelessWidget {
     super.key,
     required this.notification,
     required this.description,
+    this.isRead = true,
   });
   final NotificationModel notification;
   final String description;
+  final bool isRead;
 
   @override
   Widget build(BuildContext context) {
@@ -22,13 +24,14 @@ class ItemNotification extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
       ),
       elevation: 0,
+      color: isRead ? null : AppColors.colorGreen.withOpacity(0.1),
       surfaceTintColor: AppColors.colorGrayBg,
       child: Padding(
         padding: 5.allPadding,
         child: ListTile(
           leading: Badge(
             alignment: Alignment.bottomRight,
-            backgroundColor: AppColors.colorOrange,
+            backgroundColor: isRead ? AppColors.colorOrange : Colors.red,
             label: const Icon(
               AppIcons.ic_notes_round,
               size: 8,
@@ -57,16 +60,27 @@ class ItemNotification extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: AppTextStyles.bodyStyle.changeSize(9),
           ),
-          trailing: Container(
-            padding: const EdgeInsets.only(
-              top: 35,
-            ),
-            child: Text(
-              AppDateUtils.getTimeAgoFromMilliseconds(notification.time),
-              style: AppTextStyles.bodyStyle
-                  .changeColor(AppColors.colorGray)
-                  .changeSize(10),
-            ),
+          trailing: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              if (!isRead)
+                Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              const SizedBox(height: 4),
+              Text(
+                AppDateUtils.getTimeAgoFromMilliseconds(notification.time),
+                style: AppTextStyles.bodyStyle
+                    .changeColor(AppColors.colorGray)
+                    .changeSize(10),
+              ),
+            ],
           ),
         ),
       ),

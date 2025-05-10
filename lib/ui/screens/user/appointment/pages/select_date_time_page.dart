@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/data/models/availability/availability.dart';
-
+import 'package:horti_vige/data/models/consultation/consultation_model.dart';
 import 'package:horti_vige/data/models/package/package_model.dart';
 import 'package:horti_vige/providers/packages_provider.dart';
 import 'package:horti_vige/ui/screens/user/appointment/sub/service_selector.dart';
@@ -20,14 +20,17 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 class SelectDateTimePage extends StatefulWidget {
-  const SelectDateTimePage(
-      {super.key,
-      required this.bookNowClick,
-      required this.availability,
-      required this.packages,
-      required this.consultantEmail});
+  const SelectDateTimePage({
+    super.key,
+    required this.bookNowClick,
+    required this.availability,
+    required this.packages,
+    required this.consultantEmail,
+    this.existingConsultations = const [],
+  });
   final Availability availability;
   final List<PackageModel> packages;
+  final List<ConsultationModel> existingConsultations;
   final Function(DateTime selectedTime, PackageModel selectedPackage)
       bookNowClick;
 
@@ -46,9 +49,7 @@ class _SelectDateTimePageState extends State<SelectDateTimePage> {
   String patientTimeZone = '';
   bool gettingTimes = true;
   PackageModel? selectedPkg;
-  late final selectableDays = widget.availability.days
-      .map((e) => e.day.name.substring(0, 3).capitalizeFirstLetter())
-      .toList();
+  List<String> selectableDays = [];
 
   List<String> availableTimes = [];
   List<PackageModel> packages = [];
@@ -59,6 +60,15 @@ class _SelectDateTimePageState extends State<SelectDateTimePage> {
     super.initState();
     try {
       if (AppDateUtils.getNext30DaysOfYearWithMonth().values.isEmpty) return;
+
+      // Get the selectable days from consultant availability
+      selectableDays = widget.availability.days
+          .map((e) => e.day.name.substring(0, 3).capitalizeFirstLetter())
+          .toList();
+
+      if (selectableDays.isEmpty) return;
+
+      // Find the first available day in the next 30 days
       final data =
           AppDateUtils.getNext30DaysOfYearWithMonth().values.firstWhereOrNull(
                 (ele) => selectableDays.any((day) => day == ele.split(',')[0]),
@@ -67,17 +77,11 @@ class _SelectDateTimePageState extends State<SelectDateTimePage> {
       if (data == null) return;
 
       final day = data.split(',')[0].toLowerCase();
-      final dayEum = DayEnum.values.firstWhere(
+      final dayEnum = DayEnum.values.firstWhere(
         (element) => element.name.substring(0, 3) == day,
       );
 
-      Future.delayed(const Duration(seconds: 2), () async {
-        _selectTimes(dayEum);
-      });
-      Future.delayed(Duration.zero, () async {
-        packages = await context.read<PackagesProvider>().getAllPackages();
-      });
-
+      // Get the index of the found day
       final index =
           AppDateUtils.getNext30DaysOfYearWithMonth().values.toList().indexOf(
                 data,
@@ -85,11 +89,28 @@ class _SelectDateTimePageState extends State<SelectDateTimePage> {
       final dayIndex = int.parse(
         AppDateUtils.getNext30DaysOfYearWithMonth().keys.toList()[index],
       );
+
+      // Update selected day and month
       selected = index;
       selectedDay = dayIndex;
+      selectedMonth = AppDateUtils.getIntMonthFromString(
+        data.split(',')[1].trim(),
+      );
+
+      // Delay loading times to ensure timezone data is loaded
+      Future.delayed(const Duration(seconds: 2), () async {
+        _selectTimes(dayEnum);
+      });
+
+      // Load packages
+      Future.delayed(Duration.zero, () async {
+        packages = await context.read<PackagesProvider>().getAllPackages();
+      });
     } catch (e) {
       e.logError();
     }
+
+    // Fetch existing consultations
     getConsultations();
   }
 
@@ -137,7 +158,8 @@ class _SelectDateTimePageState extends State<SelectDateTimePage> {
                 .values
                 .map(
                   (ele) => selectableDays.any(
-                    (day) => day == ele.split(',')[0],
+                    (day) =>
+                        day.toLowerCase() == ele.split(',')[0].toLowerCase(),
                   ),
                 )
                 .toList(),
@@ -372,18 +394,12 @@ class _SelectDateTimePageState extends State<SelectDateTimePage> {
         final hour = int.parse(time.split(':')[0]);
         final minute = int.parse(time.split(':')[1]);
 
-        // final selectedDateTime = DateTime(
-        //   currentDateTime.year,
-        //   selectedMonth,
-        //   selectedDay,
-        //   hour,
-        //   minute,
-        // );
+        // Create date time with selected day and month (not current day/month)
         final selectedDateTimeConsultant = tz.TZDateTime(
           consultantTimeZone1,
           currentDateTime.year,
-          currentDateTime.month,
-          currentDateTime.day,
+          selectedMonth, // Use the selected month
+          selectedDay, // Use the selected day
           hour,
           minute,
         );
@@ -419,13 +435,42 @@ class _SelectDateTimePageState extends State<SelectDateTimePage> {
   }
 
   bool isTimeWithinConsultations(DateTime time) {
+    // First check widget.existingConsultations that were passed from the ConsultantDetailsScreen
+    for (var consultation in widget.existingConsultations) {
+      if (consultation.status == ConsultationStatus.accepted ||
+          consultation.status == ConsultationStatus.pending) {
+        // Use the DateTime objects directly instead of parsing strings
+        DateTime startDateTime = consultation.startTime;
+        DateTime endDateTime = consultation.endTime;
+
+        // Only check if the dates are the same day
+        bool isSameDay = time.year == startDateTime.year &&
+            time.month == startDateTime.month &&
+            time.day == startDateTime.day;
+
+        if (isSameDay &&
+            (time.isAfter(startDateTime) && time.isBefore(endDateTime) ||
+                time.isAtSameMomentAs(startDateTime) ||
+                time.isAtSameMomentAs(endDateTime))) {
+          return true;
+        }
+      }
+    }
+
+    // Also check any consultations fetched from Firebase
     for (var consultation in consultations) {
       DateTime startDateTime = DateTime.parse(consultation['startDateTime']);
       DateTime endDateTime = DateTime.parse(consultation['endDateTime']);
 
-      if (time.isAfter(startDateTime) && time.isBefore(endDateTime) ||
-          time.isAtSameMomentAs(startDateTime) ||
-          time.isAtSameMomentAs(endDateTime)) {
+      // Only check if the dates are the same day
+      bool isSameDay = time.year == startDateTime.year &&
+          time.month == startDateTime.month &&
+          time.day == startDateTime.day;
+
+      if (isSameDay &&
+          (time.isAfter(startDateTime) && time.isBefore(endDateTime) ||
+              time.isAtSameMomentAs(startDateTime) ||
+              time.isAtSameMomentAs(endDateTime))) {
         return true;
       }
     }
@@ -461,10 +506,10 @@ class _SelectDateTimePageState extends State<SelectDateTimePage> {
       CollectionReference consultationsCollection =
           FirebaseFirestore.instance.collection('Consultations');
 
+      // Fetch all active consultations (accepted and pending), not just accepted ones
       QuerySnapshot querySnapshot = await consultationsCollection
           .where('specialist.email', isEqualTo: email)
-          .where('status', isEqualTo: 'accepted')
-          .get();
+          .where('status', whereIn: ['accepted', 'pending']).get();
 
       List<Map<String, dynamic>> consultations = querySnapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;

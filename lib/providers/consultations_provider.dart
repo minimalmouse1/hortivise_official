@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:horti_vige/core/exceptions/app_exception.dart';
 import 'package:horti_vige/core/utils/helpers/preference_manager.dart';
@@ -70,7 +71,7 @@ class ConsultationProvider extends ChangeNotifier {
     //   specialistUser.userName,
     // );
 
-   // final isPaymentSuccess = await paymentService.displayPaymentSheet();
+    // final isPaymentSuccess = await paymentService.displayPaymentSheet();
 
     // if (!isPaymentSuccess) {
     //   return Future.error('Payment failed')
@@ -285,6 +286,43 @@ class ConsultationProvider extends ChangeNotifier {
       e.logError();
     }
     return null;
+  }
+
+  Future<List<ConsultationModel>> getAllConsultationsForSpecialist(
+    String specialistEmail,
+  ) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return [];
+
+      final userId = user.uid;
+
+      // Get all consultations where the current user is the customer and
+      // the specified email is the specialist
+      final snapshot = await _consultationsCollectionRef
+          .where(FieldPath(const ['customer', 'id']), isEqualTo: userId)
+          .where(
+            FieldPath(const ['specialist', 'email']),
+            isEqualTo: specialistEmail,
+          )
+          .get();
+
+      if (snapshot.docs.isEmpty) return [];
+
+      // Convert all documents to ConsultationModel objects
+      final consultations = snapshot.docs
+          .map((doc) => ConsultationModel.fromJson(doc.data()))
+          .toList();
+
+      // Filter out canceled consultations
+      return consultations
+          .where((consultation) =>
+              consultation.status != ConsultationStatus.canceled)
+          .toList();
+    } catch (e) {
+      e.toString().logError();
+      return [];
+    }
   }
 
   bool isCustomer() {

@@ -174,6 +174,7 @@ class Constants {
 
   static const userModel = 'UserModel';
   static const packages = 'Packages';
+  static const consultations = 'Consultations';
   static const consultModel = 'ConsultationModel';
   static const fromUserConsultationPage = 'UserConsultationPage';
   static const docID = 'docID';
