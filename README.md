@@ -106,7 +106,7 @@ sudo apt-get install curl git unzip xz-utils zip libglu1-mesa
 
 ### 1. Clone the Repository
 ```bash
-git clone <repository-url>
+git clone (https://github.com/minimalmouse1/hortivise_official.git)
 cd hortivise_official
 ```
 
