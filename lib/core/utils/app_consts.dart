@@ -173,6 +173,7 @@ class Constants {
   ];
 
   static const userModel = 'UserModel';
+  static const authToken = 'AuthToken';
   static const packages = 'Packages';
   static const consultations = 'Consultations';
   static const consultModel = 'ConsultationModel';

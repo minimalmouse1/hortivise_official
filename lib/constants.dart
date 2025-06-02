@@ -1,5 +1,15 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+// API Configuration
+class ApiConstants {
+  // API Configuration
+  static const String apiVersion = 'v1';
+  static const int apiPort = 3333;
+  static const String productionBaseUrl = 'https://payment.hortivise.com/api/$apiVersion';
+  static const String productionFullBaseUrl = 'https://payment.hortivise.com/api/v1/auth/login';
+
+}
+
 Map<String, String> timeZoneMapping = {
   'Etc/GMT-12': 'International Date Line West (GMT -12:00)',
   'Etc/GMT-11': 'Coordinated Universal Time -11 (GMT -11:00)',

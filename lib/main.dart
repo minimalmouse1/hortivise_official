@@ -55,10 +55,23 @@ import 'dart:developer' as developer;
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'Services/api_services.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Initialize SharedPreferences first
   await PreferenceManager.getInstance().initSharedPreferences();
+
+  // Now we can safely call the API and save the token
+  final token = await ApiService.loginAndGetToken();
+
+  if (token != null) {
+    print('Auth Token called: $token');
+  } else {
+    (print(" toke is not found called $token"));
+  }
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

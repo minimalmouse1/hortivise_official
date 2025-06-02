@@ -23,6 +23,27 @@ class PreferenceManager {
     return _prefs.remove(Constants.userModel);
   }
 
+  // Authentication token methods
+  Future<void> saveAuthToken(String token) async {
+    try {
+      await _prefs.setString(Constants.authToken, token);
+      print(
+          'Token stored successfully in SharedPreferences with key: ${Constants.authToken}');
+      print(
+          'Stored token: ${token.substring(0, 20)}...'); // Show first 20 characters for security
+    } catch (e) {
+      e.logError();
+    }
+  }
+
+  String? getAuthToken() {
+    return _prefs.getString(Constants.authToken);
+  }
+
+  Future<bool> deleteAuthToken() {
+    return _prefs.remove(Constants.authToken);
+  }
+
   UserModel? getCurrentUser() {
     final userString = _prefs.getString(Constants.userModel);
     if (userString == null) {
