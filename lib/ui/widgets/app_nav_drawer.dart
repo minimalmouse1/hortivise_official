@@ -25,11 +25,9 @@ class MenuItems {
   static const chat = MenuItem(title: 'Chat', icon: AppIcons.ic_chat_outlined);
   static const profile = MenuItem(title: 'Profile', icon: Icons.person_2);
   static const logOut = MenuItem(title: 'Logout', icon: Icons.logout);
-  static const all = <MenuItem>[
-    home,
-    chat,
-    profile,
-  ];
+  static const deleteAccount =
+      MenuItem(title: 'Delete Account', icon: Icons.delete_forever);
+  static const all = <MenuItem>[home, chat, profile, logOut, deleteAccount];
 }
 
 class MenuItem {
@@ -94,6 +92,12 @@ class _ZoomDrawerScreenState extends State<ZoomDrawerScreen> {
         return const Conversations();
       case MenuItems.profile:
         return const ProfileScreen();
+      case MenuItems.logOut:
+        return const LoginScreen();
+      case MenuItems.deleteAccount:
+        return currentUser.type == UserType.CUSTOMER
+            ? const UserMainScreen()
+            : const ConsultantMainScreen();
       default:
         return const UserMainScreen();
     }
@@ -123,12 +127,8 @@ class AppNavDrawer extends StatelessWidget {
           const SizedBox(height: 60),
           _buildUserInfo(),
           const SizedBox(height: 20),
-          ...MenuItems.all
-              .map((item) => _buildMenuItem(item, context))
-              .toList(),
+          ...MenuItems.all.map((item) => _buildMenuItem(item, context)),
           // if (user?.specialist != null) _buildChatTile(context),
-          const Spacer(),
-          _buildFooter(context),
         ],
       ),
     );
@@ -170,240 +170,381 @@ class AppNavDrawer extends StatelessWidget {
 
   Widget _buildMenuItem(MenuItem item, context) {
     final isSelected = currentItem == item;
+    final isDeleteAccount = item == MenuItems.deleteAccount;
 
     return Padding(
       padding: const EdgeInsets.only(left: 16),
       child: ListTile(
         selected: isSelected,
-        selectedTileColor:
-            AppColors.colorGreen, // Background color for selected tile
+        selectedTileColor: isDeleteAccount
+            ? AppColors.colorRed.withOpacity(0.1)
+            : AppColors.colorGreen, // Background color for selected tile
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         leading: Icon(
           item.icon,
-          color: isSelected ? Colors.white : AppColors.colorGray,
+          color: isSelected
+              ? (isDeleteAccount ? AppColors.colorRed : Colors.white)
+              : (isDeleteAccount ? AppColors.colorRed : AppColors.colorGray),
         ),
         title: Text(
           item.title,
           style: TextStyle(
-            color: isSelected ? Colors.white : AppColors.colorGray,
+            color: isSelected
+                ? (isDeleteAccount ? AppColors.colorRed : Colors.white)
+                : (isDeleteAccount ? AppColors.colorRed : AppColors.colorGray),
           ),
         ),
         onTap: () {
-          // Close the Zoom Drawer and navigate to the selected screen
-          //ZoomDrawer.of(context)?.close();
-          onSelectItem(item); // Trigger the callback to update the main screen
+          // Handle logout functionality
+          if (item == MenuItems.logOut) {
+            _handleLogout(context);
+          } else if (item == MenuItems.deleteAccount) {
+            _handleDeleteAccount(context);
+          } else {
+            // Close the Zoom Drawer and navigate to the selected screen
+            //ZoomDrawer.of(context)?.close();
+            onSelectItem(
+                item); // Trigger the callback to update the main screen
+          }
         },
       ),
     );
   }
 
+  void _handleLogout(BuildContext context) async {
+    try {
+      // Show confirmation bottom sheet
+      final shouldLogout = await showModalBottomSheet<bool>(
+        context: context,
+        backgroundColor: AppColors.colorBeige,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+          ),
+        ),
+        builder: (BuildContext context) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Are you sure you want to logout?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.colorBlack,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Poppins',
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _logoutButton(
+                      label: 'Cancel',
+                      onTap: () {
+                        Navigator.of(context).pop(false);
+                      },
+                      buttonColor: AppColors.colorGreen,
+                    ),
+                    _logoutButton(
+                      label: 'Logout',
+                      onTap: () {
+                        Navigator.of(context).pop(true);
+                      },
+                      buttonColor: AppColors.colorGreen.withOpacity(0.6),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      );
 
+      if (shouldLogout == true) {
+        // Show loading indicator
+        if (context.mounted) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.colorGreen),
+              ),
+            ),
+          );
+        }
 
-  Widget _buildFooter(BuildContext context) {
-    return Column(
-      children: [
-      //  if (user?.specialist != null) _buildStripeTile(),
-       // _buildDeleteAccountTile(context),
-        _buildLogoutTile(context),
-      ],
+        // Perform logout
+        await AuthService().signOut();
+
+        // Clear user data from provider
+        if (context.mounted) {
+          Provider.of<UserProvider>(context, listen: false).clearUser();
+        }
+
+        // Close loading dialog and navigate to login screen
+        if (context.mounted) {
+          Navigator.pop(context); // Remove loading indicator
+
+          // Navigate to login screen and remove all previous routes
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            LoginScreen.routeName,
+            (route) => false, // This will remove all previous routes
+          );
+
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Logged out successfully'),
+              backgroundColor: AppColors.colorGreen,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.pop(context); // Remove loading indicator
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to logout: ${e.toString()}'),
+            backgroundColor: AppColors.colorRed,
+          ),
+        );
+      }
+    }
+  }
+
+  Widget _logoutButton({
+    required String label,
+    required Function() onTap,
+    required Color buttonColor,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: buttonColor,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        width: 100,
+        height: 40,
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: AppTextStyles.bodyStyle
+              .changeColor(AppColors.colorWhite)
+              .changeSize(15)
+              .changeFontWeight(FontWeight.w700),
+        ),
+      ),
     );
   }
 
-  // Widget _buildStripeTile() {
-  //   return ListTile(
-  //     onTap: () async {
-  //       final url = StripeController.instance.getAccountUrl();
-  //       if (url != null && await canLaunchUrl(Uri.parse(url))) {
-  //         await launchUrl(Uri.parse(url));
-  //       }
-  //     },
-  //     leading: const Icon(Icons.attach_money_outlined),
-  //     title: const Text('My Stripe', style: AppTextStyles.bodyStyleMedium),
-  //   );
-  // }
+  void _handleDeleteAccount(BuildContext context) async {
+    try {
+      // Show confirmation bottom sheet
+      final password = await showModalBottomSheet<String>(
+        context: context,
+        backgroundColor: AppColors.colorBeige,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+          ),
+        ),
+        isScrollControlled: true,
+        builder: (BuildContext context) {
+          return _showDeleteAccountConfirmation(context);
+        },
+      );
 
-  // Widget _buildDeleteAccountTile(BuildContext context) {
-  //   return ListTile(
-  //     onTap: () => showModalBottomSheet(
-  //       context: context,
-  //       isScrollControlled: true,
-  //       builder: (context) => _showDeleteAccountConfirmation(context),
-  //     ),
-  //     leading: const Icon(
-  //       Icons.delete_forever,
-  //       color: Colors.red,
-  //     ),
-  //     title: Text(
-  //       'Delete Account',
-  //       style: AppTextStyles.bodyStyleMedium.copyWith(
-  //         color: Colors.red,
-  //       ),
-  //     ),
-  //   );
-  // }
-  //
-  // Widget _showDeleteAccountConfirmation(BuildContext context) {
-  //   final passwordController = TextEditingController();
-  //   bool isPasswordVisible = false;
-  //
-  //   return Padding(
-  //     padding: EdgeInsets.only(
-  //       bottom: MediaQuery.of(context).viewInsets.bottom,
-  //       left: 20,
-  //       right: 20,
-  //       top: 20,
-  //     ),
-  //     child: SingleChildScrollView(
-  //       child: StatefulBuilder(
-  //         builder: (context, setState) => Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             const Text(
-  //               'Delete Account',
-  //               style: TextStyle(
-  //                 fontSize: 20,
-  //                 fontWeight: FontWeight.bold,
-  //               ),
-  //             ),
-  //             const SizedBox(height: 20),
-  //             const Text(
-  //               'Please enter your password to confirm account deletion. This action cannot be undone.',
-  //               textAlign: TextAlign.center,
-  //             ),
-  //             const SizedBox(height: 20),
-  //             TextField(
-  //               controller: passwordController,
-  //               obscureText: !isPasswordVisible,
-  //               autofocus: true,
-  //               decoration: InputDecoration(
-  //                 hintText: 'Enter your password',
-  //                 border: const OutlineInputBorder(),
-  //                 suffixIcon: IconButton(
-  //                   icon: Icon(
-  //                     isPasswordVisible
-  //                         ? Icons.visibility
-  //                         : Icons.visibility_off,
-  //                   ),
-  //                   onPressed: () {
-  //                     setState(() {
-  //                       isPasswordVisible = !isPasswordVisible;
-  //                     });
-  //                   },
-  //                 ),
-  //               ),
-  //             ),
-  //             const SizedBox(height: 20),
-  //             Row(
-  //               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //               children: [
-  //                 TextButton(
-  //                   onPressed: () => Navigator.pop(context),
-  //                   child: const Text('Cancel'),
-  //                 ),
-  //                 ElevatedButton(
-  //                   onPressed: () {
-  //                     if (passwordController.text.isEmpty) {
-  //                       ScaffoldMessenger.of(context).showSnackBar(
-  //                         const SnackBar(
-  //                           content: Text('Please enter your password'),
-  //                           backgroundColor: Colors.red,
-  //                         ),
-  //                       );
-  //                       return;
-  //                     }
-  //                     Navigator.pop(context);
-  //                     _deleteAccount(context, passwordController.text);
-  //                   },
-  //                   style: ElevatedButton.styleFrom(
-  //                     backgroundColor: Colors.red,
-  //                     foregroundColor: Colors.white,
-  //                   ),
-  //                   child: const Text('Delete'),
-  //                 ),
-  //               ],
-  //             ),
-  //             const SizedBox(height: 20),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-  //
-  // void _deleteAccount(BuildContext context, String password) async {
-  //   try {
-  //     final userProvider = Provider.of<UserProvider>(context, listen: false);
-  //     final authService = AuthService();
-  //
-  //     // Show loading indicator
-  //     if (context.mounted) {
-  //       showDialog(
-  //         context: context,
-  //         barrierDismissible: false,
-  //         builder: (context) => const Center(
-  //           child: CircularProgressIndicator(),
-  //         ),
-  //       );
-  //     }
-  //
-  //     // Delete the user account with password
-  //     final success = await authService.deleteAccount(password);
-  //
-  //     if (success) {
-  //       // Clear user data from provider
-  //       userProvider.clearUser();
-  //
-  //       // Close loading dialog and navigate to login screen
-  //       if (context.mounted) {
-  //         Navigator.pop(context); // Remove loading indicator
-  //
-  //         // Navigate to login screen and remove all previous routes
-  //         Navigator.of(context).pushNamedAndRemoveUntil(
-  //           LoginScreen.routeName,
-  //           (route) => false, // This will remove all previous routes
-  //         );
-  //
-  //         // Show success message
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           const SnackBar(
-  //             content: Text('Account deleted successfully'),
-  //             backgroundColor: Colors.green,
-  //           ),
-  //         );
-  //       }
-  //     } else {
-  //       if (context.mounted) {
-  //         Navigator.pop(context); // Remove loading indicator
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           const SnackBar(
-  //             content: Text('Failed to delete account. Please try again.'),
-  //             backgroundColor: Colors.red,
-  //           ),
-  //         );
-  //       }
-  //     }
-  //   } catch (e) {
-  //     if (context.mounted) {
-  //       Navigator.pop(context); // Remove loading indicator
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(
-  //           content: Text('Failed to delete account: ${e.toString()}'),
-  //           backgroundColor: Colors.red,
-  //         ),
-  //       );
-  //     }
-  //   }
-  // }
+      if (password != null && password.isNotEmpty) {
+        // Show loading indicator
+        if (context.mounted) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.colorGreen),
+              ),
+            ),
+          );
+        }
 
-  Widget _buildLogoutTile(context) {
-    return ListTile(
-      onTap: () {
-        AuthService().signOut();
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => const LoginScreen()));
-      },
-      leading: const Icon(Icons.logout),
-      title: const Text('Logout', style: AppTextStyles.bodyStyleMedium),
+        // Perform account deletion
+        final success = await AuthService().deleteAccount(password);
+
+        if (success) {
+          // Clear user data from provider
+          if (context.mounted) {
+            Provider.of<UserProvider>(context, listen: false).clearUser();
+          }
+
+          // Close loading dialog and navigate to login screen
+          if (context.mounted) {
+            Navigator.pop(context); // Remove loading indicator
+
+            // Navigate to login screen and remove all previous routes
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              LoginScreen.routeName,
+              (route) => false, // This will remove all previous routes
+            );
+
+            // Show success message
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Account deleted successfully'),
+                backgroundColor: AppColors.colorGreen,
+              ),
+            );
+          }
+        } else {
+          if (context.mounted) {
+            Navigator.pop(context); // Remove loading indicator
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Failed to delete account. Please try again.'),
+                backgroundColor: AppColors.colorRed,
+              ),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.pop(context); // Remove loading indicator
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to delete account: ${e.toString()}'),
+            backgroundColor: AppColors.colorRed,
+          ),
+        );
+      }
+    }
+  }
+
+  Widget _showDeleteAccountConfirmation(BuildContext context) {
+    final passwordController = TextEditingController();
+    bool isPasswordVisible = false;
+
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+        left: 20,
+        right: 20,
+        top: 20,
+      ),
+      child: StatefulBuilder(
+        builder: (context, setState) => Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Delete Account',
+              style: TextStyle(
+                color: AppColors.colorBlack,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                fontFamily: 'Poppins',
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Please enter your password to confirm account deletion. This action cannot be undone.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: AppColors.colorBlack,
+                fontSize: 14,
+                fontFamily: 'Poppins',
+              ),
+            ),
+            const SizedBox(height: 20),
+            TextField(
+              controller: passwordController,
+              obscureText: !isPasswordVisible,
+              autofocus: true,
+              decoration: InputDecoration(
+                hintText: 'Enter your password',
+                border: const OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                    color: AppColors.colorGray,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      isPasswordVisible = !isPasswordVisible;
+                    });
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _deleteAccountButton(
+                  label: 'Cancel',
+                  onTap: () {
+                    Navigator.of(context).pop(null);
+                  },
+                  buttonColor: AppColors.colorGreen,
+                ),
+                _deleteAccountButton(
+                  label: 'Delete',
+                  onTap: () {
+                    if (passwordController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please enter your password'),
+                          backgroundColor: AppColors.colorRed,
+                        ),
+                      );
+                      return;
+                    }
+                    Navigator.of(context).pop(passwordController.text);
+                  },
+                  buttonColor: AppColors.colorRed,
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _deleteAccountButton({
+    required String label,
+    required Function() onTap,
+    required Color buttonColor,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: buttonColor,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        width: 100,
+        height: 40,
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: AppTextStyles.bodyStyle
+              .changeColor(AppColors.colorWhite)
+              .changeSize(15)
+              .changeFontWeight(FontWeight.w700),
+        ),
+      ),
     );
   }
 }
