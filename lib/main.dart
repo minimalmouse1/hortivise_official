@@ -55,6 +55,8 @@ import 'dart:developer' as developer;
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'core/services/api.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -229,6 +231,8 @@ class _MyAppState extends State<MyApp> {
 
 // top class function to store the local time zone
 void getTimeZoneAndSave() async {
+  final api = Api();
+  await api.ensureAuthenticated();
   String localTimeZone =
       await FlutterTimezone.getLocalTimezone(); // e.g., Asia/Karachi
   print('Local time zone: $localTimeZone');

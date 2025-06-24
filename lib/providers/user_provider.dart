@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:horti_vige/core/exceptions/app_exception.dart';
+import 'package:horti_vige/core/services/api.dart';
 import 'package:horti_vige/data/enums/enums.dart';
 import 'package:horti_vige/data/models/availability/availability.dart';
 import 'package:horti_vige/data/models/user/specialist.dart';
@@ -309,8 +310,26 @@ class UserProvider extends ChangeNotifier {
     String email,
     UserType type,
   ) async {
-    await StripeController.instance.createStripeAccount(email);
-    return StripeController.instance.getAccountId() ?? '';
+    final api = Api();
+    // await StripeController.instance.createStripeAccount(email);
+
+    final response = await api.request(
+      path: '/consultants',
+      method: 'POST',
+      data: {
+        'first_name': name,
+        'email': email,
+      },
+    );
+    debugPrint('consultant response ==> $response');
+    final responseData = response.data;
+    debugPrint('consultant response data ==> ${responseData['result']['stripe_account_id']}');
+
+    return responseData['result']['stripe_account_id'] ?? '';
+
+    // return StripeController.instance.getAccountId() ?? '';
+
+
 
     // final body = <String, dynamic>{
     //   'name': name,
