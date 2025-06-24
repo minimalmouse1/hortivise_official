@@ -9,6 +9,8 @@ import 'package:horti_vige/ui/utils/extensions/extensions.dart';
 import 'package:horti_vige/ui/widgets/app_filled_button.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/services/api.dart';
+
 class AddPricingScreen extends StatefulWidget {
   const AddPricingScreen({super.key});
 
@@ -614,7 +616,7 @@ class _AddPricingScreenState extends State<AddPricingScreen>
     );
   }
 
-  void _saveTextValues() {
+  void _saveTextValues() async {
     final textPackages = <TextPricingModel>[];
     for (var i = 0; i < _noOfTextPriceControllers.length; i++) {
       final controller = _noOfTextPriceControllers[i];
@@ -629,9 +631,30 @@ class _AddPricingScreenState extends State<AddPricingScreen>
       if (price.isNotEmpty) {
         // price without $
         price = price.substring(1);
+        final api = Api();
+        final response = await api.request(
+          path: '/products',
+          method: 'POST',
+          data: {
+            'name': 'text-product-$noOfTexts',
+            'description': 'text description',
+            'price': num.parse(price),
+            'active':true,
+          },
+        );
+        debugPrint('text response ==> $response');
+        final responseData = response.data;
+        debugPrint('text response data ==> ${responseData['result']['price_id']}');
+        debugPrint('text response data ==> ${responseData['result']['product_id']}');
+        final stripePriceId = responseData['result']['price_id'] ?? '';
+        final stripeProductId = responseData['result']['product_id'] ?? '';
+
+
 
         textPackages.add(
           TextPricingModel(
+            stripe_price_id: stripePriceId,
+            stripe_product_id: stripeProductId,
             isEnabled: isEnabled,
             price: double.parse(price),
             noOfTexts: noOfTexts,
@@ -655,7 +678,7 @@ class _AddPricingScreenState extends State<AddPricingScreen>
     );
   }
 
-  void _saveVideoValues() {
+  void _saveVideoValues() async {
     final videoPackages = <VideoPricingModel>[];
     for (var i = 0; i < _videoPricingControllers.length; i++) {
       final controller = _videoPricingControllers[i];
@@ -670,8 +693,27 @@ class _AddPricingScreenState extends State<AddPricingScreen>
       if (price.isNotEmpty) {
         // price without $
         price = price.substring(1);
+        final api = Api();
+        final response = await api.request(
+          path: '/products',
+          method: 'POST',
+          data: {
+            'name': 'video-product-$noOf-$duration',
+            'description': 'video description',
+            'price': num.parse(price),
+            'active':true,
+          },
+        );
+        debugPrint('video response ==> $response');
+        final responseData = response.data;
+        debugPrint('video response data ==> ${responseData['result']['price_id']}');
+        debugPrint('video response data ==> ${responseData['result']['product_id']}');
+        final stripePriceId = responseData['result']['price_id'] ?? '';
+        final stripeProductId = responseData['result']['product_id'] ?? '';
         videoPackages.add(
           VideoPricingModel(
+            stripe_price_id: stripePriceId,
+            stripe_product_id: stripeProductId,
             duration: duration,
             isEnabled: isEnabled,
             price: double.parse(price),

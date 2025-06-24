@@ -16,6 +16,8 @@ class VideoPricingModel {
     required this.noOf,
     required this.duration,
     required this.price,
+    required this.stripe_price_id,
+    required this.stripe_product_id,
     this.isEnabled = true,
   });
 
@@ -28,4 +30,6 @@ class VideoPricingModel {
   final int noOf;
   final double price;
   final bool isEnabled;
+  final String stripe_price_id;
+  final String stripe_product_id;
 }
