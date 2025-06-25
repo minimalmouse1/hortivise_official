@@ -4,7 +4,7 @@ import 'dart:developer' as developer;
 class Api {
   static final Api _instance = Api._internal();
   factory Api() => _instance;
-  static const String _baseUrl = 'http://192.168.2.22:3333';
+  static const String _baseUrl = 'https://payment.hortivise.com';
   static const String _prefix = '/api/v1';
   final Dio api = Dio();
 
