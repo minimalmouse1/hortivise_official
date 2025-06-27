@@ -11,8 +11,8 @@ TextPricingModel _$TextPricingModelFromJson(Map<String, dynamic> json) =>
       noOfTexts: (json['noOfTexts'] as num).toInt(),
       price: (json['price'] as num).toDouble(),
       isEnabled: json['isEnabled'] as bool? ?? true,
-      stripe_price_id:json['stripe_price_id'] as String,
-      stripe_product_id:json['stripe_product_id'] as String,
+      stripe_price_id: json['stripe_price_id'] as String,
+      stripe_product_id: json['stripe_product_id'] as String,
     );
 
 Map<String, dynamic> _$TextPricingModelToJson(TextPricingModel instance) =>

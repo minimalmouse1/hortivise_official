@@ -138,7 +138,7 @@ class UserProvider extends ChangeNotifier {
           StripeController.instance.initStripe(appUser.specialist!.stripeId);
         }
         await _prefManager.saveUserModelInPref(appUser);
-        Navigator.pushNamed(context, ZoomDrawerScreen.routeName);
+        Navigator.pushNamed(context, ZoomDrawerScreen.userHome);
       }
     } on AppException {
       rethrow;
@@ -323,13 +323,12 @@ class UserProvider extends ChangeNotifier {
     );
     debugPrint('consultant response ==> $response');
     final responseData = response.data;
-    debugPrint('consultant response data ==> ${responseData['result']['stripe_account_id']}');
+    debugPrint(
+        'consultant response data ==> ${responseData['result']['stripe_account_id']}');
 
     return responseData['result']['stripe_account_id'] ?? '';
 
     // return StripeController.instance.getAccountId() ?? '';
-
-
 
     // final body = <String, dynamic>{
     //   'name': name,

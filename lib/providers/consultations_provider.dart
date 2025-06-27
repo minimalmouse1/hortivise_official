@@ -60,7 +60,7 @@ class ConsultationProvider extends ChangeNotifier {
         packageType: selectedPackage.type,
         timeZone: timeZone);
 
-    final paymentService = PaymentsService();
+    // final paymentService = PaymentsService();
 
     // final paymentIntent = await paymentService.createPaymentIntent(
     //   totalAmount,

@@ -47,7 +47,7 @@ class CongratsScreen extends StatelessWidget {
             onPress: () {
               Navigator.pushNamedAndRemoveUntil(
                 context,
-                LoginScreen.routeName,
+                LoginScreen.loginScreen,
                 (route) => false,
               );
             },

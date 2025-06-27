@@ -49,9 +49,7 @@ class PatientSideNotificationService {
           priority: Priority.high,
         ),
       ),
-      androidAllowWhileIdle: true,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
+      androidScheduleMode: AndroidScheduleMode.exact,
     );
 
     d.log(

@@ -2,123 +2,159 @@
 // waleedkalyar48@gmail.com/
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:horti_vige/ui/widgets/loading_button.dart';
+import 'package:horti_vige/constants.dart';
+// import 'package:flutter_stripe/flutter_stripe.dart'; // Removed Stripe import
+import 'package:horti_vige/ui/utils/colors/colors.dart';
+import 'package:horti_vige/ui/utils/extensions/extensions.dart';
+import 'package:horti_vige/ui/utils/styles/text_styles.dart';
+import 'package:horti_vige/ui/widgets/app_filled_button.dart';
+import 'package:horti_vige/ui/widgets/app_outlined_button.dart';
 import 'package:http/http.dart' as http;
 
 class CustomCardPaymentScreen extends StatefulWidget {
   const CustomCardPaymentScreen({super.key});
-  static const routeName = 'customCard';
+  static const String routeName = 'CustomCardPayment';
+
   @override
-  _CustomCardPaymentScreenState createState() =>
+  State<CustomCardPaymentScreen> createState() =>
       _CustomCardPaymentScreenState();
 }
 
 class _CustomCardPaymentScreenState extends State<CustomCardPaymentScreen> {
-  CardDetails _card = CardDetails();
-  bool? _saveCard = false;
+  // Removed Stripe card controller
+  // CardFormEditController controller = CardFormEditController();
+  bool _enabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Removed Stripe controller initialization
+    // controller.addListener(update);
+  }
+
+  @override
+  void dispose() {
+    // Removed Stripe controller disposal
+    // controller.removeListener(update);
+    // controller.dispose();
+    super.dispose();
+  }
+
+  void update() => setState(() {});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: SingleChildScrollView(
+      backgroundColor: AppColors.colorBeige,
+      appBar: AppBar(
+        title: Text(
+          'Payment',
+          style: AppTextStyles.titleStyle.changeSize(20),
+        ),
+        backgroundColor: AppColors.colorBeige,
+      ),
+      body: Padding(
+        padding: 12.allPadding,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Text(
-                  "If you don't want to or can't rely on the CardField you"
-                  ' can use the dangerouslyUpdateCardDetails in combination with '
-                  'your own card field implementation. \n\n'
-                  'Please beware that this will potentially break PCI compliance: '
-                  'https://stripe.com/docs/security/guide#validating-pci-compliance'),
-            ),
-            Padding(
               padding: const EdgeInsets.all(16),
-              child: Row(
+              decoration: BoxDecoration(
+                color: AppColors.colorWhite,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    flex: 2,
-                    child: TextField(
-                      decoration: const InputDecoration(hintText: 'Number'),
-                      onChanged: (number) {
-                        setState(() {
-                          _card = _card.copyWith(number: number);
-                        });
-                      },
-                      keyboardType: TextInputType.number,
+                  Text(
+                    'Payment Information',
+                    style: AppTextStyles.titleStyle.changeSize(18),
+                  ),
+                  16.height,
+                  // Removed Stripe card form
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppColors.colorGrayLight.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.colorGrayLight),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.credit_card_outlined,
+                          color: AppColors.colorGrayLight,
+                        ),
+                        12.width,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Payment functionality is disabled',
+                                style: AppTextStyles.bodyStyleMedium
+                                    .copyWith(color: AppColors.colorGrayLight),
+                              ),
+                              4.height,
+                              Text(
+                                'Stripe payment processing has been removed',
+                                style: AppTextStyles.bodyStyle
+                                    .copyWith(color: AppColors.colorGrayLight),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    width: 80,
-                    child: TextField(
-                      decoration: const InputDecoration(hintText: 'Exp. Year'),
-                      onChanged: (number) {
-                        setState(() {
-                          _card = _card.copyWith(
-                            expirationYear: int.tryParse(number),
-                          );
-                        });
-                      },
-                      keyboardType: TextInputType.number,
-                    ),
+                  16.height,
+                  Text(
+                    'Security Note:',
+                    style: AppTextStyles.bodyStyleMedium
+                        .changeFontWeight(FontWeight.w600),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    width: 80,
-                    child: TextField(
-                      decoration: const InputDecoration(hintText: 'Exp. Month'),
-                      onChanged: (number) {
-                        setState(() {
-                          _card = _card.copyWith(
-                            expirationMonth: int.tryParse(number),
-                          );
-                        });
-                      },
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    width: 80,
-                    child: TextField(
-                      decoration: const InputDecoration(hintText: 'CVC'),
-                      onChanged: (number) {
-                        setState(() {
-                          _card = _card.copyWith(cvc: number);
-                        });
-                      },
-                      keyboardType: TextInputType.number,
-                    ),
+                  8.height,
+                  Text(
+                    'Payment processing is currently disabled. In a production environment, ensure PCI compliance by following security guidelines.',
+                    style: AppTextStyles.bodyStyle
+                        .copyWith(color: AppColors.colorGrayLight),
                   ),
                 ],
               ),
             ),
-            CheckboxListTile(
-              value: _saveCard,
-              onChanged: (value) {
-                setState(() {
-                  _saveCard = value;
-                });
-              },
-              title: const Text('Save card during payment'),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: LoadingButton(
-                onPressed: _handlePayPress,
-                text: 'Pay',
-              ),
+            const Spacer(),
+            Row(
+              children: [
+                Expanded(
+                  child: AppOutlinedButton(
+                    onPress: () {
+                      Navigator.pop(context);
+                    },
+                    title: 'Cancel',
+                    btnColor: AppColors.colorGrayLight,
+                  ),
+                ),
+                12.width,
+                Expanded(
+                  child: AppFilledButton(
+                    onPress: () {
+                      // Removed Stripe payment processing
+                      _showPaymentDisabledDialog();
+                    },
+                    title: 'Pay Now',
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -126,138 +162,32 @@ class _CustomCardPaymentScreenState extends State<CustomCardPaymentScreen> {
     );
   }
 
-  Future<void> _handlePayPress() async {
-    await Stripe.instance.dangerouslyUpdateCardDetails(_card);
-
-    try {
-      // 1. Gather customer billing information (ex. email)
-
-      const billingDetails = BillingDetails(
-        email: 'email@stripe.com',
-        phone: '+48888000888',
-        address: Address(
-          city: 'Houston',
-          country: 'US',
-          line1: '1459  Circle Drive',
-          line2: '',
-          state: 'Texas',
-          postalCode: '77063',
+  void _showPaymentDisabledDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Payment Disabled'),
+        content: const Text(
+          'Payment functionality has been removed from this version. Please contact support for payment options.',
         ),
-      ); // mocked data for tests
-
-      // 2. Create payment method
-      final paymentMethod = await Stripe.instance.createPaymentMethod(
-        params: const PaymentMethodParams.card(
-          paymentMethodData: PaymentMethodData(
-            billingDetails: billingDetails,
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
           ),
-        ),
-      );
-
-      // 3. call API to create PaymentIntent
-      final paymentIntentResult = await callNoWebhookPayEndpointMethodId(
-        useStripeSdk: true,
-        paymentMethodId: paymentMethod.id,
-        currency: 'usd', // mocked data
-        items: [
-          'id-1',
         ],
-      );
+      ),
+    );
+  }
 
-      if (paymentIntentResult['error'] != null) {
-        // Error during creating or confirming Intent
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${paymentIntentResult['error']}')),
-        );
-        return;
-      }
-
-      if (paymentIntentResult['clientSecret'] != null &&
-          paymentIntentResult['requiresAction'] == null) {
-        // Payment succedeed
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Success!: The payment was confirmed successfully!'),
-          ),
-        );
-        return;
-      }
-
-      if (paymentIntentResult['clientSecret'] != null &&
-          paymentIntentResult['requiresAction'] == true) {
-        // 4. if payment requires action calling handleNextAction
-        final paymentIntent = await Stripe.instance
-            .handleNextAction(paymentIntentResult['clientSecret']);
-
-        if (paymentIntent.status == PaymentIntentsStatus.RequiresConfirmation) {
-          // 5. Call API to confirm intent
-          await confirmIntent(paymentIntent.id);
-        } else {
-          // Payment succedeed
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error: ${paymentIntentResult['error']}'),
-            ),
-          );
-        }
-      }
+// Removed all Stripe payment methods
+/*
+  Future<void> _processPayment() async {
+    try {
+      // Removed Stripe payment processing code
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: $e')));
-      rethrow;
+      e.logError();
     }
   }
-
-  Future<void> confirmIntent(String paymentIntentId) async {
-    final result = await callNoWebhookPayEndpointIntentId(
-      paymentIntentId: paymentIntentId,
-    );
-    if (result['error'] != null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: ${result['error']}')));
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Success!: The payment was confirmed successfully!'),
-        ),
-      );
-    }
-  }
-
-  Future<Map<String, dynamic>> callNoWebhookPayEndpointIntentId({
-    required String paymentIntentId,
-  }) async {
-    final url = Uri.parse('https://api.stripe.com/v1/charge-card-off-session');
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({'paymentIntentId': paymentIntentId}),
-    );
-    return json.decode(response.body);
-  }
-
-  Future<Map<String, dynamic>> callNoWebhookPayEndpointMethodId({
-    required bool useStripeSdk,
-    required String paymentMethodId,
-    required String currency,
-    List<String>? items,
-  }) async {
-    final url = Uri.parse('https://api.stripe.com/v1/pay-without-webhooks');
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({
-        'useStripeSdk': useStripeSdk,
-        'paymentMethodId': paymentMethodId,
-        'currency': currency,
-        'items': items,
-      }),
-    );
-    return json.decode(response.body);
-  }
+  */
 }

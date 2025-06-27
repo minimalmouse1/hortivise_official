@@ -7,7 +7,6 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:horti_vige/constants.dart';
 import 'package:horti_vige/data/services/notification_service.dart';
 import 'package:horti_vige/firebase_options.dart';
@@ -65,7 +64,6 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   //await FirebaseAppCheck.instance.activate();
-  Stripe.publishableKey = Constants.kStripePublishKey;
   // await dotenv.load(fileName: 'assets/.env');
 
   NotificationService.setupNotifications();
@@ -187,9 +185,9 @@ class _MyAppState extends State<MyApp> {
           initialRoute: LandingScreen.landingScreen,
           routes: {
             LandingScreen.landingScreen: (ctx) => const LandingScreen(),
-            LoginScreen.routeName: (ctx) => const LoginScreen(),
+            LoginScreen.loginScreen: (ctx) => const LoginScreen(),
             SignUpScreen.routeName: (ctx) => const SignUpScreen(),
-            ZoomDrawerScreen.routeName: (ctx) => const ZoomDrawerScreen(),
+            ZoomDrawerScreen.userHome: (ctx) => const ZoomDrawerScreen(),
             BecomeConsultantScreen.routeName: (ctx) =>
                 const BecomeConsultantScreen(),
             ThankYouScreen.routeName: (ctx) => const ThankYouScreen(),

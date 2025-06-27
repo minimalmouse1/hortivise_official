@@ -36,9 +36,8 @@ class ConsultantSideNotificationService {
         Random.secure().nextInt(100000).toString(),
         'High Importance Notification',
         importance: Importance.max);
-
     await flutterLocalNotificationsPlugin.zonedSchedule(
-      notificationId, // Use unique ID for each notification
+      notificationId,
       'Consultation Reminder',
       message,
       tz.TZDateTime.from(appointmentDateTime, tz.local),
@@ -50,16 +49,13 @@ class ConsultantSideNotificationService {
           priority: Priority.high,
         ),
       ),
-      androidAllowWhileIdle: true,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
+      androidScheduleMode: AndroidScheduleMode.exact,
     );
 
-    d.log(
-        'Consultant Notification scheduled for: ${appointmentDateTime.toLocal()}');
-  }
 
-  Future<void> initializeService() async {
+        }
+
+    Future<void> initializeService() async {
     final service = FlutterBackgroundService();
     await service.configure(
       androidConfiguration: AndroidConfiguration(

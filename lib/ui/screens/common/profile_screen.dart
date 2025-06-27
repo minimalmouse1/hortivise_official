@@ -69,7 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         .updateUser(model: user);
 
     if (!mounted) return;
-    Navigator.pushReplacementNamed(context, ZoomDrawerScreen.routeName);
+    Navigator.pushReplacementNamed(context, ZoomDrawerScreen.userHome);
     //  Navigator.pop(context);
   }
 
@@ -385,7 +385,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onPressed: () {
                   Navigator.pushReplacementNamed(
                     context,
-                    ZoomDrawerScreen.routeName,
+                    ZoomDrawerScreen.userHome,
                   );
                 },
                 elevation: 1,

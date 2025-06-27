@@ -1,23 +1,15 @@
 import 'dart:convert';
 import 'dart:math';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
-import 'package:horti_vige/firebase_options.dart';
 import 'package:horti_vige/ui/utils/colors/colors.dart';
 import 'package:horti_vige/ui/utils/extensions/extensions.dart';
 import 'package:timezone/data/latest.dart' as latestTz;
 import 'package:timezone/standalone.dart' as standaloneTz;
 import 'package:timezone/timezone.dart' as latestTz;
 import 'package:http/http.dart' as http;
-import 'dart:developer' as d;
-import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest.dart' as tz;
 
 class NotificationService {
   NotificationService._();
@@ -42,15 +34,6 @@ class NotificationService {
           requestBadgePermission: false,
           requestSoundPermission: false,
           requestCriticalPermission: true,
-          onDidReceiveLocalNotification: (id, title, body, payload) async {
-            // if (payload == 'progress') {
-            // GroundsApp.navigatorKey.currentState?.pushNamedAndRemoveUntil(
-            //   Routes.progress,
-            //   (route) =>
-            //       route.settings.name == Routes.progress || route.isFirst,
-            // );
-            // }
-          },
         ),
       ),
       // onDidReceiveNotificationResponse: notificationTapBackground,   these handlers are causing multiple thread running issue
@@ -132,8 +115,8 @@ class NotificationService {
 
   @pragma('vm:entry-point')
   static void notificationTapBackground(
-    NotificationResponse notificationResponse,
-  ) {}
+      NotificationResponse notificationResponse,
+      ) {}
 
   static NotificationDetails notificationDetails() {
     return const NotificationDetails(
@@ -155,8 +138,8 @@ class NotificationService {
   }
 
   static void scheduleNotification(
-    int scheduledNotificationDateTime,
-  ) async {
+      int scheduledNotificationDateTime,
+      ) async {
     if (scheduledNotificationDateTime - DateTime.now().millisecondsSinceEpoch >=
         300000) {
       final alarmTime = scheduledNotificationDateTime - 300000;
@@ -174,8 +157,6 @@ class NotificationService {
           notificationDetails(),
           matchDateTimeComponents: DateTimeComponents.dateAndTime,
           androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
         );
       } catch (e) {
         e.logError();
@@ -233,51 +214,51 @@ class NotificationService {
     FlutterLocalNotificationsPlugin().cancelAll();
   }
 
-  // static Future<void> initializePatientService() async {
-  //   final service = FlutterBackgroundService();
-  //   await service.configure(
-  //     androidConfiguration: AndroidConfiguration(
-  //       onStart: onPatientStart,
-  //       autoStart: true,
-  //       isForegroundMode: true,
-  //     ),
-  //     iosConfiguration: IosConfiguration(),
-  //   );
-  //   await service.startService();
-  //   d.log('Patient Background service initialized and started');
-  // }
+// static Future<void> initializePatientService() async {
+//   final service = FlutterBackgroundService();
+//   await service.configure(
+//     androidConfiguration: AndroidConfiguration(
+//       onStart: onPatientStart,
+//       autoStart: true,
+//       isForegroundMode: true,
+//     ),
+//     iosConfiguration: IosConfiguration(),
+//   );
+//   await service.startService();
+//   d.log('Patient Background service initialized and started');
+// }
 
-  // static Future<void> schedulePatientNotification(
-  //     DateTime appointmentDateTime, String message, int id) async {
-  //   d.log(
-  //       'Patient Attempting to schedule a notification for: $appointmentDateTime');
+// static Future<void> schedulePatientNotification(
+//     DateTime appointmentDateTime, String message, int id) async {
+//   d.log(
+//       'Patient Attempting to schedule a notification for: $appointmentDateTime');
 
-  //   AndroidNotificationChannel channel = AndroidNotificationChannel(
-  //       Random.secure().nextInt(100000).toString(),
-  //       'High Importance Notification',
-  //       importance: Importance.max);
+//   AndroidNotificationChannel channel = AndroidNotificationChannel(
+//       Random.secure().nextInt(100000).toString(),
+//       'High Importance Notification',
+//       importance: Importance.max);
 
-  //   await FlutterLocalNotificationsPlugin().zonedSchedule(
-  //     id,
-  //     'Consultation Reminder',
-  //     message,
-  //     latestTz.TZDateTime.from(appointmentDateTime, latestTz.local),
-  //     NotificationDetails(
-  //       android: AndroidNotificationDetails(
-  //         channel.id,
-  //         channel.name,
-  //         importance: Importance.max,
-  //         priority: Priority.high,
-  //       ),
-  //     ),
-  //     androidAllowWhileIdle: true,
-  //     uiLocalNotificationDateInterpretation:
-  //         UILocalNotificationDateInterpretation.absoluteTime,
-  //   );
+//   await FlutterLocalNotificationsPlugin().zonedSchedule(
+//     id,
+//     'Consultation Reminder',
+//     message,
+//     latestTz.TZDateTime.from(appointmentDateTime, latestTz.local),
+//     NotificationDetails(
+//       android: AndroidNotificationDetails(
+//         channel.id,
+//         channel.name,
+//         importance: Importance.max,
+//         priority: Priority.high,
+//       ),
+//     ),
+//     androidAllowWhileIdle: true,
+//     uiLocalNotificationDateInterpretation:
+//         UILocalNotificationDateInterpretation.absoluteTime,
+//   );
 
-  //   d.log(
-  //       'Patient Notification scheduled for: ${appointmentDateTime.toLocal()}');
-  // }
+//   d.log(
+//       'Patient Notification scheduled for: ${appointmentDateTime.toLocal()}');
+// }
 }
 
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {

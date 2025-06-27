@@ -271,7 +271,7 @@ class _AnimatedLandingScreenState extends State<AnimatedLandingScreen>
 
         Future.delayed(const Duration(seconds: 2), () {
           _finalUiController.forward();
-          Navigator.pushNamed(context, ZoomDrawerScreen.routeName);
+          Navigator.pushNamed(context, ZoomDrawerScreen.userHome);
         });
       });
     });

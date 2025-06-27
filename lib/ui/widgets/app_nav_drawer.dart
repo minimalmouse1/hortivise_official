@@ -41,7 +41,7 @@ class MenuItem {
 // Main ZoomDrawerScreen widget
 class ZoomDrawerScreen extends StatefulWidget {
   const ZoomDrawerScreen({super.key});
-  static const String routeName = 'UserMain';
+  static const String userHome = 'UserMain';
 
   @override
   State<ZoomDrawerScreen> createState() => _ZoomDrawerScreenState();

@@ -51,7 +51,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       backgroundColor: AppColors.colorBeige,
       body: Column(
         children: [
-          20.height,
+          40.height,
           double.infinity.width,
           CircleAvatar(
             minRadius: 41,
@@ -339,7 +339,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           Navigator.pop(context);
           Navigator.pushNamedAndRemoveUntil(
             context,
-            ZoomDrawerScreen.routeName,
+            ZoomDrawerScreen.userHome,
             (route) => false,
           );
         } on AppException catch (e) {

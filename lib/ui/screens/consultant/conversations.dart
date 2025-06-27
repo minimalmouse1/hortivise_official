@@ -63,7 +63,7 @@ class _ConversationsState extends State<Conversations> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             // Navigate to BottomNavigationBarScreen when back button is pressed
-            Navigator.pushNamed(context, ZoomDrawerScreen.routeName);
+            Navigator.pushNamed(context, ZoomDrawerScreen.userHome);
           },
         ),
       ),

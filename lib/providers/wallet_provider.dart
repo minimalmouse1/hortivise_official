@@ -13,7 +13,7 @@ class WalletProvider extends ChangeNotifier {
   final _transCollectionRef =
       FirebaseFirestore.instance.collection('Transactions');
 
-  final PaymentsService _paymentsService = PaymentsService();
+  //final PaymentsService _paymentsService = PaymentsService();
 
   final _userCollectionRef = FirebaseFirestore.instance.collection('Users');
 
@@ -28,15 +28,15 @@ class WalletProvider extends ChangeNotifier {
 
   Future<JsonMap?> makePayment(double amount, String currency) async {
     try {
-      final paymentIntent = await _paymentsService.createPaymentIntent(
-        amount,
-      );
-      await _paymentsService.initPaymentSheet(
-        paymentIntent,
-        currentUser?.email ?? '',
-        currentUser?.userName ?? '',
-      );
-      return paymentIntent;
+      // final paymentIntent = await _paymentsService.createPaymentIntent(
+      //   amount,
+      // );
+      // await _paymentsService.initPaymentSheet(
+      //   paymentIntent,
+      //   currentUser?.email ?? '',
+      //   currentUser?.userName ?? '',
+      // );
+     // return paymentIntent;
     } catch (e) {
       e.logError();
     }
@@ -46,7 +46,7 @@ class WalletProvider extends ChangeNotifier {
   //secret key of customer to recognize customer for future use...
   Future createCustomerEphemeralKeyFromId() async {
     try {
-      _paymentsService.createCustomerEphemeralKeyFromId(stripeId);
+   //   _paymentsService.createCustomerEphemeralKeyFromId(stripeId);
     } catch (err) {
       print(err);
       throw Exception(err.toString());
