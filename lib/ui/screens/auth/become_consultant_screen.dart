@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:horti_vige/providers/consultant_provider.dart';
 import 'package:horti_vige/providers/user_provider.dart';
 import 'package:horti_vige/ui/dialogs/waiting_dialog.dart';
 import 'package:horti_vige/ui/utils/colors/colors.dart';
@@ -240,7 +241,7 @@ class _BecomeConsultantScreenState extends State<BecomeConsultantScreen> {
       context.showProgressDialog(
         dialog: const WaitingDialog(status: 'Submitting Info'),
       );
-      Provider.of<UserProvider>(context, listen: false)
+      Provider.of<ConsultantProvider>(context, listen: false)
           .sendSpecialistRequest(
         name: _hortistName,
         email: _hortistEmail,

@@ -13,6 +13,7 @@ import 'package:horti_vige/firebase_options.dart';
 import 'package:horti_vige/providers/availability_provider.dart';
 import 'package:horti_vige/providers/blogs_provider.dart';
 import 'package:horti_vige/providers/chat_provider.dart';
+import 'package:horti_vige/providers/consultant_provider.dart';
 import 'package:horti_vige/providers/consultation_pricing_provider.dart';
 import 'package:horti_vige/providers/consultations_provider.dart';
 import 'package:horti_vige/providers/notifications_provider.dart';
@@ -146,6 +147,7 @@ class _MyAppState extends State<MyApp> {
           create: (_) => UserProvider(),
         ),
         ChangeNotifierProvider(create: (_) => ConsultationProvider()),
+        ChangeNotifierProvider(create: (_)=> ConsultantProvider()),
         ChangeNotifierProvider(create: (_) => PackagesProvider()),
         ChangeNotifierProvider(create: (_) => ChatProvider()),
         ChangeNotifierProvider(create: (_) => WalletProvider()),

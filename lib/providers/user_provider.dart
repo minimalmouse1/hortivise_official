@@ -190,62 +190,62 @@ class UserProvider extends ChangeNotifier {
     return _prefManager.getCurrentUser()?.type ?? UserType.CUSTOMER;
   }
 
-  Future<String> sendSpecialistRequest(
-      {required String name,
-      required String email,
-      required String category,
-      required String bio,
-      required String password}) async {
-    final stripeId = await _createStripeUser(name, email, UserType.SPECIALIST);
-    final currentTimeZone = await FlutterTimezone.getLocalTimezone();
-    final placeHolderName = getPlaceHolderName(name);
-    final userModel = UserModel(
-      id: _userCollectionRef.doc().id,
-      userName: name,
-      email: email,
-      stripeId: stripeId,
-      type: UserType.SPECIALIST,
-      profileUrl:
-          'https://ui-avatars.com/api/?name=$placeHolderName&background=random&size=200',
-      // 'https://firebasestorage.googleapis.com/v0/b/hortivige.appspot.com/o/defaults%2FDefault_pfp.svg.png?alt=media&token=acdad01c-7608-421c-b7cd-df899bf00feb&_gl=1*630m8s*_ga*MTYyNjI3NTU0MC4xNjk0NTkzODc3*_ga_CW55HF8NVT*MTY5NjY4Mjc5MS40Mi4xLjE2OTY2ODI4NjQuNDcuMC4w',
-      uId: '',
-      isAuthenticated: true,
-      specialist: Specialist(
-        isStripeActive: false,
-        stripeId: stripeId,
-        professionalName: name,
-        email: email,
-        bio: bio,
-        category: SpecialistCategory.values.byName(category),
-      ),
-      availability: Availability(
-        defaultFrom: const TimeOfDay(hour: 09, minute: 0),
-        defaultTo: const TimeOfDay(hour: 18, minute: 0),
-        timeZone: currentTimeZone,
-        days: const [],
-      ),
-    );
-
-    final docs =
-        await _userCollectionRef.where('email', isEqualTo: email).get();
-    print(userModel.toJson());
-    if (docs.docs.isNotEmpty) {
-      return Future.error('User already exist with provided email');
-    } else {
-      // run signup function here
-      try {
-        final user = await _authService.createUserWithEmailAndPassword(
-          email,
-          password,
-        );
-        await _userCollectionRef.doc(userModel.email).set(userModel.toJson());
-        return 'Request submitted successfully!';
-      } catch (e) {
-        debugPrint('error in consultant signup: ${e.toString()}');
-      }
-      return 'Error in Request submission . Try again later!';
-    }
-  }
+  // Future<String> sendSpecialistRequest(
+  //     {required String name,
+  //     required String email,
+  //     required String category,
+  //     required String bio,
+  //     required String password}) async {
+  //   final stripeId = await _createStripeUser(name, email, UserType.SPECIALIST);
+  //   final currentTimeZone = await FlutterTimezone.getLocalTimezone();
+  //   final placeHolderName = getPlaceHolderName(name);
+  //   final userModel = UserModel(
+  //     id: _userCollectionRef.doc().id,
+  //     userName: name,
+  //     email: email,
+  //     stripeId: stripeId,
+  //     type: UserType.SPECIALIST,
+  //     profileUrl:
+  //         'https://ui-avatars.com/api/?name=$placeHolderName&background=random&size=200',
+  //     // 'https://firebasestorage.googleapis.com/v0/b/hortivige.appspot.com/o/defaults%2FDefault_pfp.svg.png?alt=media&token=acdad01c-7608-421c-b7cd-df899bf00feb&_gl=1*630m8s*_ga*MTYyNjI3NTU0MC4xNjk0NTkzODc3*_ga_CW55HF8NVT*MTY5NjY4Mjc5MS40Mi4xLjE2OTY2ODI4NjQuNDcuMC4w',
+  //     uId: '',
+  //     isAuthenticated: true,
+  //     specialist: Specialist(
+  //       isStripeActive: false,
+  //       stripeId: stripeId,
+  //       professionalName: name,
+  //       email: email,
+  //       bio: bio,
+  //       category: SpecialistCategory.values.byName(category),
+  //     ),
+  //     availability: Availability(
+  //       defaultFrom: const TimeOfDay(hour: 09, minute: 0),
+  //       defaultTo: const TimeOfDay(hour: 18, minute: 0),
+  //       timeZone: currentTimeZone,
+  //       days: const [],
+  //     ),
+  //   );
+  //
+  //   final docs =
+  //       await _userCollectionRef.where('email', isEqualTo: email).get();
+  //   print(userModel.toJson());
+  //   if (docs.docs.isNotEmpty) {
+  //     return Future.error('User already exist with provided email');
+  //   } else {
+  //     // run signup function here
+  //     try {
+  //       final user = await _authService.createUserWithEmailAndPassword(
+  //         email,
+  //         password,
+  //       );
+  //       await _userCollectionRef.doc(userModel.email).set(userModel.toJson());
+  //       return 'Request submitted successfully!';
+  //     } catch (e) {
+  //       debugPrint('error in consultant signup: ${e.toString()}');
+  //     }
+  //     return 'Error in Request submission . Try again later!';
+  //   }
+  // }
 
   String getPlaceHolderName(String name) {
     final words = name.split(' ');
