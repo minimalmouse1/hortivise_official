@@ -16,7 +16,6 @@ import 'package:horti_vige/data/services/notification_service.dart';
 import 'package:horti_vige/data/services/payments_service.dart';
 import 'package:horti_vige/ui/utils/extensions/extensions.dart';
 
-import 'package:horti_vige/data/services/stripe.dart';
 
 class ConsultationProvider extends ChangeNotifier {
   final _consultationsCollectionRef =

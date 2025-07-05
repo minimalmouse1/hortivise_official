@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:horti_vige/core/services/api.dart';
 import 'package:horti_vige/data/models/consultation_pricing/consultation_pricing.dart';
 import 'package:horti_vige/data/models/consultation_pricing/text_pricing_model.dart';
 import 'package:horti_vige/data/models/consultation_pricing/video_pricing_model.dart';
@@ -8,8 +9,6 @@ import 'package:horti_vige/ui/utils/colors/colors.dart';
 import 'package:horti_vige/ui/utils/extensions/extensions.dart';
 import 'package:horti_vige/ui/widgets/app_filled_button.dart';
 import 'package:provider/provider.dart';
-
-import '../../../../core/services/api.dart';
 
 class AddPricingScreen extends StatefulWidget {
   const AddPricingScreen({super.key});
@@ -52,6 +51,7 @@ class _AddPricingScreenState extends State<AddPricingScreen>
     bool isVideoPricing = false,
   ]) {
     if (isVideoPricing) {
+      if (index >= _videoPricingOptions.length) return;
       setState(() {
         _videoPricingOptions[index] += change;
         if (_videoPricingOptions[index] < 1) {
@@ -59,6 +59,7 @@ class _AddPricingScreenState extends State<AddPricingScreen>
         }
       });
     } else {
+      if (index >= _onOfTextOptions.length) return;
       setState(() {
         _onOfTextOptions[index] += change;
         if (_onOfTextOptions[index] < 1) {
@@ -72,13 +73,46 @@ class _AddPricingScreenState extends State<AddPricingScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _populateValues();
+
+    // Initialize controllers with default values immediately
+    _initializeDefaultControllers();
+
+    // Wait for the provider to be initialized before populating values
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final provider =
+          Provider.of<ConsultationPricingProvider>(context, listen: false);
+      if (provider.consultationPricingModel == null) {
+        await provider.init();
+      }
+      _populateValues();
+    });
+  }
+
+  void _initializeDefaultControllers() {
+    // Initialize text controllers with default values
+    final defaultTextPricingList = [r'$20.00', r'$37.00', r'$45.00'];
+    for (var i = 0; i < defaultTextPricingList.length; i++) {
+      _noOfTextPriceControllers.add(
+        TextEditingController(text: defaultTextPricingList[i]),
+      );
+    }
+
+    // Initialize video controllers with default values
+    final defaultVideoPricingList = [r'$20.00', r'$37.00', r'$45.00'];
+    for (var i = 0; i < defaultVideoPricingList.length; i++) {
+      _videoPricingControllers.add(
+        TextEditingController(text: defaultVideoPricingList[i]),
+      );
+    }
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     for (final controller in _noOfTextPriceControllers) {
+      controller.dispose();
+    }
+    for (final controller in _videoPricingControllers) {
       controller.dispose();
     }
     super.dispose();
@@ -166,6 +200,14 @@ class _AddPricingScreenState extends State<AddPricingScreen>
                                       : textPackagesCount,
                                   physics: const NeverScrollableScrollPhysics(),
                                   itemBuilder: (context, index) {
+                                    if (index >=
+                                            _noOfTextPriceControllers.length ||
+                                        index >= enabledTexts.length ||
+                                        index >= isDeletingTexts.length ||
+                                        index >= _onOfTextOptions.length) {
+                                      return const SizedBox.shrink();
+                                    }
+
                                     return Stack(
                                       children: [
                                         AnimatedContainer(
@@ -288,7 +330,8 @@ class _AddPricingScreenState extends State<AddPricingScreen>
                         builder: (context, ref, child) {
                           return AppFilledButton(
                             title: 'Save Changes',
-                            isEnabled: enabledTexts.any((e) => e == true),
+                            isEnabled: enabledTexts.any((e) => e == true) ||
+                                enabledVideos.any((e) => e == true),
                             showLoading: ref.isLoading,
                             onPress: () {
                               if (ref.isLoading) return;
@@ -339,6 +382,16 @@ class _AddPricingScreenState extends State<AddPricingScreen>
                                       : videoPackagesCount,
                                   physics: const NeverScrollableScrollPhysics(),
                                   itemBuilder: (context, index) {
+                                    if (index >=
+                                            _videoPricingControllers.length ||
+                                        index >= enabledVideos.length ||
+                                        index >=
+                                            isDeletingVideoPricing.length ||
+                                        index >= _videoPricingOptions.length ||
+                                        index >= _videoDurations.length) {
+                                      return const SizedBox.shrink();
+                                    }
+
                                     return Padding(
                                       padding: const EdgeInsets.only(bottom: 8),
                                       child: Stack(
@@ -492,7 +545,8 @@ class _AddPricingScreenState extends State<AddPricingScreen>
                         builder: (context, ref, child) {
                           return AppFilledButton(
                             title: 'Save Changes',
-                            isEnabled: enabledVideos.any((e) => e == true),
+                            isEnabled: enabledTexts.any((e) => e == true) ||
+                                enabledVideos.any((e) => e == true),
                             showLoading: ref.isLoading,
                             onPress: () {
                               if (ref.isLoading) return;
@@ -522,6 +576,7 @@ class _AddPricingScreenState extends State<AddPricingScreen>
       _populateTextValues(model);
       _populateVideoValues(model);
     }
+    // If model is null, we keep the default values that were set in _initializeDefaultControllers
   }
 
   void _populateTextValues(
@@ -531,28 +586,28 @@ class _AddPricingScreenState extends State<AddPricingScreen>
     final defaultTextPricingList = [r'$20.00', r'$37.00', r'$45.00'];
 
     if (textPackages.isEmpty) {
-      for (var i = 0; i < defaultTextPricingList.length; i++) {
-        _noOfTextPriceControllers.add(
-          TextEditingController(
-            text: defaultTextPricingList[i],
-          ),
-        );
+      // Update existing controllers with default values
+      for (var i = 0;
+          i < defaultTextPricingList.length &&
+              i < _noOfTextPriceControllers.length;
+          i++) {
+        _noOfTextPriceControllers[i].text = defaultTextPricingList[i];
+        enabledTexts[i] = false;
+        _onOfTextOptions[i] = [15, 30, 50][i];
       }
       return;
     }
 
     textPackagesCount = textPackages.length;
 
-    for (var i = 0; i < textPackages.length; i++) {
+    for (var i = 0;
+        i < textPackages.length && i < _noOfTextPriceControllers.length;
+        i++) {
       final package = textPackages[i];
 
       final text =
           package.isEnabled ? '\$${package.price}' : defaultTextPricingList[i];
-      _noOfTextPriceControllers.add(
-        TextEditingController(
-          text: text,
-        ),
-      );
+      _noOfTextPriceControllers[i].text = text;
 
       enabledTexts[i] = package.isEnabled;
       _onOfTextOptions[i] = package.noOfTexts;
@@ -567,29 +622,34 @@ class _AddPricingScreenState extends State<AddPricingScreen>
     final defaultVideoPricingList = [r'$20.00', r'$37.00', r'$45.00'];
 
     if (videoPackages.isEmpty) {
-      for (var i = 0; i < defaultVideoPricingList.length; i++) {
-        _videoPricingControllers.add(
-          TextEditingController(
-            text: defaultVideoPricingList[i],
-          ),
-        );
+      // Update existing controllers with default values
+      for (var i = 0;
+          i < defaultVideoPricingList.length &&
+              i < _videoPricingControllers.length;
+          i++) {
+        _videoPricingControllers[i].text = defaultVideoPricingList[i];
+        enabledVideos[i] = false;
+        _videoPricingOptions[i] = [30, 1, 2][i];
+        _videoDurations[i] = [
+          VideoDurationEnum.minute,
+          VideoDurationEnum.hour,
+          VideoDurationEnum.hour
+        ][i];
       }
       return;
     }
 
     videoPackagesCount = videoPackages.length;
 
-    for (var i = 0; i < videoPackages.length; i++) {
+    for (var i = 0;
+        i < videoPackages.length && i < _videoPricingControllers.length;
+        i++) {
       final package = videoPackages[i];
 
       final text =
           package.isEnabled ? '\$${package.price}' : defaultVideoPricingList[i];
 
-      _videoPricingControllers.add(
-        TextEditingController(
-          text: text,
-        ),
-      );
+      _videoPricingControllers[i].text = text;
 
       enabledVideos[i] = package.isEnabled;
       _videoPricingOptions[i] = package.noOf;
@@ -597,27 +657,65 @@ class _AddPricingScreenState extends State<AddPricingScreen>
     }
   }
 
-  void _saveValues() {
+  void _saveValues() async {
     FocusManager.instance.primaryFocus?.unfocus();
-    if (enabledTexts.every((e) => e == false)) {
-      return;
-    }
-    if (enabledVideos.every((e) => e == false)) {
-      return;
-    }
-    _saveTextValues();
-    _saveVideoValues();
 
-    Future.delayed(
-      const Duration(milliseconds: 1000),
-      () {
-        Navigator.of(context).pop();
-      },
-    );
+    // Check if at least one package is enabled in either category
+    final hasEnabledTexts = enabledTexts.any((e) => e == true);
+    final hasEnabledVideos = enabledVideos.any((e) => e == true);
+
+    if (!hasEnabledTexts && !hasEnabledVideos) {
+      context.showSnack(message: "Please enable at least one package");
+      return;
+    }
+
+    try {
+      final textPackages = <TextPricingModel>[];
+      final videoPackages = <VideoPricingModel>[];
+
+      // Save text values if any are enabled
+      if (hasEnabledTexts) {
+        await _collectTextPackages(textPackages);
+      }
+
+      // Save video values if any are enabled
+      if (hasEnabledVideos) {
+        await _collectVideoPackages(videoPackages);
+      }
+
+      // Update the provider with all packages at once
+      final provider =
+          Provider.of<ConsultationPricingProvider>(context, listen: false);
+      final model = provider.consultationPricingModel;
+
+      if (model == null) {
+        context.showSnack(message: "Error: No pricing model found");
+        return;
+      }
+
+      // Create new model with updated packages
+      final updatedModel = model.copyWith(
+        textPackages: hasEnabledTexts ? textPackages : model.textPackages,
+        videoPackages: hasEnabledVideos ? videoPackages : model.videoPackages,
+      );
+
+      await provider.updateConsultationPricing(updatedModel);
+
+      // Show success message and navigate back
+      context.showSnack(message: "Pricing updated successfully");
+
+      Future.delayed(
+        const Duration(milliseconds: 1000),
+        () {
+          Navigator.of(context).pop();
+        },
+      );
+    } catch (e) {
+      context.showSnack(message: "Error updating pricing: $e");
+    }
   }
 
-  void _saveTextValues() async {
-    final textPackages = <TextPricingModel>[];
+  Future<void> _collectTextPackages(List<TextPricingModel> textPackages) async {
     for (var i = 0; i < _noOfTextPriceControllers.length; i++) {
       final controller = _noOfTextPriceControllers[i];
       var price = controller.text;
@@ -639,17 +737,17 @@ class _AddPricingScreenState extends State<AddPricingScreen>
             'name': 'text-product-$noOfTexts',
             'description': 'text description',
             'price': num.parse(price),
-            'active':true,
+            'active': true,
           },
         );
         debugPrint('text response ==> $response');
         final responseData = response.data;
-        debugPrint('text response data ==> ${responseData['result']['price_id']}');
-        debugPrint('text response data ==> ${responseData['result']['product_id']}');
+        debugPrint(
+            'text response data ==> ${responseData['result']['price_id']}');
+        debugPrint(
+            'text response data ==> ${responseData['result']['product_id']}');
         final stripePriceId = responseData['result']['price_id'] ?? '';
         final stripeProductId = responseData['result']['product_id'] ?? '';
-
-
 
         textPackages.add(
           TextPricingModel(
@@ -663,23 +761,13 @@ class _AddPricingScreenState extends State<AddPricingScreen>
       }
     }
 
-    final provider =
-        Provider.of<ConsultationPricingProvider>(context, listen: false);
-    final model = provider.consultationPricingModel;
-
-    if (model == null) return;
-
     if (textPackages.isEmpty) {
-      context.showSnack(message: "You can't delete all packages");
-      return;
+      throw Exception("You can't delete all text packages");
     }
-    provider.updateConsultationPricing(
-      model.copyWith(textPackages: textPackages),
-    );
   }
 
-  void _saveVideoValues() async {
-    final videoPackages = <VideoPricingModel>[];
+  Future<void> _collectVideoPackages(
+      List<VideoPricingModel> videoPackages) async {
     for (var i = 0; i < _videoPricingControllers.length; i++) {
       final controller = _videoPricingControllers[i];
       var price = controller.text;
@@ -701,13 +789,15 @@ class _AddPricingScreenState extends State<AddPricingScreen>
             'name': 'video-product-$noOf-$duration',
             'description': 'video description',
             'price': num.parse(price),
-            'active':true,
+            'active': true,
           },
         );
         debugPrint('video response ==> $response');
         final responseData = response.data;
-        debugPrint('video response data ==> ${responseData['result']['price_id']}');
-        debugPrint('video response data ==> ${responseData['result']['product_id']}');
+        debugPrint(
+            'video response data ==> ${responseData['result']['price_id']}');
+        debugPrint(
+            'video response data ==> ${responseData['result']['product_id']}');
         final stripePriceId = responseData['result']['price_id'] ?? '';
         final stripeProductId = responseData['result']['product_id'] ?? '';
         videoPackages.add(
@@ -723,18 +813,9 @@ class _AddPricingScreenState extends State<AddPricingScreen>
       }
     }
 
-    final provider =
-        Provider.of<ConsultationPricingProvider>(context, listen: false);
-    final model = provider.consultationPricingModel;
-
-    if (model == null) return;
     if (videoPackages.isEmpty) {
-      context.showSnack(message: "You can't delete all packages");
-      return;
+      throw Exception("You can't delete all video packages");
     }
-    provider.updateConsultationPricing(
-      model.copyWith(videoPackages: videoPackages),
-    );
   }
 }
 

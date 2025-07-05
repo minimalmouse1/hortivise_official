@@ -116,6 +116,7 @@ class _ConsultationPricingScreenState extends State<ConsultationPricingScreen>
                                 .changeFontWeight(FontWeight.w600),
                           ),
                         ),
+
                       ),
                     ],
                   ),

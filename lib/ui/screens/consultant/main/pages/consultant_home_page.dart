@@ -6,7 +6,6 @@ import 'package:horti_vige/ui/screens/consultant/consultation_pricing/consultati
 import 'package:horti_vige/ui/widgets/app_filled_button.dart';
 import 'package:provider/provider.dart';
 import 'package:horti_vige/data/models/user/user_model.dart';
-import 'package:horti_vige/data/services/stripe.dart';
 import 'package:horti_vige/providers/consultations_provider.dart';
 import 'package:horti_vige/providers/user_provider.dart';
 import 'package:horti_vige/ui/dialogs/waiting_dialog.dart';

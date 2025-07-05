@@ -1,7 +1,6 @@
 import 'package:horti_vige/data/enums/enums.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import 'package:horti_vige/data/services/stripe.dart';
 
 part 'specialist.g.dart';
 

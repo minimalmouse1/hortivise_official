@@ -7,7 +7,6 @@ import 'package:horti_vige/ui/widgets/exit_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:horti_vige/data/models/user/user_model.dart';
-import 'package:horti_vige/data/services/stripe.dart';
 import 'package:horti_vige/providers/user_provider.dart';
 import 'package:horti_vige/ui/resources/app_icons_icons.dart';
 import 'package:horti_vige/ui/screens/common/landing_screen.dart';
@@ -17,7 +16,6 @@ import 'package:horti_vige/ui/screens/consultant/main/consultant_main_screen.dar
 import 'package:horti_vige/ui/screens/user/main/user_main_screen.dart';
 import 'package:horti_vige/ui/utils/colors/colors.dart';
 import 'package:horti_vige/ui/utils/styles/text_styles.dart';
-import 'package:horti_vige/ui/widgets/app_version_text.dart';
 
 // Static menu items
 class MenuItems {

@@ -83,3 +83,9 @@ enum NotificationType {
   request_cancel, //by sender,
   message_send,
 }
+enum StripeStatus {
+  enabled,
+  incomplete,
+  pending,
+  restricted,
+}

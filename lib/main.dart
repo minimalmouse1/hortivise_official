@@ -147,7 +147,7 @@ class _MyAppState extends State<MyApp> {
           create: (_) => UserProvider(),
         ),
         ChangeNotifierProvider(create: (_) => ConsultationProvider()),
-        ChangeNotifierProvider(create: (_)=> ConsultantProvider()),
+        ChangeNotifierProvider(create: (_) => ConsultantProvider()),
         ChangeNotifierProvider(create: (_) => PackagesProvider()),
         ChangeNotifierProvider(create: (_) => ChatProvider()),
         ChangeNotifierProvider(create: (_) => WalletProvider()),
